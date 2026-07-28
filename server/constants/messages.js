@@ -44,4 +44,25 @@ CUSTOMER_NOT_FOUND: "Customer not found.",
 
   // Inventory
   STOCK_UPDATED: "Stock updated successfully.",
+
+  //Purchase
+  PURCHASE_CREATED: "Purchase created successfully.",
+PURCHASES_FETCHED: "Purchases fetched successfully.",
+PURCHASE_FETCHED: "Purchase fetched successfully.",
+PURCHASE_UPDATED: "Purchase updated successfully.",
+PURCHASE_DELETED: "Purchase deleted successfully.",
+PURCHASE_NOT_FOUND: "Purchase not found.",
+SUPPLIER_NOT_FOUND: "Supplier not found.",
+MEDICINE_NOT_FOUND: "Medicine not found.",
+PURCHASE_ALREADY_EXISTS: "Purchase with this invoice number already exists.",
+
+
+SALE_CREATED: "Sale created successfully.",
+SALES_FETCHED: "Sales fetched successfully.",
+SALE_FETCHED: "Sale fetched successfully.",
+SALE_UPDATED: "Sale updated successfully.",
+SALE_DELETED: "Sale deleted successfully.",
+SALE_ALREADY_EXISTS: "Sale already exists.",
+SALE_NOT_FOUND: "Sale not found.",
+INSUFFICIENT_STOCK: "Insufficient stock available.",
 };
