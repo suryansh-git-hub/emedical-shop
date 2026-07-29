@@ -1,13 +1,16 @@
 import Medicine from "../models/medicineModel.js";
 import { MESSAGES } from "../constants/messages.js";
 
+// =======================================
+// Create Medicine
+// =======================================
 export const createMedicineService = async (medicineData) => {
   const existingMedicine = await Medicine.findOne({
     batchNumber: medicineData.batchNumber,
   });
 
   if (existingMedicine) {
-    const error = new Error("Medicine with this batch number already exists.");
+    const error = new Error(MESSAGES.MEDICINE_ALREADY_EXISTS);
     error.statusCode = 409;
     throw error;
   }
@@ -15,20 +18,127 @@ export const createMedicineService = async (medicineData) => {
   const medicine = await Medicine.create(medicineData);
 
   return {
-    message: "Medicine added successfully.",
+    message: MESSAGES.MEDICINE_CREATED,
     medicine,
   };
 };
 
-export const getAllMedicinesService = async () => {
-  const medicines = await Medicine.find();
+// =======================================
+// Get All Medicines
+// =======================================
+export const getAllMedicinesService = async (query) => {
+  const {
+    search,
+    category,
+    company,
+    expiry,
+    page = 1,
+    limit = 10,
+    sortBy = "createdAt",
+    order = "desc",
+  } = query;
+
+  const filter = {};
+
+  // ==========================
+  // Search
+  // ==========================
+  if (search) {
+    filter.$or = [
+      {
+        medicineName: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        genericName: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+    ];
+  }
+
+  // ==========================
+  // Filter by Category
+  // ==========================
+  if (category) {
+    filter.category = category;
+  }
+
+  // ==========================
+  // Filter by Company
+  // ==========================
+  if (company) {
+    filter.company = company;
+  }
+
+  // ==========================
+  // Filter by Expiry
+  // ==========================
+  const today = new Date();
+
+  if (expiry === "expired") {
+    filter.expiryDate = {
+      $lt: today,
+    };
+  }
+
+  if (expiry === "valid") {
+    filter.expiryDate = {
+      $gte: today,
+    };
+  }
+
+  if (expiry === "near") {
+    const next30Days = new Date();
+    next30Days.setDate(today.getDate() + 30);
+
+    filter.expiryDate = {
+      $gte: today,
+      $lte: next30Days,
+    };
+  }
+
+  // ==========================
+  // Pagination
+  // ==========================
+  const currentPage = Number(page);
+  const pageSize = Number(limit);
+
+  const skip = (currentPage - 1) * pageSize;
+
+  // ==========================
+  // Sorting
+  // ==========================
+  const sort = {};
+
+  sort[sortBy] = order === "asc" ? 1 : -1;
+
+  // ==========================
+  // Database Query
+  // ==========================
+  const totalMedicines = await Medicine.countDocuments(filter);
+
+  const medicines = await Medicine.find(filter)
+    .sort(sort)
+    .skip(skip)
+    .limit(pageSize)
+    .lean();
 
   return {
     message: MESSAGES.MEDICINES_FETCHED,
+    currentPage,
+    totalPages: Math.ceil(totalMedicines / pageSize),
+    totalMedicines,
     medicines,
   };
 };
 
+// =======================================
+// Get Medicine By ID
+// =======================================
 export const getMedicineByIdService = async (id) => {
   const medicine = await Medicine.findById(id);
 
@@ -44,6 +154,9 @@ export const getMedicineByIdService = async (id) => {
   };
 };
 
+// =======================================
+// Update Medicine
+// =======================================
 export const updateMedicineService = async (id, medicineData) => {
   const medicine = await Medicine.findById(id);
 
@@ -53,7 +166,6 @@ export const updateMedicineService = async (id, medicineData) => {
     throw error;
   }
 
-  // Check duplicate batch number
   if (
     medicineData.batchNumber &&
     medicineData.batchNumber !== medicine.batchNumber
@@ -79,6 +191,9 @@ export const updateMedicineService = async (id, medicineData) => {
   };
 };
 
+// =======================================
+// Delete Medicine
+// =======================================
 export const deleteMedicineService = async (id) => {
   const medicine = await Medicine.findById(id);
 

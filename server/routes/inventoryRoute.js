@@ -3,6 +3,10 @@ import express from "express";
 import {
   getAllInventory,
   getInventoryByMedicine,
+  getLowStockMedicines,
+  getOutOfStockMedicines,
+  getNearExpiryMedicines,
+  getStockMovementHistory,
 } from "../controllers/inventoryController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -11,9 +15,9 @@ import { ROLES } from "../constants/roles.js";
 
 const router = express.Router();
 
-// ==========================
+// =======================================
 // Get All Inventory
-// ==========================
+// =======================================
 router.get(
   "/",
   authMiddleware,
@@ -21,9 +25,49 @@ router.get(
   getAllInventory
 );
 
-// ==========================
+// =======================================
+// Get Low Stock Medicines
+// =======================================
+router.get(
+  "/low-stock",
+  authMiddleware,
+  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  getLowStockMedicines
+);
+
+// =======================================
+// Get Out Of Stock Medicines
+// =======================================
+router.get(
+  "/out-of-stock",
+  authMiddleware,
+  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  getOutOfStockMedicines
+);
+
+// =======================================
+// Get Near Expiry Medicines
+// =======================================
+router.get(
+  "/near-expiry",
+  authMiddleware,
+  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  getNearExpiryMedicines
+);
+
+// =======================================
+// Stock Movement History
+// =======================================
+router.get(
+  "/stock-history/:medicineId",
+  authMiddleware,
+  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  getStockMovementHistory
+);
+
+// =======================================
 // Get Inventory By Medicine
-// ==========================
+// =======================================
 router.get(
   "/:medicineId",
   authMiddleware,

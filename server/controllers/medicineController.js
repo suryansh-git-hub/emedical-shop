@@ -19,7 +19,7 @@ export const createMedicine = async (req, res) => {
 
 export const getAllMedicines = async (req, res) => {
   try {
-    const result = await getAllMedicinesService();
+    const result = await getAllMedicinesService(req.query);
 
     res.status(200).json({
       success: true,

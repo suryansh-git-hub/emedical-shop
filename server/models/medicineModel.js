@@ -55,15 +55,20 @@ const medicineSchema = new mongoose.Schema(
       min: 0,
     },
 
-    stockQuantity: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-
     unit: {
       type: String,
       required: true,
+      enum: [
+        "Tablet",
+        "Capsule",
+        "Bottle",
+        "Strip",
+        "Box",
+        "Tube",
+        "Injection",
+        "Sachet",
+        "Piece",
+      ],
     },
 
     gst: {
