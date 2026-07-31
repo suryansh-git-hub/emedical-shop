@@ -1,8 +1,24 @@
-import { createMedicineService,getAllMedicinesService,getMedicineByIdService,updateMedicineService, deleteMedicineService} from "../services/medicineService.js";
+import {
+  createMedicineService,
+  getAllMedicinesService,
+  getMedicineByIdService,
+  updateMedicineService,
+  deleteMedicineService,
+} from "../services/medicineService.js";
 
 export const createMedicine = async (req, res) => {
   try {
-    const result = await createMedicineService(req.body);
+    // Create a new object from the request body
+    const medicineData = {
+      ...req.body,
+    };
+
+    // If an image was uploaded, save its filename
+    if (req.file) {
+      medicineData.medicineImage = req.file.filename;
+    }
+
+    const result = await createMedicineService(medicineData);
 
     res.status(201).json({
       success: true,
@@ -25,6 +41,9 @@ export const getAllMedicines = async (req, res) => {
       success: true,
       message: result.message,
       medicines: result.medicines,
+       currentPage: result.currentPage,
+  totalPages: result.totalPages,
+  totalMedicines: result.totalMedicines,
     });
   } catch (error) {
     res.status(error.statusCode || 500).json({
@@ -33,6 +52,7 @@ export const getAllMedicines = async (req, res) => {
     });
   }
 };
+
 export const getMedicineById = async (req, res) => {
   try {
     const result = await getMedicineByIdService(req.params.id);
@@ -49,11 +69,22 @@ export const getMedicineById = async (req, res) => {
     });
   }
 };
+
 export const updateMedicine = async (req, res) => {
   try {
+    // Create a new object from the request body
+    const medicineData = {
+      ...req.body,
+    };
+
+    // If a new image was uploaded, replace the old filename
+    if (req.file) {
+      medicineData.medicineImage = req.file.filename;
+    }
+
     const result = await updateMedicineService(
       req.params.id,
-      req.body
+      medicineData
     );
 
     res.status(200).json({

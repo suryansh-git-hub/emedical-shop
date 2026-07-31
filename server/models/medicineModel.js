@@ -38,6 +38,11 @@ const medicineSchema = new mongoose.Schema(
       required: true,
     },
 
+    medicineImage: {
+    type: String,
+    default: "",
+},
+
     expiryDate: {
       type: Date,
       required: true,
@@ -55,36 +60,38 @@ const medicineSchema = new mongoose.Schema(
       min: 0,
     },
 
+    stock: {
+  type: Number,
+  required: true,
+  min: 0,
+  default: 0,
+},
+
     unit: {
       type: String,
       required: true,
       enum: [
-        "Tablet",
-        "Capsule",
-        "Bottle",
-        "Strip",
-        "Box",
-        "Tube",
-        "Injection",
-        "Sachet",
-        "Piece",
+     "Strip",
+    "Bottle",
+    "Box",
+    "Tube",
+    "Piece",
+    "Sachet",
       ],
     },
 
     gst: {
-      type: Number,
-      default: 0,
-    },
+  type: Number,
+  required: true,
+  enum: [0, 5, 12, 18, 28],
+},
 
     description: {
       type: String,
       default: "",
     },
 
-    medicineImage: {
-      type: String,
-      default: "",
-    },
+
   },
   {
     timestamps: true,

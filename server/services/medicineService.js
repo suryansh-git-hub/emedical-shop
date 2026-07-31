@@ -15,7 +15,20 @@ export const createMedicineService = async (medicineData) => {
     throw error;
   }
 
+  if (
+  Number(medicineData.sellingPrice) <
+  Number(medicineData.purchasePrice)
+) {
+  const error = new Error(
+    "Selling price cannot be less than purchase price."
+  );
+  error.statusCode = 400;
+  throw error;
+}
+
   const medicine = await Medicine.create(medicineData);
+
+  
 
   return {
     message: MESSAGES.MEDICINE_CREATED,
@@ -71,8 +84,11 @@ export const getAllMedicinesService = async (query) => {
   // Filter by Company
   // ==========================
   if (company) {
-    filter.company = company;
-  }
+  filter.company = {
+    $regex: company,
+    $options: "i",
+  };
+}
 
   // ==========================
   // Filter by Expiry
@@ -180,6 +196,24 @@ export const updateMedicineService = async (id, medicineData) => {
       throw error;
     }
   }
+
+  const purchasePrice =
+  medicineData.purchasePrice ??
+  medicine.purchasePrice;
+
+const sellingPrice =
+  medicineData.sellingPrice ??
+  medicine.sellingPrice;
+
+if (Number(sellingPrice) < Number(purchasePrice)) {
+  const error = new Error(
+    "Selling price cannot be less than purchase price."
+  );
+
+  error.statusCode = 400;
+
+  throw error;
+}
 
   Object.assign(medicine, medicineData);
 

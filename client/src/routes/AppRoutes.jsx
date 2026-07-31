@@ -6,6 +6,8 @@ import Dashboard from "../pages/dashboard/Dashboard";
 
 import ProtectedRoute from "./ProtectedRoute";
 import DashboardLayout from "../components/layouts/DashboardLayout";
+import Medicines from "../pages/medicines/Medicines";
+import Suppliers from "../pages/suppliers/Suppliers";
 
 function AppRoutes() {
   return (
@@ -18,6 +20,8 @@ function AppRoutes() {
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/medicines" element={<Medicines />} />
+             <Route path="/suppliers" element={<Suppliers />} />
           </Route>
         </Route>
 
