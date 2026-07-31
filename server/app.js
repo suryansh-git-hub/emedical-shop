@@ -10,11 +10,17 @@ import inventoryRoute from "./routes/inventoryRoute.js";
 import saleRoute from "./routes/saleRoute.js";
 import dashboardRoute from "./routes/dashboardRoute.js";
 import reportRoute from "./routes/reportRoute.js";
+import cors from "cors";
 
 
 const app = express();
 
-//app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
