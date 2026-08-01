@@ -1,12 +1,36 @@
 import { Plus, Trash2 } from "lucide-react";
-
+import { useEffect } from "react";
 const SalesForm = ({
   formData,
   setFormData,
   customers,
   medicines,
-  onSubmit,
+  onSubmit,selectedMedicine
 }) => {
+  // ==========================
+// Pre-select Medicine
+// ==========================
+
+useEffect(() => {
+  if (selectedMedicine) {
+    const medicine = medicines.find(
+      (m) => m._id === selectedMedicine._id
+    );
+
+    setFormData((prev) => ({
+      ...prev,
+      medicines: prev.medicines.map((item, index) =>
+        index === 0
+          ? {
+              ...item,
+              medicine: selectedMedicine._id,
+              sellingPrice: medicine?.sellingPrice || "",
+            }
+          : item
+      ),
+    }));
+  }
+}, [selectedMedicine, medicines, setFormData]);
   // ==========================
   // Basic Fields
   // ==========================
@@ -173,9 +197,9 @@ const SalesForm = ({
       <div className="space-y-5">
 
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">
-            Medicines
-          </h2>
+         <h2 className="text-lg font-semibold">
+  {selectedMedicine ? "Reduce Stock" : "Medicines"}
+</h2>
 
           <button
             type="button"
@@ -202,18 +226,23 @@ const SalesForm = ({
                     Medicine
                   </label>
 
-                  <select
-                    value={item.medicine}
-                    onChange={(e) =>
-                      handleMedicineChange(
-                        index,
-                        "medicine",
-                        e.target.value
-                      )
-                    }
-                    required
-                    className="w-full rounded-lg border p-3"
-                  >
+                <select
+  value={item.medicine}
+  onChange={(e) =>
+    handleMedicineChange(
+      index,
+      "medicine",
+      e.target.value
+    )
+  }
+  required
+  disabled={!!selectedMedicine && index === 0}
+  className={`w-full rounded-lg border p-3 ${
+    selectedMedicine && index === 0
+      ? "cursor-not-allowed bg-gray-100"
+      : ""
+  }`}
+>
                     <option value="">
                       Select Medicine
                     </option>
@@ -308,7 +337,9 @@ const SalesForm = ({
         type="submit"
         className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700"
       >
-        Generate Bill
+      {selectedMedicine
+  ? "Reduce Stock"
+  : "Generate Bill"}
       </button>
     </form>
   );

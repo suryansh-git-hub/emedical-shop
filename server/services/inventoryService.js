@@ -161,3 +161,32 @@ export const getStockMovementHistoryService = async (medicineId) => {
     history,
   };
 };
+
+// =======================================
+// Get Expired Medicines
+// =======================================
+export const getExpiredMedicinesService = async () => {
+  const today = new Date();
+
+  const inventory = await Inventory.find()
+    .populate({
+      path: "medicine",
+      match: {
+        expiryDate: {
+          $lt: today,
+        },
+      },
+      select:
+        "medicineName genericName company category expiryDate",
+    })
+    .lean();
+
+  const expired = inventory.filter(
+    (item) => item.medicine
+  );
+
+  return {
+    message: "Expired medicines fetched successfully.",
+    inventory: expired,
+  };
+};

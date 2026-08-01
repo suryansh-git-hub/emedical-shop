@@ -10,6 +10,7 @@ import Medicines from "../pages/medicines/Medicines";
 import Suppliers from "../pages/suppliers/Suppliers";
 import Customers from "../pages/customers/Customers";
 import Purchases from "../pages/purchases/Purchases";
+import Inventory from "../pages/Inventory/Inventory";
 import Reports from "../pages/reports/Reports";
 function AppRoutes() {
   return (
@@ -28,6 +29,7 @@ function AppRoutes() {
               <Route path = "/purchases" element = {<Purchases />} />
               <Route path = "/sales" element = {<Sales />} />
               <Route path = "/reports" element = {<Reports />} />
+              <Route path = "/inventory" element = {<Inventory />} />
           </Route>
         </Route>
 

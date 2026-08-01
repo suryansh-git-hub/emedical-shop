@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Loader } from "lucide-react";
 import AddPurchaseButton from "../../components/purchase/AddPurchaseButton";
@@ -16,7 +17,6 @@ const initialFormData = {
   supplier: "",
   invoiceNumber: "",
   purchaseDate: new Date().toISOString().split("T")[0],
-
   medicines: [
     {
       medicine: "",
@@ -28,16 +28,16 @@ const initialFormData = {
 
 const Purchases = () => {
   const [loading, setLoading] = useState(true);
-
   const [purchases, setPurchases] = useState([]);
-
   const [suppliers, setSuppliers] = useState([]);
-
   const [medicines, setMedicines] = useState([]);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [formData, setFormData] = useState(initialFormData);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const selectedMedicine = location.state?.medicine || null;
 
   // =============================
   // Fetch Purchases
@@ -46,7 +46,6 @@ const Purchases = () => {
   const fetchPurchases = async () => {
     try {
       const response = await getPurchases();
-
       setPurchases(response.purchases || []);
     } catch (error) {
       toast.error(
@@ -63,7 +62,6 @@ const Purchases = () => {
   const fetchSuppliers = async () => {
     try {
       const response = await getSuppliers();
-
       setSuppliers(response.suppliers || []);
     } catch (error) {
       toast.error(
@@ -80,7 +78,6 @@ const Purchases = () => {
   const fetchMedicines = async () => {
     try {
       const response = await getMedicines();
-
       setMedicines(response.medicines || []);
     } catch (error) {
       toast.error(
@@ -113,12 +110,41 @@ const Purchases = () => {
   }, []);
 
   // =============================
+  // Open Purchase from Inventory
+  // =============================
+
+  useEffect(() => {
+    if (selectedMedicine) {
+      setFormData({
+        ...initialFormData,
+        medicines: [
+          {
+            medicine: selectedMedicine._id,
+            quantity: 1,
+            purchasePrice: "",
+          },
+        ],
+      });
+
+      setIsModalOpen(true);
+
+      navigate(location.pathname, {
+        replace: true,
+        state: null,
+      });
+    }
+  }, [
+    selectedMedicine,
+    navigate,
+    location.pathname,
+  ]);
+
+  // =============================
   // Open Modal
   // =============================
 
   const handleAddPurchase = () => {
     setFormData(initialFormData);
-
     setIsModalOpen(true);
   };
 
@@ -159,7 +185,6 @@ const Purchases = () => {
       <div className="flex items-center justify-between">
 
         <div>
-
           <h1 className="text-2xl font-bold">
             Purchase Management
           </h1>
@@ -167,7 +192,6 @@ const Purchases = () => {
           <p className="text-gray-500">
             Manage medicine purchases
           </p>
-
         </div>
 
         <AddPurchaseButton
@@ -186,7 +210,6 @@ const Purchases = () => {
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
-
           setFormData(initialFormData);
         }}
       >
@@ -196,6 +219,7 @@ const Purchases = () => {
           suppliers={suppliers}
           medicines={medicines}
           onSubmit={handleSavePurchase}
+          selectedMedicine={selectedMedicine}
         />
       </PurchaseModal>
 

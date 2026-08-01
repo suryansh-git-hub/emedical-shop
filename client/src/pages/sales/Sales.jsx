@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Loader } from "lucide-react";
 import SalesForm from "../../components/sales/SalesForm";
@@ -28,16 +29,17 @@ const initialFormData = {
 
 const Sales = () => {
   const [loading, setLoading] = useState(true);
-
   const [sales, setSales] = useState([]);
-
   const [customers, setCustomers] = useState([]);
-
   const [medicines, setMedicines] = useState([]);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [formData, setFormData] = useState(initialFormData);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const selectedMedicine =
+    location.state?.medicine || null;
 
   // ==========================
   // Fetch Sales
@@ -46,7 +48,6 @@ const Sales = () => {
   const fetchSales = async () => {
     try {
       const response = await getSales();
-
       setSales(response.sales || []);
     } catch (error) {
       toast.error(
@@ -63,7 +64,6 @@ const Sales = () => {
   const fetchCustomers = async () => {
     try {
       const response = await getCustomers();
-
       setCustomers(response.customers || []);
     } catch (error) {
       toast.error(
@@ -80,7 +80,6 @@ const Sales = () => {
   const fetchMedicines = async () => {
     try {
       const response = await getMedicines();
-
       setMedicines(response.medicines || []);
     } catch (error) {
       toast.error(
@@ -113,12 +112,41 @@ const Sales = () => {
   }, []);
 
   // ==========================
+  // Open Billing from Inventory
+  // ==========================
+
+  useEffect(() => {
+    if (selectedMedicine) {
+      setFormData({
+        ...initialFormData,
+        medicines: [
+          {
+            medicine: selectedMedicine._id,
+            quantity: 1,
+            sellingPrice: "",
+          },
+        ],
+      });
+
+      setIsModalOpen(true);
+
+      navigate(location.pathname, {
+        replace: true,
+        state: null,
+      });
+    }
+  }, [
+    selectedMedicine,
+    navigate,
+    location.pathname,
+  ]);
+
+  // ==========================
   // Open Modal
   // ==========================
 
   const handleAddBill = () => {
     setFormData(initialFormData);
-
     setIsModalOpen(true);
   };
 
@@ -166,7 +194,9 @@ const Sales = () => {
           </p>
         </div>
 
-        <AddBillButton onClick={handleAddBill} />
+        <AddBillButton
+          onClick={handleAddBill}
+        />
       </div>
 
       {/* Billing Table */}
@@ -188,6 +218,7 @@ const Sales = () => {
           customers={customers}
           medicines={medicines}
           onSubmit={handleSaveBill}
+          selectedMedicine={selectedMedicine}
         />
       </SalesModal>
     </div>

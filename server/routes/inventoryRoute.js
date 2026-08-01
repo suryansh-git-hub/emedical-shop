@@ -5,7 +5,7 @@ import {
   getInventoryByMedicine,
   getLowStockMedicines,
   getOutOfStockMedicines,
-  getNearExpiryMedicines,
+  getNearExpiryMedicines,getExpiredMedicines,
   getStockMovementHistory,
 } from "../controllers/inventoryController.js";
 
@@ -53,6 +53,16 @@ router.get(
   authMiddleware,
   roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
   getNearExpiryMedicines
+);
+
+router.get(
+  "/expired",
+  authMiddleware,
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
+  getExpiredMedicines
 );
 
 // =======================================

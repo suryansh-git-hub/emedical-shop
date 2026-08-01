@@ -5,6 +5,7 @@ import {
   getOutOfStockMedicinesService,
   getNearExpiryMedicinesService,
   getStockMovementHistoryService,
+  getExpiredMedicinesService
 } from "../services/inventoryService.js";
 
 // =======================================
@@ -112,6 +113,26 @@ export const getStockMovementHistory = async (req, res) => {
     const { medicineId } = req.params;
 
     const result = await getStockMovementHistoryService(medicineId);
+
+    res.status(200).json({
+      success: true,
+      ...result,
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getExpiredMedicines = async (
+  req,
+  res
+) => {
+  try {
+    const result =
+      await getExpiredMedicinesService();
 
     res.status(200).json({
       success: true,
