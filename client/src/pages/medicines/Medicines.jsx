@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useAuth } from "../../context/AuthContext";
 
 import PageHeader from "../../components/common/PageHeader";
 import AddMedicineButton from "../../components/medicines/AddMedicineButton";
@@ -64,6 +65,10 @@ function Medicines() {
 
   const [totalPages, setTotalPages] =
     useState(1);
+
+    const { user } = useAuth();
+
+const isAdmin = user?.role === "admin";
 
   // ==========================
   // Fetch Medicines
@@ -210,14 +215,16 @@ function Medicines() {
       />
 
       {/* Add Medicine Button */}
-      <div className="flex justify-end">
-        <AddMedicineButton
-          onClick={() => {
-            setEditingMedicine(null);
-            setOpen(true);
-          }}
-        />
-      </div>
+     {isAdmin && (
+  <div className="flex justify-end">
+    <AddMedicineButton
+      onClick={() => {
+        setEditingMedicine(null);
+        setOpen(true);
+      }}
+    />
+  </div>
+)}
 
       {/* Search */}
       <MedicineSearch
@@ -242,12 +249,13 @@ function Medicines() {
       />
 
       {/* Medicine Table */}
-      <MedicineTable
-        medicines={medicines}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+    <MedicineTable
+  medicines={medicines}
+  loading={loading}
+  onEdit={handleEdit}
+  onDelete={handleDelete}
+  isAdmin={isAdmin}
+/>
 
       {/* Pagination */}
       <MedicinePagination
@@ -257,23 +265,25 @@ function Medicines() {
       />
 
       {/* Add / Edit Medicine Modal */}
-      <MedicineModal
-        isOpen={open}
-        onClose={() => {
-          setOpen(false);
-          setEditingMedicine(null);
-        }}
-        title={
-          editingMedicine
-            ? "Edit Medicine"
-            : "Add Medicine"
-        }
-      >
-        <MedicineForm
-          onSubmit={handleSubmit}
-          defaultValues={editingMedicine}
-        />
-      </MedicineModal>
+   {isAdmin && (
+  <MedicineModal
+    isOpen={open}
+    onClose={() => {
+      setOpen(false);
+      setEditingMedicine(null);
+    }}
+    title={
+      editingMedicine
+        ? "Edit Medicine"
+        : "Add Medicine"
+    }
+  >
+    <MedicineForm
+      onSubmit={handleSubmit}
+      defaultValues={editingMedicine}
+    />
+  </MedicineModal>
+)}
     </div>
   );
 }

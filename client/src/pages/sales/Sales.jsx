@@ -1,11 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Loader } from "lucide-react";
+
 import SalesForm from "../../components/sales/SalesForm";
 import SalesModal from "../../components/sales/SalesModal";
 import SalesTable from "../../components/sales/SalesTable";
 import AddBillButton from "../../components/sales/AddBillButton";
+
 import {
   getSales,
   getCustomers,
@@ -17,7 +19,6 @@ const initialFormData = {
   customer: "",
   invoiceNumber: "",
   saleDate: new Date().toISOString().split("T")[0],
-
   medicines: [
     {
       medicine: "",
@@ -29,11 +30,17 @@ const initialFormData = {
 
 const Sales = () => {
   const [loading, setLoading] = useState(true);
+
   const [sales, setSales] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [medicines, setMedicines] = useState([]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState(initialFormData);
+
+  // Filters
+  const [search, setSearch] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -142,7 +149,7 @@ const Sales = () => {
   ]);
 
   // ==========================
-  // Open Modal
+  // Add Bill
   // ==========================
 
   const handleAddBill = () => {
@@ -175,8 +182,36 @@ const Sales = () => {
     }
   };
 
+  // ==========================
+  // Filter Sales
+  // ==========================
+
+  const filteredSales = useMemo(() => {
+    return sales.filter((sale) => {
+      const searchMatch =
+        sale.invoiceNumber
+          ?.toLowerCase()
+          .includes(search.toLowerCase()) ||
+        sale.customer?.customerName
+          ?.toLowerCase()
+          .includes(search.toLowerCase());
+
+      const dateMatch = selectedDate
+        ? new Date(sale.saleDate)
+            .toISOString()
+            .split("T")[0] === selectedDate
+        : true;
+
+      return searchMatch && dateMatch;
+    });
+  }, [sales, search, selectedDate]);
+
   if (loading) {
-    return <Loader />;
+    return (
+      <div className="flex justify-center py-20">
+        <Loader className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    );
   }
 
   return (
@@ -199,9 +234,32 @@ const Sales = () => {
         />
       </div>
 
-      {/* Billing Table */}
+      {/* Filters */}
 
-      <SalesTable sales={sales} />
+      <div className="grid gap-4 md:grid-cols-2">
+        <input
+          type="text"
+          placeholder="Search by Invoice or Customer..."
+          value={search}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
+          className="rounded-lg border px-4 py-2 outline-none focus:border-blue-500"
+        />
+
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) =>
+            setSelectedDate(e.target.value)
+          }
+          className="rounded-lg border px-4 py-2 outline-none focus:border-blue-500"
+        />
+      </div>
+
+      {/* Sales Table */}
+
+      <SalesTable sales={filteredSales} />
 
       {/* Billing Modal */}
 

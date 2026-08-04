@@ -2,7 +2,7 @@ import { Pencil, Trash2 } from "lucide-react";
 
 const IMAGE_URL = import.meta.env.VITE_BASE_URL;
 
-function MedicineTable({ medicines, loading,onEdit, onDelete, }) {
+function MedicineTable({ medicines, loading,onEdit, onDelete,isAdmin }) {
   if (loading) {
     return (
       <div className="rounded-lg border bg-white p-8 text-center">
@@ -28,7 +28,11 @@ function MedicineTable({ medicines, loading,onEdit, onDelete, }) {
             <th className="p-3 text-center">Selling</th>
             <th className="p-3 text-center">GST</th>
             <th className="p-3 text-center">Expiry</th>
-            <th className="p-3 text-center">Actions</th>
+           {isAdmin && (
+  <th className="p-3 text-center">
+    Actions
+  </th>
+)}
           </tr>
         </thead>
 
@@ -36,7 +40,7 @@ function MedicineTable({ medicines, loading,onEdit, onDelete, }) {
           {medicines.length === 0 ? (
             <tr>
               <td
-                colSpan={13}
+             colSpan={isAdmin ? 13 : 12} 
                 className="p-6 text-center text-gray-500"
               >
                 No medicines found.
@@ -127,23 +131,25 @@ function MedicineTable({ medicines, loading,onEdit, onDelete, }) {
                 </td>
 
                 {/* Actions */}
-                <td className="p-3">
-                  <div className="flex justify-center gap-2">
-                   <button
-  onClick={() => onEdit(medicine)}
-  className="rounded-lg bg-yellow-500 p-2 text-white transition hover:bg-yellow-600"
->
-                      <Pencil size={16} />
-                    </button>
+               {isAdmin && (
+  <td className="p-3">
+    <div className="flex justify-center gap-2">
+      <button
+        onClick={() => onEdit(medicine)}
+        className="rounded-lg bg-yellow-500 p-2 text-white transition hover:bg-yellow-600"
+      >
+        <Pencil size={16} />
+      </button>
 
-                   <button
-  onClick={() => onDelete(medicine._id)}
-  className="rounded-lg bg-red-500 p-2 text-white transition hover:bg-red-600"
->
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </td>
+      <button
+        onClick={() => onDelete(medicine._id)}
+        className="rounded-lg bg-red-500 p-2 text-white transition hover:bg-red-600"
+      >
+        <Trash2 size={16} />
+      </button>
+    </div>
+  </td>
+)}
               </tr>
             ))
           )}

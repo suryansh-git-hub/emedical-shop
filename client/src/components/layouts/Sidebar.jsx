@@ -1,7 +1,18 @@
 import { NavLink } from "react-router-dom";
 import { navigation } from "../../constants/navigation";
+import { useAuth } from "../../context/AuthContext";
 
 function Sidebar() {
+  const { user } = useAuth();
+
+  const filteredNavigation = navigation.filter((item) => {
+    // If no roles are specified, everyone can access it
+    if (!item.roles) return true;
+
+    // Show only if the user's role is allowed
+    return item.roles.includes(user?.role);
+  });
+
   return (
     <aside className="w-64 bg-slate-900 text-white">
       <div className="border-b border-slate-700 p-6">
@@ -9,7 +20,7 @@ function Sidebar() {
       </div>
 
       <nav className="mt-4 px-3">
-        {navigation.map((item) => {
+        {filteredNavigation.map((item) => {
           const Icon = item.icon;
 
           return (
@@ -25,7 +36,6 @@ function Sidebar() {
               }
             >
               <Icon size={20} />
-
               <span>{item.name}</span>
             </NavLink>
           );

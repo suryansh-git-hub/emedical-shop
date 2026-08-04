@@ -1,10 +1,41 @@
+import { Download } from "lucide-react";
+import toast from "react-hot-toast";
+import { exportToExcel } from "../../utils/exportExcel";
+
 const BestSellingTable = ({ medicines }) => {
+  const handleExport = () => {
+    if (medicines.length === 0) {
+      return toast.error("No sales data available.");
+    }
+
+    const excelData = medicines.map((medicine, index) => ({
+      Rank: index + 1,
+      Medicine: medicine.medicineName,
+      Category: medicine.category,
+      "Quantity Sold": medicine.totalSold,
+      Revenue: medicine.totalRevenue || 0,
+    }));
+
+    exportToExcel(excelData, "Best Selling Medicines Report");
+    toast.success("Best selling medicines report exported successfully.");
+  };
+
   if (medicines.length === 0) {
     return (
       <div className="rounded-xl bg-white p-8 text-center shadow">
-        <h2 className="text-xl font-semibold text-gray-700">
-          Best Selling Medicines
-        </h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-gray-700">
+            Best Selling Medicines
+          </h2>
+
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
+          >
+            <Download size={18} />
+            Export Excel
+          </button>
+        </div>
 
         <p className="mt-2 text-gray-500">
           No sales data available.
@@ -17,10 +48,18 @@ const BestSellingTable = ({ medicines }) => {
     <div className="rounded-xl bg-white shadow">
       {/* Header */}
 
-      <div className="border-b px-6 py-4">
+      <div className="flex items-center justify-between border-b px-6 py-4">
         <h2 className="text-xl font-semibold">
           Best Selling Medicines
         </h2>
+
+        <button
+          onClick={handleExport}
+          className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
+        >
+          <Download size={18} />
+          Export Excel
+        </button>
       </div>
 
       {/* Table */}

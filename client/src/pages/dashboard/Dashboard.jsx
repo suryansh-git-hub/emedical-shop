@@ -1,4 +1,13 @@
-import { Pill, Truck, Users, IndianRupee ,TriangleAlert } from "lucide-react";
+import {
+  Pill,
+  Truck,
+  Users,
+  IndianRupee,
+  TriangleAlert,
+} from "lucide-react";
+
+import { useAuth } from "../../context/AuthContext";
+
 import PageHeader from "../../components/common/PageHeader";
 import StatCard from "../../components/common/StatCard";
 import QuickActions from "../../components/dashboard/QuickActions";
@@ -12,6 +21,10 @@ import ExpiringMedicines from "../../components/dashboard/ExpiringMedicines";
 import CategorySalesChart from "../../components/dashboard/CategorySalesChart";
 
 function Dashboard() {
+  const { user } = useAuth();
+
+  const isAdmin = user?.role === "admin";
+
   return (
     <>
       <PageHeader
@@ -19,10 +32,9 @@ function Dashboard() {
         subtitle="Welcome to Medical Shop Management System"
       />
 
+      <WelcomeBanner />
 
-<WelcomeBanner />
-
-
+      {/* Statistics */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Medicines"
@@ -31,12 +43,14 @@ function Dashboard() {
           color="bg-blue-500"
         />
 
-        <StatCard
-          title="Suppliers"
-          value="25"
-          icon={<Truck size={28} className="text-white" />}
-          color="bg-green-500"
-        />
+        {isAdmin && (
+          <StatCard
+            title="Suppliers"
+            value="25"
+            icon={<Truck size={28} className="text-white" />}
+            color="bg-green-500"
+          />
+        )}
 
         <StatCard
           title="Customers"
@@ -51,49 +65,55 @@ function Dashboard() {
           icon={<IndianRupee size={28} className="text-white" />}
           color="bg-purple-500"
         />
+
         <StatCard
-    title="Monthly Revenue"
-    value="₹2,45,000"
-    icon={<IndianRupee size={28} className="text-white" />}
-    color="bg-emerald-500"
-/>
+          title="Monthly Revenue"
+          value="₹2,45,000"
+          icon={<IndianRupee size={28} className="text-white" />}
+          color="bg-emerald-500"
+        />
 
-<StatCard
-    title="Expired Medicines"
-    value="18"
-    icon={<TriangleAlert size={28} className="text-white" />}
-    color="bg-red-500"
-/>
-</div>
+        <StatCard
+          title="Expired Medicines"
+          value="18"
+          icon={<TriangleAlert size={28} className="text-white" />}
+          color="bg-red-500"
+        />
+      </div>
 
-        <QuickActions />
-        <div className="mt-8">
-    <LowStockTable />
-</div>
+      {/* Quick Actions */}
+      <QuickActions isAdmin={isAdmin} />
 
-<div className="mt-8">
-    <RecentSales />
-</div>
+      {/* Low Stock */}
+      <div className="mt-8">
+        <LowStockTable />
+      </div>
 
-<div className="mt-8">
-  <SalesOverview />
-</div>
+      {/* Recent Sales */}
+      <div className="mt-8">
+        <RecentSales />
+      </div>
 
-<div className="mt-8 grid gap-6 lg:grid-cols-2">
-    <CategorySalesChart />
-</div>
+      {/* Monthly Sales */}
+      <div className="mt-8">
+        <SalesOverview />
+      </div>
 
-<div className="mt-8 grid gap-6 lg:grid-cols-2">
-  <RecentPurchases />
-  <TopSellingMedicines />
-</div>
+      {/* Category Sales */}
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <CategorySalesChart />
+      </div>
 
-<div className="mt-8">
-  <ExpiringMedicines />
-</div>
+      {/* Purchases & Top Selling */}
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        {isAdmin && <RecentPurchases />}
+        <TopSellingMedicines />
+      </div>
 
-      
-      
+      {/* Expiring Medicines */}
+      <div className="mt-8">
+        <ExpiringMedicines />
+      </div>
     </>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Loader } from "lucide-react";
+
 import BestSellingTable from "../../components/reports/BestSellingTable";
 import ExpiredMedicinesTable from "../../components/reports/ExpiredMedicinesTable";
 import InventoryReportTable from "../../components/reports/InventoryReportTable";
@@ -9,6 +10,7 @@ import ProfitCard from "../../components/reports/ProfitCard";
 import PurchaseReportTable from "../../components/reports/PurchaseReportTable";
 import ReportCard from "../../components/reports/ReportCard";
 import SalesReportTable from "../../components/reports/SalesReportTable";
+
 import {
   getSalesReport,
   getPurchaseReport,
@@ -68,16 +70,13 @@ const Reports = () => {
       setSalesReport(sales.sales || []);
       setPurchaseReport(purchases.purchases || []);
       setInventoryReport(inventory.inventory || []);
-
       setLowStockReport(lowStock.medicines || []);
       setExpiredMedicinesReport(expired.medicines || []);
-
       setBestSellingReport(bestSelling.medicines || []);
 
       setTodaySales(today.totalSales || 0);
       setWeeklySales(weekly.totalSales || 0);
       setMonthlySales(monthly.totalSales || 0);
-
       setProfit(profitData.totalProfit || 0);
     } catch (error) {
       toast.error(
@@ -94,7 +93,11 @@ const Reports = () => {
   }, []);
 
   if (loading) {
-    return <Loader />;
+    return (
+      <div className="flex justify-center py-20">
+        <Loader className="h-8 w-8 animate-spin text-blue-600" />
+      </div>
+    );
   }
 
   return (
@@ -114,7 +117,6 @@ const Reports = () => {
       {/* Summary Cards */}
 
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-
         <ReportCard
           title="Today's Sales"
           value={`₹${todaySales.toLocaleString()}`}
@@ -131,7 +133,6 @@ const Reports = () => {
         />
 
         <ProfitCard profit={profit} />
-
       </div>
 
       {/* Sales Report */}
@@ -149,18 +150,14 @@ const Reports = () => {
       {/* Bottom Grid */}
 
       <div className="grid gap-6 xl:grid-cols-2">
-
-        <LowStockTable
-          medicines={lowStockReport}
-        />
+        <LowStockTable medicines={lowStockReport} />
 
         <ExpiredMedicinesTable
           medicines={expiredMedicinesReport}
         />
-
       </div>
 
-      {/* Best Selling */}
+      {/* Best Selling Medicines */}
 
       <BestSellingTable
         medicines={bestSellingReport}

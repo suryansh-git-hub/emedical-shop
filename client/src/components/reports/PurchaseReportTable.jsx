@@ -1,10 +1,44 @@
+import { Download } from "lucide-react";
+import toast from "react-hot-toast";
+import { exportToExcel } from "../../utils/exportExcel";
+
 const PurchaseReportTable = ({ purchases }) => {
+  const handleExport = () => {
+    if (purchases.length === 0) {
+      return toast.error("No purchase report available.");
+    }
+
+    const excelData = purchases.map((purchase) => ({
+      Invoice: purchase.invoiceNumber,
+      Supplier: purchase.supplier?.supplierName || "-",
+      "Purchase Date": new Date(
+        purchase.purchaseDate
+      ).toLocaleDateString(),
+      Medicines: purchase.medicines?.length || 0,
+      "Total Amount": purchase.totalAmount,
+      "Created By": purchase.createdBy?.name || "-",
+    }));
+
+    exportToExcel(excelData, "Purchase Report");
+    toast.success("Purchase report exported successfully.");
+  };
+
   if (purchases.length === 0) {
     return (
       <div className="rounded-xl bg-white p-8 text-center shadow">
-        <h2 className="text-xl font-semibold text-gray-700">
-          Purchase Report
-        </h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-gray-700">
+            Purchase Report
+          </h2>
+
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
+          >
+            <Download size={18} />
+            Export Excel
+          </button>
+        </div>
 
         <p className="mt-2 text-gray-500">
           No purchase report available.
@@ -15,10 +49,18 @@ const PurchaseReportTable = ({ purchases }) => {
 
   return (
     <div className="rounded-xl bg-white shadow">
-      <div className="border-b px-6 py-4">
+      <div className="flex items-center justify-between border-b px-6 py-4">
         <h2 className="text-xl font-semibold">
           Purchase Report
         </h2>
+
+        <button
+          onClick={handleExport}
+          className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
+        >
+          <Download size={18} />
+          Export Excel
+        </button>
       </div>
 
       <div className="overflow-x-auto">

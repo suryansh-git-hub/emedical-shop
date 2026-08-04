@@ -1,10 +1,42 @@
+import { Download } from "lucide-react";
+import toast from "react-hot-toast";
+import { exportToExcel } from "../../utils/exportExcel";
+
 const SalesReportTable = ({ sales }) => {
+  const handleExport = () => {
+    if (sales.length === 0) {
+      return toast.error("No sales report available.");
+    }
+
+    const excelData = sales.map((sale) => ({
+      Invoice: sale.invoiceNumber,
+      Customer: sale.customer?.customerName || "-",
+      "Sale Date": new Date(sale.saleDate).toLocaleDateString(),
+      Medicines: sale.medicines?.length || 0,
+      "Total Amount": sale.totalAmount,
+      "Created By": sale.createdBy?.name || "-",
+    }));
+
+    exportToExcel(excelData, "Sales Report");
+    toast.success("Sales report exported successfully.");
+  };
+
   if (sales.length === 0) {
     return (
       <div className="rounded-xl bg-white p-8 text-center shadow">
-        <h2 className="text-xl font-semibold text-gray-700">
-          Sales Report
-        </h2>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-gray-700">
+            Sales Report
+          </h2>
+
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
+          >
+            <Download size={18} />
+            Export Excel
+          </button>
+        </div>
 
         <p className="mt-2 text-gray-500">
           No sales report available.
@@ -15,19 +47,24 @@ const SalesReportTable = ({ sales }) => {
 
   return (
     <div className="rounded-xl bg-white shadow">
-      <div className="border-b px-6 py-4">
+      <div className="flex items-center justify-between border-b px-6 py-4">
         <h2 className="text-xl font-semibold">
           Sales Report
         </h2>
+
+        <button
+          onClick={handleExport}
+          className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
+        >
+          <Download size={18} />
+          Export Excel
+        </button>
       </div>
 
       <div className="overflow-x-auto">
         <table className="min-w-full">
-
           <thead className="bg-gray-100">
-
             <tr>
-
               <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                 Invoice
               </th>
@@ -51,13 +88,10 @@ const SalesReportTable = ({ sales }) => {
               <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                 Created By
               </th>
-
             </tr>
-
           </thead>
 
           <tbody>
-
             {sales.map((sale) => (
               <tr
                 key={sale._id}
@@ -72,9 +106,7 @@ const SalesReportTable = ({ sales }) => {
                 </td>
 
                 <td className="px-6 py-4">
-                  {new Date(
-                    sale.saleDate
-                  ).toLocaleDateString()}
+                  {new Date(sale.saleDate).toLocaleDateString()}
                 </td>
 
                 <td className="px-6 py-4 text-center">
@@ -82,10 +114,7 @@ const SalesReportTable = ({ sales }) => {
                 </td>
 
                 <td className="px-6 py-4 text-right font-semibold text-green-600">
-                  ₹
-                  {Number(
-                    sale.totalAmount
-                  ).toLocaleString()}
+                  ₹{Number(sale.totalAmount).toLocaleString()}
                 </td>
 
                 <td className="px-6 py-4">
@@ -93,9 +122,7 @@ const SalesReportTable = ({ sales }) => {
                 </td>
               </tr>
             ))}
-
           </tbody>
-
         </table>
       </div>
     </div>

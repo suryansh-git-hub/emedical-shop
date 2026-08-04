@@ -1,13 +1,12 @@
 import {
   LayoutDashboard,
   Pill,
-  Boxes,
   Truck,
   Users,
   ShoppingCart,
-  ReceiptText,
-  FileBarChart2,
-  UserCog,
+  Receipt,
+  Boxes,
+  BarChart3,
 } from "lucide-react";
 
 export const navigation = [
@@ -15,45 +14,48 @@ export const navigation = [
     name: "Dashboard",
     path: "/dashboard",
     icon: LayoutDashboard,
+    roles: ["admin", "pharmacist"],
   },
   {
     name: "Medicines",
     path: "/medicines",
     icon: Pill,
-  },
-  {
-    name: "Inventory",
-    path: "/inventory",
-    icon: Boxes,
+    roles: ["admin"],
   },
   {
     name: "Suppliers",
     path: "/suppliers",
     icon: Truck,
+    roles: ["admin"],
   },
   {
     name: "Customers",
     path: "/customers",
     icon: Users,
+    roles: ["admin", "pharmacist"],
   },
   {
     name: "Purchases",
     path: "/purchases",
     icon: ShoppingCart,
+    roles: ["admin"],
   },
   {
     name: "Sales",
     path: "/sales",
-    icon: ReceiptText,
+    icon: Receipt,
+    roles: ["admin", "pharmacist"],
+  },
+  {
+    name: "Inventory",
+    path: "/inventory",
+    icon: Boxes,
+    roles: ["admin", "pharmacist"],
   },
   {
     name: "Reports",
     path: "/reports",
-    icon: FileBarChart2,
-  },
-  {
-    name: "Users",
-    path: "/users",
-    icon: UserCog,
+    icon: BarChart3,
+    roles: ["admin"],
   },
 ];
