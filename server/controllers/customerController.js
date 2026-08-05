@@ -3,7 +3,7 @@ import {
   getAllCustomersService,
   getCustomerByIdService,
   updateCustomerService,
-  deleteCustomerService,
+  deleteCustomerService,getCustomerPurchaseHistoryService
 } from "../services/customerService.js";
 
 // Create Customer
@@ -62,6 +62,27 @@ export const updateCustomer = async (req, res) => {
 export const deleteCustomer = async (req, res) => {
   try {
     const result = await deleteCustomerService(req.params.id);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(404).json({
+      message: error.message,
+    });
+  }
+};
+
+// ==========================
+// Customer Purchase History
+// ==========================
+export const getCustomerPurchaseHistory = async (
+  req,
+  res
+) => {
+  try {
+    const result =
+      await getCustomerPurchaseHistoryService(
+        req.params.id
+      );
 
     return res.status(200).json(result);
   } catch (error) {

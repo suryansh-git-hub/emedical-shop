@@ -1,9 +1,10 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, History } from "lucide-react";
 
 const CustomerTable = ({
   customers,
   onEdit,
   onDelete,
+  onHistory,
 }) => {
   if (customers.length === 0) {
     return (
@@ -21,15 +22,10 @@ const CustomerTable = ({
 
   return (
     <div className="overflow-hidden rounded-xl bg-white shadow">
-
       <div className="overflow-x-auto">
-
         <table className="min-w-full">
-
           <thead className="bg-gray-100">
-
             <tr>
-
               <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                 Customer Name
               </th>
@@ -49,20 +45,15 @@ const CustomerTable = ({
               <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
                 Actions
               </th>
-
             </tr>
-
           </thead>
 
           <tbody>
-
             {customers.map((customer) => (
-
               <tr
                 key={customer._id}
                 className="border-t hover:bg-gray-50"
               >
-
                 <td className="px-6 py-4 font-medium">
                   {customer.customerName}
                 </td>
@@ -80,8 +71,15 @@ const CustomerTable = ({
                 </td>
 
                 <td className="px-6 py-4">
-
                   <div className="flex items-center justify-center gap-3">
+
+                    <button
+                      onClick={() => onHistory(customer)}
+                      className="rounded-lg bg-green-100 p-2 text-green-600 transition hover:bg-green-200"
+                      title="Purchase History"
+                    >
+                      <History size={18} />
+                    </button>
 
                     <button
                       onClick={() => onEdit(customer)}
@@ -100,19 +98,12 @@ const CustomerTable = ({
                     </button>
 
                   </div>
-
                 </td>
-
               </tr>
-
             ))}
-
           </tbody>
-
         </table>
-
       </div>
-
     </div>
   );
 };

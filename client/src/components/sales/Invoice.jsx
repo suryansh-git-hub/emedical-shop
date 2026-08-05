@@ -2,10 +2,14 @@ const Invoice = ({ sale }) => {
   if (!sale) return null;
 
   return (
-    <div className="mx-auto max-w-4xl bg-white p-8">
-      {/* Header */}
+    <div className="mx-auto max-w-5xl bg-white p-8">
+
+      {/* ================= Header ================= */}
+
       <div className="mb-8 flex items-start justify-between border-b pb-6">
+
         <div>
+
           <h1 className="text-3xl font-bold text-blue-700">
             Medical Shop
           </h1>
@@ -19,62 +23,111 @@ const Invoice = ({ sale }) => {
           </p>
 
           <p className="text-sm text-gray-500">
-            Phone: +91 XXXXX XXXXX
+            Phone : +91 XXXXX XXXXX
           </p>
+
+          <p className="text-sm text-gray-500">
+            GSTIN : XXXXXXXX1234
+          </p>
+
         </div>
 
         <div className="text-right">
-          <h2 className="text-2xl font-bold">
+
+          <h2 className="text-3xl font-bold">
             TAX INVOICE
           </h2>
 
-          <p className="mt-3">
+          <p className="mt-4">
             <span className="font-semibold">
-              Invoice:
+              Invoice :
             </span>{" "}
             {sale.invoiceNumber}
           </p>
 
           <p>
             <span className="font-semibold">
-              Date:
+              Date :
             </span>{" "}
             {new Date(
               sale.saleDate
             ).toLocaleDateString()}
           </p>
+
         </div>
+
       </div>
 
-      {/* Customer Details */}
+      {/* ================= Customer ================= */}
 
-      <div className="mb-8 rounded-lg border bg-gray-50 p-4">
-        <h3 className="mb-3 text-lg font-semibold">
+      <div className="mb-8 rounded-lg border bg-gray-50 p-5">
+
+        <h3 className="mb-4 text-xl font-semibold">
           Customer Details
         </h3>
 
-        <div className="grid gap-2 md:grid-cols-2">
-          <p>
-            <span className="font-medium">
-              Name:
-            </span>{" "}
-            {sale.customer?.customerName}
-          </p>
+        <div className="grid grid-cols-2 gap-5">
 
-          <p>
-            <span className="font-medium">
-              Contact:
-            </span>{" "}
-            {sale.customer?.contactNumber}
-          </p>
+          <div>
+
+            <p>
+
+              <span className="font-semibold">
+                Name :
+              </span>{" "}
+
+              {sale.customer?.customerName}
+
+            </p>
+
+            <p className="mt-2">
+
+              <span className="font-semibold">
+                Contact :
+              </span>{" "}
+
+              {sale.customer?.contactNumber}
+
+            </p>
+
+          </div>
+
+          <div>
+
+            <p>
+
+              <span className="font-semibold">
+                Email :
+              </span>{" "}
+
+              {sale.customer?.email || "-"}
+
+            </p>
+
+            <p className="mt-2">
+
+              <span className="font-semibold">
+                Address :
+              </span>{" "}
+
+              {sale.customer?.address || "-"}
+
+            </p>
+
+          </div>
+
         </div>
+
       </div>
 
-      {/* Medicines */}
+      {/* ================= Medicines ================= */}
 
       <table className="mb-8 w-full border-collapse border">
+
         <thead className="bg-gray-100">
+
           <tr>
+
             <th className="border p-3 text-left">
               Medicine
             </th>
@@ -87,66 +140,218 @@ const Invoice = ({ sale }) => {
               Price
             </th>
 
+            <th className="border p-3 text-center">
+              GST
+            </th>
+
             <th className="border p-3 text-right">
               Total
             </th>
+
           </tr>
+
         </thead>
 
         <tbody>
-          {sale.medicines.map((item, index) => (
-            <tr key={index}>
-              <td className="border p-3">
-                {item.medicine?.medicineName}
-              </td>
 
-              <td className="border p-3 text-center">
-                {item.quantity}
-              </td>
+          {sale.medicines.map((item, index) => {
 
-              <td className="border p-3 text-right">
-                ₹{item.sellingPrice}
-              </td>
+            const subtotal =
+              item.quantity *
+              item.sellingPrice;
 
-              <td className="border p-3 text-right">
-                ₹
-                {(
-                  item.quantity *
-                  item.sellingPrice
-                ).toLocaleString()}
-              </td>
-            </tr>
-          ))}
+            const gst =
+              (subtotal *
+                (item.gst || 0)) /
+              100;
+
+            return (
+
+              <tr key={index}>
+
+                <td className="border p-3">
+
+                  {item.medicine?.medicineName}
+
+                </td>
+
+                <td className="border p-3 text-center">
+
+                  {item.quantity}
+
+                </td>
+
+                <td className="border p-3 text-right">
+
+                  ₹{item.sellingPrice}
+
+                </td>
+
+                <td className="border p-3 text-center">
+
+                  {item.gst || 0}%
+
+                </td>
+
+                <td className="border p-3 text-right">
+
+                  ₹
+                  {(subtotal + gst).toFixed(2)}
+
+                </td>
+
+              </tr>
+
+            );
+
+          })}
+
         </tbody>
+
       </table>
 
-      {/* Total */}
+      {/* ================= Billing Summary ================= */}
 
       <div className="mb-10 flex justify-end">
-        <div className="w-72 rounded-lg border bg-gray-50 p-5">
-          <div className="flex justify-between text-lg font-bold">
-            <span>Grand Total</span>
 
-            <span className="text-green-600">
-              ₹
-              {sale.totalAmount?.toLocaleString()}
-            </span>
+        <div className="w-[420px] rounded-lg border bg-gray-50 p-6">
+
+          <div className="space-y-3">
+
+            <div className="flex justify-between">
+
+              <span>Subtotal</span>
+
+              <span>
+                ₹
+              {(sale.subtotal ?? 0).toFixed(2)}
+              </span>
+
+            </div>
+
+            <div className="flex justify-between">
+
+              <span>GST</span>
+
+              <span>
+                ₹
+                {(sale.gstAmount ?? 0).toFixed(2)}
+              </span>
+
+            </div>
+
+            <div className="flex justify-between">
+
+              <span>Discount</span>
+
+              <span className="text-red-600">
+
+                - ₹
+               {(sale.discount ?? 0).toFixed(2)}
+
+              </span>
+
+            </div>
+
+            <hr />
+
+            <div className="flex justify-between text-xl font-bold">
+
+              <span>Grand Total</span>
+
+              <span className="text-green-600">
+
+                ₹
+               {(sale.grandTotal ?? 0).toFixed(2)}
+
+              </span>
+
+            </div>
+
+            <hr />
+
+            <div className="flex justify-between">
+
+              <span>Payment Method</span>
+
+              <span>
+
+                {sale.paymentMethod}
+
+              </span>
+
+            </div>
+
+            <div className="flex justify-between">
+
+              <span>Cash Received</span>
+
+              <span>
+
+                ₹
+               {(sale.cashReceived ?? 0).toFixed(2)}
+
+              </span>
+
+            </div>
+
+            <div className="flex justify-between">
+
+              <span>Change Returned</span>
+
+              <span className="font-semibold text-blue-600">
+
+                ₹
+             {(sale.changeReturned ?? 0).toFixed(2)}
+
+              </span>
+
+            </div>
+
           </div>
+
         </div>
+
       </div>
 
-      {/* Footer */}
+      {/* ================= Notes ================= */}
+
+      {sale.notes && (
+
+        <div className="mb-8 rounded-lg border bg-yellow-50 p-4">
+
+          <h3 className="mb-2 font-semibold">
+            Notes
+          </h3>
+
+          <p>{sale.notes}</p>
+
+        </div>
+
+      )}
+
+      {/* ================= Footer ================= */}
 
       <div className="border-t pt-6 text-center text-sm text-gray-500">
-        <p>
-          Thank you for choosing our
-          Medical Shop.
-        </p>
 
         <p>
+          Thank you for choosing our Medical Shop.
+        </p>
+
+        <p className="mt-1">
+          Medicines once sold will not be taken back.
+        </p>
+
+        <p className="mt-1">
+          Please keep this invoice for future reference.
+        </p>
+
+        <p className="mt-3 font-medium">
           Get Well Soon!
         </p>
+
       </div>
+
     </div>
   );
 };

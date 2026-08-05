@@ -1,9 +1,9 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2,History } from "lucide-react";
 
 const SupplierTable = ({
   suppliers,
   onEdit,
-  onDelete,
+  onDelete,onHistory
 }) => {
   if (suppliers.length === 0) {
     return (
@@ -87,31 +87,35 @@ const SupplierTable = ({
                   {supplier.address}
                 </td>
 
-                <td className="px-6 py-4">
+               <td className="px-6 py-4">
+  <div className="flex items-center justify-center gap-3">
 
-                  <div className="flex items-center justify-center gap-3">
+    <button
+      onClick={() => onHistory(supplier)}
+      className="rounded-lg bg-green-100 p-2 text-green-600 transition hover:bg-green-200"
+      title="Purchase History"
+    >
+      <History size={18} />
+    </button>
 
-                    <button
-                      onClick={() => onEdit(supplier)}
-                      className="rounded-lg bg-blue-100 p-2 text-blue-600 transition hover:bg-blue-200"
-                      title="Edit Supplier"
-                    >
-                      <Pencil size={18} />
-                    </button>
+    <button
+      onClick={() => onEdit(supplier)}
+      className="rounded-lg bg-blue-100 p-2 text-blue-600 transition hover:bg-blue-200"
+      title="Edit Supplier"
+    >
+      <Pencil size={18} />
+    </button>
 
-                    <button
-                      onClick={() =>
-                        onDelete(supplier._id)
-                      }
-                      className="rounded-lg bg-red-100 p-2 text-red-600 transition hover:bg-red-200"
-                      title="Delete Supplier"
-                    >
-                      <Trash2 size={18} />
-                    </button>
+    <button
+      onClick={() => onDelete(supplier._id)}
+      className="rounded-lg bg-red-100 p-2 text-red-600 transition hover:bg-red-200"
+      title="Delete Supplier"
+    >
+      <Trash2 size={18} />
+    </button>
 
-                  </div>
-
-                </td>
+  </div>
+</td>
 
               </tr>
 

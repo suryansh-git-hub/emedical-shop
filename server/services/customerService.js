@@ -1,5 +1,6 @@
 import Customer from "../models/customerModel.js";
 import { MESSAGES } from "../constants/messages.js";
+import Sale from "../models/saleModel.js";
 
 // Create Customer
 export const createCustomerService = async (customerData) => {
@@ -86,5 +87,41 @@ export const deleteCustomerService = async (id) => {
 
   return {
     message: MESSAGES.CUSTOMER_DELETED,
+  };
+};
+
+// ==========================
+// Customer Purchase History
+// ==========================
+export const getCustomerPurchaseHistoryService = async (customerId) => {
+  const customer = await Customer.findById(customerId);
+
+  if (!customer) {
+    throw new Error(MESSAGES.CUSTOMER_NOT_FOUND);
+  }
+
+  const sales = await Sale.find({
+    customer: customerId,
+  })
+    .populate(
+      "medicines.medicine",
+      "medicineName sellingPrice"
+    )
+    .sort({ saleDate: -1 })
+    .lean();
+
+  const totalOrders = sales.length;
+
+  const totalSpent = sales.reduce(
+    (sum, sale) => sum + sale.totalAmount,
+    0
+  );
+
+  return {
+    message: "Customer purchase history fetched successfully.",
+    customer,
+    totalOrders,
+    totalSpent,
+    sales,
   };
 };

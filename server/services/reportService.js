@@ -210,7 +210,10 @@ export const getMonthlySalesReportService = async () => {
 
 export const getProfitReportService = async () => {
   const sales = await Sale.find()
-    .populate("medicines.medicine")
+    .populate(
+      "medicines.medicine",
+      "medicineName purchasePrice sellingPrice"
+    )
     .lean();
 
   let totalRevenue = 0;
@@ -223,12 +226,23 @@ export const getProfitReportService = async () => {
     for (const item of sale.medicines) {
       const medicine = item.medicine;
 
-      const quantity = item.quantity;
+      // Skip if medicine is missing
+      if (!medicine) {
+        continue;
+      }
 
-      const revenue = medicine.sellingPrice * quantity;
+      const quantity = Number(item.quantity || 0);
 
-      const cost = medicine.purchasePrice * quantity;
+      const sellingPrice = Number(
+        medicine.sellingPrice || item.sellingPrice || 0
+      );
 
+      const purchasePrice = Number(
+        medicine.purchasePrice || 0
+      );
+
+      const revenue = sellingPrice * quantity;
+      const cost = purchasePrice * quantity;
       const profit = revenue - cost;
 
       totalRevenue += revenue;
@@ -240,8 +254,8 @@ export const getProfitReportService = async () => {
         saleDate: sale.saleDate,
         medicineName: medicine.medicineName,
         quantity,
-        purchasePrice: medicine.purchasePrice,
-        sellingPrice: medicine.sellingPrice,
+        purchasePrice,
+        sellingPrice,
         revenue,
         cost,
         profit,

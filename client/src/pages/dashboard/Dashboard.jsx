@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Pill,
   Truck,
@@ -5,9 +6,10 @@ import {
   IndianRupee,
   TriangleAlert,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 import { useAuth } from "../../context/AuthContext";
-
+import { getDashboardStats } from "../../services/dashboardServices";
 import PageHeader from "../../components/common/PageHeader";
 import StatCard from "../../components/common/StatCard";
 import QuickActions from "../../components/dashboard/QuickActions";
@@ -25,6 +27,39 @@ function Dashboard() {
 
   const isAdmin = user?.role === "admin";
 
+  const [dashboard, setDashboard] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+
+  const fetchDashboard = async () => {
+    try {
+      setLoading(true);
+
+      const response = await getDashboardStats();
+
+      setDashboard(response);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to load dashboard."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboard();
+  }, []);
+
+  if (loading || !dashboard) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        Loading Dashboard...
+      </div>
+    );
+  }
+
   return (
     <>
       <PageHeader
@@ -35,84 +70,143 @@ function Dashboard() {
       <WelcomeBanner />
 
       {/* Statistics */}
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Medicines"
-          value="150"
-          icon={<Pill size={28} className="text-white" />}
+          value={dashboard.totalMedicines}
+          icon={
+            <Pill
+              size={28}
+              className="text-white"
+            />
+          }
           color="bg-blue-500"
         />
 
         {isAdmin && (
           <StatCard
             title="Suppliers"
-            value="25"
-            icon={<Truck size={28} className="text-white" />}
+            value={dashboard.totalSuppliers}
+            icon={
+              <Truck
+                size={28}
+                className="text-white"
+              />
+            }
             color="bg-green-500"
           />
         )}
 
         <StatCard
           title="Customers"
-          value="420"
-          icon={<Users size={28} className="text-white" />}
+          value={dashboard.totalCustomers}
+          icon={
+            <Users
+              size={28}
+              className="text-white"
+            />
+          }
           color="bg-orange-500"
         />
 
         <StatCard
           title="Today's Sales"
-          value="₹12,500"
-          icon={<IndianRupee size={28} className="text-white" />}
+          value={`₹${dashboard.todaySales.toLocaleString()}`}
+          icon={
+            <IndianRupee
+              size={28}
+              className="text-white"
+            />
+          }
           color="bg-purple-500"
         />
 
         <StatCard
           title="Monthly Revenue"
-          value="₹2,45,000"
-          icon={<IndianRupee size={28} className="text-white" />}
+          value={`₹${dashboard.monthlyRevenue.toLocaleString()}`}
+          icon={
+            <IndianRupee
+              size={28}
+              className="text-white"
+            />
+          }
           color="bg-emerald-500"
         />
 
         <StatCard
           title="Expired Medicines"
-          value="18"
-          icon={<TriangleAlert size={28} className="text-white" />}
+          value={dashboard.expiredMedicines.length}
+          icon={
+            <TriangleAlert
+              size={28}
+              className="text-white"
+            />
+          }
           color="bg-red-500"
         />
       </div>
 
       {/* Quick Actions */}
+
       <QuickActions isAdmin={isAdmin} />
 
       {/* Low Stock */}
+
       <div className="mt-8">
-        <LowStockTable />
+        <LowStockTable
+          medicines={dashboard.lowStockMedicines}
+        />
       </div>
 
       {/* Recent Sales */}
+
       <div className="mt-8">
-        <RecentSales />
+        <RecentSales
+          sales={dashboard.recentSales}
+        />
       </div>
 
       {/* Monthly Sales */}
+
       <div className="mt-8">
-        <SalesOverview />
+        <SalesOverview
+          data={dashboard.monthlySales}
+        />
       </div>
 
-      {/* Category Sales */}
+      {/* Category-wise Sales */}
+
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <CategorySalesChart />
+        <CategorySalesChart
+          data={dashboard.categorySales}
+        />
       </div>
 
       {/* Purchases & Top Selling */}
+
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        {isAdmin && <RecentPurchases />}
-        <TopSellingMedicines />
+        {isAdmin && (
+          <RecentPurchases
+            purchases={dashboard.recentPurchases}
+          />
+        )}
+
+        <TopSellingMedicines
+          medicines={
+            dashboard.topSellingMedicines
+          }
+        />
       </div>
 
       {/* Expiring Medicines */}
+
       <div className="mt-8">
-        <ExpiringMedicines />
+        <ExpiringMedicines
+          medicines={
+            dashboard.expiringMedicines
+          }
+        />
       </div>
     </>
   );

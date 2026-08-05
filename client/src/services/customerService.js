@@ -15,7 +15,18 @@ export const getCustomerById = async (id) => {
   const response = await api.get(`/customers/${id}`);
   return response.data;
 };
+/**
+ * Get Customer Purchase History
+ */
+export const getCustomerPurchaseHistory = async (
+  id
+) => {
+  const response = await api.get(
+    `/customers/${id}/history`
+  );
 
+  return response.data;
+};
 /**
  * Create Customer
  */

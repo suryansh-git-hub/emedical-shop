@@ -1,31 +1,6 @@
-function RecentSales() {
-  const sales = [
-    {
-      id: "INV-1001",
-      customer: "Rahul Sharma",
-      amount: 850,
-      date: "30 Jul 2026",
-    },
-    {
-      id: "INV-1002",
-      customer: "Priya Singh",
-      amount: 1200,
-      date: "30 Jul 2026",
-    },
-    {
-      id: "INV-1003",
-      customer: "Amit Verma",
-      amount: 430,
-      date: "29 Jul 2026",
-    },
-    {
-      id: "INV-1004",
-      customer: "Neha Gupta",
-      amount: 960,
-      date: "29 Jul 2026",
-    },
-  ];
+import { Link } from "react-router-dom";
 
+function RecentSales({ sales = [] }) {
   return (
     <div className="rounded-xl border bg-white p-6 shadow-sm">
       <div className="mb-5 flex items-center justify-between">
@@ -33,9 +8,12 @@ function RecentSales() {
           Recent Sales
         </h2>
 
-        <button className="text-blue-600 hover:underline">
+        <Link
+          to="/sales"
+          className="text-blue-600 hover:underline"
+        >
           View All
-        </button>
+        </Link>
       </div>
 
       <table className="w-full">
@@ -49,24 +27,45 @@ function RecentSales() {
         </thead>
 
         <tbody>
-          {sales.map((sale) => (
-            <tr
-              key={sale.id}
-              className="border-b hover:bg-gray-50"
-            >
-              <td className="py-3 font-medium">
-                {sale.id}
+          {sales.length === 0 ? (
+            <tr>
+              <td
+                colSpan={4}
+                className="py-6 text-center text-gray-500"
+              >
+                No recent sales found.
               </td>
-
-              <td>{sale.customer}</td>
-
-              <td className="font-semibold text-green-600">
-                ₹{sale.amount}
-              </td>
-
-              <td>{sale.date}</td>
             </tr>
-          ))}
+          ) : (
+            sales.map((sale) => (
+              <tr
+                key={sale._id}
+                className="border-b hover:bg-gray-50"
+              >
+                <td className="py-3 font-medium">
+                  {sale.invoiceNumber}
+                </td>
+
+                <td>
+                  {sale.customer?.customerName ||
+                    "Walk-in Customer"}
+                </td>
+
+                <td className="font-semibold text-green-600">
+                  ₹
+                  {Number(
+                    sale.totalAmount
+                  ).toLocaleString()}
+                </td>
+
+                <td>
+                  {new Date(
+                    sale.saleDate
+                  ).toLocaleDateString("en-IN")}
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>

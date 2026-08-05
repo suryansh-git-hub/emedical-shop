@@ -1,15 +1,42 @@
 import { getDashboardStatsService } from "../services/dashboardService.js";
 
+// ==========================
+// Dashboard Statistics
+// ==========================
+
 export const getDashboardStats = async (req, res) => {
   try {
-    const stats = await getDashboardStatsService();
+    const dashboard = await getDashboardStatsService();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      stats,
+      message: dashboard.message,
+
+      totalMedicines: dashboard.totalMedicines,
+      totalSuppliers: dashboard.totalSuppliers,
+      totalCustomers: dashboard.totalCustomers,
+      totalPurchases: dashboard.totalPurchases,
+      totalSales: dashboard.totalSales,
+
+      totalStock: dashboard.totalStock,
+
+      lowStockMedicines: dashboard.lowStockMedicines,
+      expiredMedicines: dashboard.expiredMedicines,
+      expiringMedicines: dashboard.expiringMedicines,
+
+      todaySales: dashboard.todaySales,
+      monthlyRevenue: dashboard.monthlyRevenue,
+
+      recentSales: dashboard.recentSales,
+      recentPurchases: dashboard.recentPurchases,
+
+      topSellingMedicines: dashboard.topSellingMedicines,
+
+      monthlySales: dashboard.monthlySales,
+      categorySales: dashboard.categorySales,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message,
     });

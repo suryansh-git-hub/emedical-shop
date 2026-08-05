@@ -1,10 +1,13 @@
 import Supplier from "../models/supplierModel.js";
+import Purchase from "../models/purchaseModel.js";
 import { MESSAGES } from "../constants/messages.js";
 
+// ==========================
+// Create Supplier
+// ==========================
 export const createSupplierService = async (supplierData) => {
   const { email, gstNumber } = supplierData;
 
-  // Check if supplier already exists by email or GST number
   const existingSupplier = await Supplier.findOne({
     $or: [{ email }, { gstNumber }],
   });
@@ -21,14 +24,21 @@ export const createSupplierService = async (supplierData) => {
   };
 };
 
-export const getAllSuppliersService = async() => {
+// ==========================
+// Get All Suppliers
+// ==========================
+export const getAllSuppliersService = async () => {
   const suppliers = await Supplier.find();
+
   return {
     message: MESSAGES.SUPPLIERS_FETCHED,
     suppliers,
-  }
-}
+  };
+};
 
+// ==========================
+// Get Supplier By ID
+// ==========================
 export const getSupplierByIdService = async (id) => {
   const supplier = await Supplier.findById(id);
 
@@ -42,14 +52,19 @@ export const getSupplierByIdService = async (id) => {
   };
 };
 
-export const updateSupplierService = async (id, supplierData) => {
+// ==========================
+// Update Supplier
+// ==========================
+export const updateSupplierService = async (
+  id,
+  supplierData
+) => {
   const supplier = await Supplier.findById(id);
 
   if (!supplier) {
     throw new Error(MESSAGES.SUPPLIER_NOT_FOUND);
   }
 
-  // Check if email is being changed
   if (
     supplierData.email &&
     supplierData.email !== supplier.email
@@ -63,7 +78,6 @@ export const updateSupplierService = async (id, supplierData) => {
     }
   }
 
-  // Check if GST Number is being changed
   if (
     supplierData.gstNumber &&
     supplierData.gstNumber !== supplier.gstNumber
@@ -87,6 +101,9 @@ export const updateSupplierService = async (id, supplierData) => {
   };
 };
 
+// ==========================
+// Delete Supplier
+// ==========================
 export const deleteSupplierService = async (id) => {
   const supplier = await Supplier.findById(id);
 
@@ -100,3 +117,47 @@ export const deleteSupplierService = async (id) => {
     message: MESSAGES.SUPPLIER_DELETED,
   };
 };
+
+// ==========================
+// Supplier Purchase History
+// ==========================
+export const getSupplierPurchaseHistoryService =
+  async (supplierId) => {
+    const supplier = await Supplier.findById(
+      supplierId
+    );
+
+    if (!supplier) {
+      throw new Error(
+        MESSAGES.SUPPLIER_NOT_FOUND
+      );
+    }
+
+    const purchases = await Purchase.find({
+      supplier: supplierId,
+    })
+      .populate(
+        "medicines.medicine",
+        "medicineName purchasePrice"
+      )
+      .sort({ purchaseDate: -1 })
+      .lean();
+
+    const totalPurchases =
+      purchases.length;
+
+    const totalSpent = purchases.reduce(
+      (sum, purchase) =>
+        sum + purchase.totalAmount,
+      0
+    );
+
+    return {
+      message:
+        "Supplier purchase history fetched successfully.",
+      supplier,
+      totalPurchases,
+      totalSpent,
+      purchases,
+    };
+  };

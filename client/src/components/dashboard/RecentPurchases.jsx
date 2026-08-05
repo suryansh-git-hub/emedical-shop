@@ -1,35 +1,25 @@
-function RecentPurchases() {
-  const purchases = [
-    {
-      id: "PO-1001",
-      supplier: "ABC Pharma",
-      amount: 8200,
-      date: "30 Jul 2026",
-    },
-    {
-      id: "PO-1002",
-      supplier: "MediLife",
-      amount: 5400,
-      date: "29 Jul 2026",
-    },
-    {
-      id: "PO-1003",
-      supplier: "Sun Pharma",
-      amount: 6700,
-      date: "28 Jul 2026",
-    },
-  ];
+import { Link } from "react-router-dom";
 
+function RecentPurchases({ purchases = [] }) {
   return (
     <div className="rounded-xl border bg-white p-6 shadow-sm">
-      <h2 className="mb-5 text-xl font-semibold">
-        Recent Purchases
-      </h2>
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-xl font-semibold">
+          Recent Purchases
+        </h2>
+
+        <Link
+          to="/purchases"
+          className="text-blue-600 hover:underline"
+        >
+          View All
+        </Link>
+      </div>
 
       <table className="w-full">
         <thead>
           <tr className="border-b text-left">
-            <th className="py-3">Purchase</th>
+            <th className="py-3">Invoice</th>
             <th>Supplier</th>
             <th>Amount</th>
             <th>Date</th>
@@ -37,16 +27,44 @@ function RecentPurchases() {
         </thead>
 
         <tbody>
-          {purchases.map((purchase) => (
-            <tr key={purchase.id} className="border-b hover:bg-gray-50">
-              <td className="py-3">{purchase.id}</td>
-              <td>{purchase.supplier}</td>
-              <td className="font-semibold text-blue-600">
-                ₹{purchase.amount}
+          {purchases.length === 0 ? (
+            <tr>
+              <td
+                colSpan={4}
+                className="py-6 text-center text-gray-500"
+              >
+                No recent purchases found.
               </td>
-              <td>{purchase.date}</td>
             </tr>
-          ))}
+          ) : (
+            purchases.map((purchase) => (
+              <tr
+                key={purchase._id}
+                className="border-b hover:bg-gray-50"
+              >
+                <td className="py-3 font-medium">
+                  {purchase.invoiceNumber}
+                </td>
+
+                <td>
+                  {purchase.supplier?.supplierName}
+                </td>
+
+                <td className="font-semibold text-blue-600">
+                  ₹
+                  {Number(
+                    purchase.totalAmount
+                  ).toLocaleString()}
+                </td>
+
+                <td>
+                  {new Date(
+                    purchase.purchaseDate
+                  ).toLocaleDateString("en-IN")}
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>

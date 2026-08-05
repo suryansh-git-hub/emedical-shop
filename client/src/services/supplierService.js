@@ -39,3 +39,13 @@ export const deleteSupplier = async (id) => {
   const response = await api.delete(`/suppliers/${id}`);
   return response.data;
 };
+
+export const getSupplierPurchaseHistory = async (
+  id
+) => {
+  const response = await api.get(
+    `/suppliers/${id}/history`
+  );
+
+  return response.data;
+};

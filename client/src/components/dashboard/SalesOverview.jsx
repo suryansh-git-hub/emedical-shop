@@ -8,38 +8,65 @@ import {
   YAxis,
 } from "recharts";
 
-const data = [
-  { month: "Jan", sales: 4000 },
-  { month: "Feb", sales: 6500 },
-  { month: "Mar", sales: 5200 },
-  { month: "Apr", sales: 8200 },
-  { month: "May", sales: 7600 },
-  { month: "Jun", sales: 9100 },
+const monthNames = [
+  "",
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
-function SalesOverview() {
+function SalesOverview({ data = [] }) {
+  const chartData = data.map((item) => ({
+    month: monthNames[item._id.month],
+    sales: item.totalSales,
+  }));
+
   return (
     <div className="rounded-xl border bg-white p-6 shadow-sm">
-      <h2 className="mb-5 text-xl font-semibold">Sales Overview</h2>
+      <h2 className="mb-5 text-xl font-semibold">
+        Monthly Sales Overview
+      </h2>
 
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
+      {chartData.length === 0 ? (
+        <div className="flex h-[300px] items-center justify-center text-gray-500">
+          No sales data available.
+        </div>
+      ) : (
+        <ResponsiveContainer
+          width="100%"
+          height={300}
+        >
+          <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
 
-          <XAxis dataKey="month" />
+            <XAxis dataKey="month" />
 
-          <YAxis />
+            <YAxis />
 
-          <Tooltip />
+            <Tooltip
+              formatter={(value) =>
+                `₹${Number(value).toLocaleString()}`
+              }
+            />
 
-          <Line
-            type="monotone"
-            dataKey="sales"
-            stroke="#2563eb"
-            strokeWidth={3}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+            <Line
+              type="monotone"
+              dataKey="sales"
+              stroke="#2563eb"
+              strokeWidth={3}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 }

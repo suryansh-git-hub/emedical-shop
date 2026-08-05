@@ -8,38 +8,99 @@ import { MESSAGES } from "../constants/messages.js";
 // Create Sale
 // ==========================
 export const createSaleService = async (data, userId) => {
-  const { customer, invoiceNumber, saleDate, medicines } = data;
+  const {
+    customer,
+    saleDate,
+    medicines,
+    discountType = "flat",
+    discount = 0,
+    paymentMethod = "Cash",
+    cashReceived = 0,
+    notes = "",
+  } = data;
 
-  // Check medicines array
+  // ==========================
+  // Basic Validation
+  // ==========================
+
   if (!medicines || medicines.length === 0) {
     throw new Error("At least one medicine is required.");
   }
 
-  // Check duplicate invoice
-  const existingSale = await Sale.findOne({ invoiceNumber });
-
-  if (existingSale) {
-    throw new Error(MESSAGES.SALE_ALREADY_EXISTS);
-  }
-
-  // Check customer
   const customerExists = await Customer.findById(customer);
 
   if (!customerExists) {
     throw new Error(MESSAGES.CUSTOMER_NOT_FOUND);
   }
 
-  let totalAmount = 0;
+  // ==========================
+  // Duplicate Medicines Check
+  // ==========================
 
-  // Store validated inventory for later update
+  const medicineIds = medicines.map((item) =>
+    item.medicine.toString()
+  );
+
+  if (
+    new Set(medicineIds).size !==
+    medicineIds.length
+  ) {
+    throw new Error(
+      "Duplicate medicines are not allowed."
+    );
+  }
+
+// ==========================
+// Generate Invoice Number
+// ==========================
+
+let invoiceNumber;
+
+const lastSale = await Sale.findOne()
+  .sort({ createdAt: -1 })
+  .select("invoiceNumber");
+
+if (
+  lastSale &&
+  lastSale.invoiceNumber.startsWith("INV-")
+) {
+  const lastNumber = parseInt(
+    lastSale.invoiceNumber.split("-")[1],
+    10
+  );
+
+  invoiceNumber = `INV-${String(
+    lastNumber + 1
+  ).padStart(5, "0")}`;
+} else {
+  invoiceNumber = "INV-00001";
+}
+
+  // ==========================
+  // Billing Variables
+  // ==========================
+
+  let subtotal = 0;
+  let gstAmount = 0;
+
   const inventoryUpdates = [];
+  const saleMedicines = [];
 
-  // Validate medicines & stock
+  // ==========================
+  // Validate Medicines
+  // ==========================
+
   for (const item of medicines) {
-    const medicine = await Medicine.findById(item.medicine);
+    const medicine = await Medicine.findById(
+      item.medicine
+    ).select(
+      "medicineName sellingPrice gst"
+    );
 
     if (!medicine) {
-      throw new Error(MESSAGES.MEDICINE_NOT_FOUND);
+      throw new Error(
+        MESSAGES.MEDICINE_NOT_FOUND
+      );
     }
 
     const inventory = await Inventory.findOne({
@@ -47,34 +108,171 @@ export const createSaleService = async (data, userId) => {
     });
 
     if (!inventory) {
-      throw new Error(MESSAGES.INVENTORY_NOT_FOUND);
+      throw new Error(
+        MESSAGES.INVENTORY_NOT_FOUND
+      );
     }
 
-    if (inventory.currentStock < item.quantity) {
-      throw new Error(MESSAGES.INSUFFICIENT_STOCK);
+    if (
+      inventory.currentStock <
+      Number(item.quantity)
+    ) {
+      throw new Error(
+        `${medicine.medicineName} has insufficient stock.`
+      );
     }
 
-    totalAmount += item.quantity * item.sellingPrice;
+    const itemSubtotal =
+      medicine.sellingPrice *
+      Number(item.quantity);
+
+    const itemGST =
+      (itemSubtotal * medicine.gst) /
+      100;
+
+    subtotal += itemSubtotal;
+    gstAmount += itemGST;
 
     inventoryUpdates.push({
       inventory,
-      quantity: item.quantity,
+      quantity: Number(item.quantity),
+    });
+
+    saleMedicines.push({
+      medicine: medicine._id,
+      quantity: Number(item.quantity),
+      sellingPrice:
+        medicine.sellingPrice,
+      gst: medicine.gst,
     });
   }
 
-  // Create Sale
+  // ==========================
+  // Discount
+  // ==========================
+
+  let discountAmount = 0;
+
+  if (
+    discountType === "percentage"
+  ) {
+    discountAmount =
+      ((subtotal + gstAmount) *
+        Number(discount)) /
+      100;
+  } else {
+    discountAmount = Number(
+      discount
+    );
+  }
+
+  if (discountAmount < 0) {
+    throw new Error(
+      "Invalid discount."
+    );
+  }
+
+  if (
+    discountAmount >
+    subtotal + gstAmount
+  ) {
+    throw new Error(
+      "Discount exceeds bill amount."
+    );
+  }
+
+  // ==========================
+  // Grand Total
+  // ==========================
+
+  const grandTotal = Math.max(
+    subtotal +
+      gstAmount -
+      discountAmount,
+    0
+  );
+
+  // ==========================
+  // Payment Validation
+  // ==========================
+
+  let paymentStatus = "Paid";
+
+  const validMethods = [
+    "Cash",
+    "UPI",
+    "Card",
+    "Net Banking",
+  ];
+
+  if (
+    !validMethods.includes(paymentMethod)
+  ) {
+    throw new Error(
+      "Invalid payment method."
+    );
+  }
+
+  let changeReturned = 0;
+
+  if (paymentMethod === "Cash") {
+    if (
+      Number(cashReceived) <
+      grandTotal
+    ) {
+      throw new Error(
+        "Cash received is less than Grand Total."
+      );
+    }
+
+    changeReturned =
+      Number(cashReceived) -
+      grandTotal;
+  }
+
   const sale = await Sale.create({
     customer,
     invoiceNumber,
     saleDate,
-    medicines,
-    totalAmount,
+
+    medicines: saleMedicines,
+
+    subtotal,
+
+    gstAmount,
+
+    discountType,
+
+    discount: discountAmount,
+
+    grandTotal,
+
+    // Keeping for compatibility
+    totalAmount: grandTotal,
+
+    paymentMethod,
+
+    paymentStatus,
+
+    cashReceived:
+      paymentMethod === "Cash"
+        ? Number(cashReceived)
+        : 0,
+
+    changeReturned,
+
+    notes,
+
     createdBy: userId,
   });
 
+  // ==========================
   // Update Inventory
+  // ==========================
+
   for (const item of inventoryUpdates) {
     item.inventory.currentStock -= item.quantity;
+
     await item.inventory.save();
   }
 
@@ -87,42 +285,76 @@ export const createSaleService = async (data, userId) => {
 // ==========================
 // Get All Sales
 // ==========================
-export const getAllSalesService = async () => {
-  const sales = await Sale.find()
-    .populate("customer", "customerName contactNumber")
-    .populate("createdBy", "name email role")
-    .populate(
-      "medicines.medicine",
-      "medicineName genericName company"
-    )
-    .sort({ createdAt: -1 })
-    .lean();
 
-  return {
-    message: MESSAGES.SALES_FETCHED,
-    sales,
+export const getAllSalesService =
+  async () => {
+    const sales = await Sale.find()
+
+      .populate(
+        "customer",
+        "customerName contactNumber"
+      )
+
+      .populate(
+        "createdBy",
+        "name email role"
+      )
+
+      .populate(
+        "medicines.medicine",
+        "medicineName genericName company"
+      )
+
+      .sort({
+        createdAt: -1,
+      })
+
+      .lean();
+
+    return {
+      message:
+        MESSAGES.SALES_FETCHED,
+
+      sales,
+    };
   };
-};
 
 // ==========================
 // Get Sale By ID
 // ==========================
-export const getSaleByIdService = async (id) => {
-  const sale = await Sale.findById(id)
-    .populate("customer", "customerName contactNumber")
-    .populate("createdBy", "name email role")
-    .populate(
-      "medicines.medicine",
-      "medicineName genericName company"
-    )
-    .lean();
 
-  if (!sale) {
-    throw new Error(MESSAGES.SALE_NOT_FOUND);
-  }
+export const getSaleByIdService =
+  async (id) => {
+    const sale =
+      await Sale.findById(id)
 
-  return {
-    message: MESSAGES.SALE_FETCHED,
-    sale,
+        .populate(
+          "customer",
+          "customerName contactNumber email address"
+        )
+
+        .populate(
+          "createdBy",
+          "name email role"
+        )
+
+        .populate(
+          "medicines.medicine",
+          "medicineName genericName company category unit"
+        )
+
+        .lean();
+
+    if (!sale) {
+      throw new Error(
+        MESSAGES.SALE_NOT_FOUND
+      );
+    }
+
+    return {
+      message:
+        MESSAGES.SALE_FETCHED,
+
+      sale,
+    };
   };
-};

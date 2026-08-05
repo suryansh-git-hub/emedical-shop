@@ -4,7 +4,7 @@ import {
   getAllCustomers,
   getCustomerById,
   updateCustomer,
-  deleteCustomer,
+  deleteCustomer,getCustomerPurchaseHistory
 } from "../controllers/customerController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -27,6 +27,14 @@ router.get(
   authMiddleware,
   roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
   getAllCustomers
+);
+
+// Customer Purchase History
+router.get(
+  "/:id/history",
+  authMiddleware,
+  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  getCustomerPurchaseHistory
 );
 
 // Get Customer By ID

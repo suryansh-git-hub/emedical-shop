@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Loader } from "lucide-react";
+
 import AddCustomerButton from "../../components/customers/AddCustomerButton";
 import CustomerForm from "../../components/customers/CustomerForm";
 import CustomerModal from "../../components/customers/CustomerModal";
 import CustomerTable from "../../components/customers/CustomerTable";
+import CustomerHistoryModal from "../../components/customers/CustomerHistoryModal";
+
 import {
   getCustomers,
   addCustomer,
   updateCustomer,
   deleteCustomer,
+  getCustomerPurchaseHistory,
 } from "../../services/customerService";
 
 const initialFormData = {
@@ -23,11 +27,25 @@ const Customers = () => {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] =
+    useState(false);
 
-  const [editingCustomer, setEditingCustomer] = useState(null);
+  const [editingCustomer, setEditingCustomer] =
+    useState(null);
 
-  const [formData, setFormData] = useState(initialFormData);
+  const [formData, setFormData] = useState(
+    initialFormData
+  );
+
+  // =============================
+  // Customer History
+  // =============================
+
+  const [history, setHistory] =
+    useState(null);
+
+  const [isHistoryOpen, setIsHistoryOpen] =
+    useState(false);
 
   // =============================
   // Fetch Customers
@@ -60,9 +78,7 @@ const Customers = () => {
 
   const handleAddCustomer = () => {
     setEditingCustomer(null);
-
     setFormData(initialFormData);
-
     setIsModalOpen(true);
   };
 
@@ -109,6 +125,30 @@ const Customers = () => {
   };
 
   // =============================
+  // Customer History
+  // =============================
+
+  const handleCustomerHistory = async (
+    customer
+  ) => {
+    try {
+      const response =
+        await getCustomerPurchaseHistory(
+          customer._id
+        );
+
+      setHistory(response);
+
+      setIsHistoryOpen(true);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to fetch purchase history"
+      );
+    }
+  };
+
+  // =============================
   // Save Customer
   // =============================
 
@@ -150,13 +190,10 @@ const Customers = () => {
 
   return (
     <div className="space-y-6">
-
       {/* Header */}
 
       <div className="flex items-center justify-between">
-
         <div>
-
           <h1 className="text-2xl font-bold">
             Customer Management
           </h1>
@@ -164,32 +201,29 @@ const Customers = () => {
           <p className="text-gray-500">
             Manage all customers
           </p>
-
         </div>
 
         <AddCustomerButton
           onClick={handleAddCustomer}
         />
-
       </div>
 
-      {/* Table */}
+      {/* Customer Table */}
 
       <CustomerTable
         customers={customers}
         onEdit={handleEditCustomer}
         onDelete={handleDeleteCustomer}
+        onHistory={handleCustomerHistory}
       />
 
-      {/* Modal */}
+      {/* Add / Edit Modal */}
 
       <CustomerModal
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
-
           setEditingCustomer(null);
-
           setFormData(initialFormData);
         }}
       >
@@ -201,6 +235,16 @@ const Customers = () => {
         />
       </CustomerModal>
 
+      {/* Purchase History Modal */}
+
+      <CustomerHistoryModal
+        isOpen={isHistoryOpen}
+        history={history}
+        onClose={() => {
+          setIsHistoryOpen(false);
+          setHistory(null);
+        }}
+      />
     </div>
   );
 };

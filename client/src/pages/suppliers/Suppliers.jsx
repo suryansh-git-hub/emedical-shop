@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Loader } from "lucide-react";
+
 import AddSupplierButton from "../../components/suppliers/AddSupplierButton";
 import SupplierModal from "../../components/suppliers/SupplierModal";
 import SupplierForm from "../../components/suppliers/SupplierForm";
 import SupplierTable from "../../components/suppliers/SupplierTable";
+import SupplierHistoryModal from "../../components/suppliers/SupplierHistoryModal";
 import {
   getSuppliers, addSupplier, updateSupplier,
-  deleteSupplier,
+  deleteSupplier,getSupplierPurchaseHistory
 } from "../../services/supplierService";
 
 const initialFormData = {
@@ -27,6 +29,14 @@ const Suppliers = () => {
   const [editingSupplier, setEditingSupplier] = useState(null);
 
   const [formData, setFormData] = useState(initialFormData);
+  // =============================
+// Supplier Purchase History
+// =============================
+
+const [history, setHistory] = useState(null);
+
+const [isHistoryOpen, setIsHistoryOpen] =
+  useState(false);
 
   // =============================
   // Fetch Suppliers
@@ -109,6 +119,30 @@ const Suppliers = () => {
   };
 
   // =============================
+// Supplier Purchase History
+// =============================
+
+const handleSupplierHistory = async (
+  supplier
+) => {
+  try {
+    const response =
+      await getSupplierPurchaseHistory(
+        supplier._id
+      );
+
+    setHistory(response);
+
+    setIsHistoryOpen(true);
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message ||
+        "Failed to fetch purchase history"
+    );
+  }
+};
+
+  // =============================
   // Save Supplier
   // =============================
 
@@ -179,11 +213,12 @@ const Suppliers = () => {
 
       {/* Table */}
 
-      <SupplierTable
-        suppliers={suppliers}
-        onEdit={handleEditSupplier}
-        onDelete={handleDeleteSupplier}
-      />
+    <SupplierTable
+  suppliers={suppliers}
+  onEdit={handleEditSupplier}
+  onDelete={handleDeleteSupplier}
+  onHistory={handleSupplierHistory}
+/>
 
       {/* Modal */}
 
@@ -197,6 +232,7 @@ const Suppliers = () => {
           setFormData(initialFormData);
         }}
       >
+      
         <SupplierForm
           formData={formData}
           setFormData={setFormData}
@@ -204,6 +240,14 @@ const Suppliers = () => {
           isEditing={editingSupplier}
         />
       </SupplierModal>
+        <SupplierHistoryModal
+  isOpen={isHistoryOpen}
+  history={history}
+  onClose={() => {
+    setIsHistoryOpen(false);
+    setHistory(null);
+  }}
+/>
 
     </div>
   );

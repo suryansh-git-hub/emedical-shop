@@ -1,6 +1,6 @@
 import express from "express";
 import { createSupplier,getAllSuppliers,getSupplierById,  updateSupplier,
-  deleteSupplier, } from "../controllers/supplierController.js";
+  deleteSupplier,getSupplierPurchaseHistory } from "../controllers/supplierController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import roleMiddleware from "../middleware/roleMiddleware.js";
 import { ROLES } from "../constants/roles.js";
@@ -16,12 +16,25 @@ router.post(
 
 router.get("/", authMiddleware,roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST), getAllSuppliers );
 
+// Supplier Purchase History
+router.get(
+  "/:id/history",
+  authMiddleware,
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
+  getSupplierPurchaseHistory
+);
+
 router.get(
   "/:id",
   authMiddleware,
   roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
   getSupplierById
 );
+
+
 
 router.put(
   "/:id",
