@@ -27,6 +27,15 @@ const customerSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+
+    // ==========================
+    // Reward Points
+    // ==========================
+    rewardPoints: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   {
     timestamps: true,

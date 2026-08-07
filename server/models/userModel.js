@@ -3,30 +3,34 @@ import { ROLES } from "../constants/roles.js";
 
 const userSchema = new mongoose.Schema(
   {
-    name:{
+    name: {
       type: String,
       required: [true, "Name is required"],
       trim: true,
     },
-    email:{
+
+    email: {
       type: String,
-      required:[true,"Email is required"],
-      unique:true,
+      required: [true, "Email is required"],
+      unique: true,
       lowercase: true,
       trim: true,
     },
+
     password: {
       type: String,
-      required:[true, "Please enter password"],
+      required: [true, "Please enter password"],
       minlength: 8,
     },
-     role: {
+
+    role: {
       type: String,
       enum: [ROLES.ADMIN, ROLES.PHARMACIST],
       default: ROLES.PHARMACIST,
     },
-    isActive:{
-      type:Boolean,
+
+    isActive: {
+      type: Boolean,
       default: true,
     },
   },

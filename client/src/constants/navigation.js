@@ -7,6 +7,7 @@ import {
   Receipt,
   Boxes,
   BarChart3,
+  UserCog,
 } from "lucide-react";
 
 export const navigation = [
@@ -20,7 +21,7 @@ export const navigation = [
     name: "Medicines",
     path: "/medicines",
     icon: Pill,
-    roles: ["admin"],
+    roles: ["admin", "pharmacist"],
   },
   {
     name: "Suppliers",
@@ -41,7 +42,7 @@ export const navigation = [
     roles: ["admin"],
   },
   {
-    name: "Sales",
+    name: "Billing",
     path: "/sales",
     icon: Receipt,
     roles: ["admin", "pharmacist"],
@@ -56,6 +57,12 @@ export const navigation = [
     name: "Reports",
     path: "/reports",
     icon: BarChart3,
+    roles: ["admin"],
+  },
+  {
+    name: "Users",
+    path: "/users",
+    icon: UserCog,
     roles: ["admin"],
   },
 ];

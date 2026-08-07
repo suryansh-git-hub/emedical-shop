@@ -4,134 +4,240 @@ import autoTable from "jspdf-autotable";
 export const generateInvoicePDF = (sale) => {
   const doc = new jsPDF();
 
-  // ------------------------------
-  // Pharmacy Information
-  // ------------------------------
+  // ==========================
+  // Header
+  // ==========================
 
-  doc.setFontSize(20);
-  doc.setTextColor(40);
+  doc.setFontSize(22);
+  doc.setTextColor(30, 64, 175);
+  doc.text("Medical Shop", 14, 20);
 
-  doc.text("Medical Shop Management", 14, 20);
-
-  doc.setFontSize(10);
+  doc.setFontSize(11);
+  doc.setTextColor(80);
 
   doc.text(
-    "123 Main Street, Lucknow, Uttar Pradesh",
+    "Medical Shop Management System",
     14,
     28
   );
 
-  doc.text("Phone: +91 9876543210", 14, 34);
+  doc.text(
+    "Lucknow, Uttar Pradesh",
+    14,
+    34
+  );
 
-  // ------------------------------
-  // Invoice Heading
-  // ------------------------------
+  doc.text(
+    "Phone : +91 XXXXX XXXXX",
+    14,
+    40
+  );
 
-  doc.setFontSize(16);
+  doc.text(
+    "GSTIN : XXXXXXXX1234",
+    14,
+    46
+  );
 
-  doc.text("INVOICE", 160, 20);
+  doc.setFontSize(20);
+  doc.setTextColor(0);
 
-  doc.setFontSize(10);
+  doc.text("TAX INVOICE", 145, 22);
+
+  doc.setFontSize(11);
 
   doc.text(
     `Invoice : ${sale.invoiceNumber}`,
-    140,
-    30
+    145,
+    32
   );
 
   doc.text(
     `Date : ${new Date(
       sale.saleDate
     ).toLocaleDateString()}`,
-    140,
-    36
+    145,
+    38
   );
 
-  // ------------------------------
+  // ==========================
   // Customer
-  // ------------------------------
+  // ==========================
 
-  doc.setFontSize(12);
+  doc.setFontSize(13);
 
-  doc.text("Customer Details", 14, 50);
+  doc.text("Customer Details", 14, 60);
 
   doc.setFontSize(10);
 
   doc.text(
     `Name : ${
-      sale.customer?.customerName || "Walk-in Customer"
+      sale.customer?.customerName || "-"
     }`,
     14,
-    58
+    68
   );
 
   doc.text(
-    `Phone : ${
-      sale.customer?.phone || "-"
+    `Contact : ${
+      sale.customer?.contactNumber || "-"
     }`,
     14,
-    64
+    74
   );
 
-  // ------------------------------
-  // Medicines Table
-  // ------------------------------
+  doc.text(
+    `Email : ${
+      sale.customer?.email || "-"
+    }`,
+    100,
+    68
+  );
+
+  doc.text(
+    `Address : ${
+      sale.customer?.address || "-"
+    }`,
+    100,
+    74
+  );
+
+  // ==========================
+  // Medicine Table
+  // ==========================
 
   autoTable(doc, {
-    startY: 75,
+    startY: 85,
 
-    head: [
-      [
-        "Medicine",
-        "Qty",
-        "Price",
-        "Total",
-      ],
-    ],
+    head: [[
+      "Medicine",
+      "Qty",
+      "Price",
+      "GST",
+      "Total",
+    ]],
 
-    body: sale.medicines.map((item) => [
-      item.medicine?.medicineName,
-      item.quantity,
-      `₹${item.price}`,
-      `₹${item.quantity * item.price}`,
-    ]),
+    body: sale.medicines.map((item) => {
+
+      const subtotal =
+        item.quantity *
+        item.sellingPrice;
+
+      const gst =
+        (subtotal *
+          (item.gst || 0)) /
+        100;
+
+      return [
+        item.medicine?.medicineName,
+        item.quantity,
+        `₹${item.sellingPrice}`,
+        `${item.gst || 0}%`,
+        `₹${(subtotal + gst).toFixed(2)}`,
+      ];
+    }),
   });
 
-  // ------------------------------
-  // Grand Total
-  // ------------------------------
+  // ==========================
+  // Billing Summary
+  // ==========================
 
-  const finalY = doc.lastAutoTable.finalY + 12;
+  const finalY =
+    doc.lastAutoTable.finalY + 15;
 
-  doc.setFontSize(12);
+  doc.setFontSize(11);
 
   doc.text(
-    `Grand Total : ₹${Number(
-      sale.totalAmount
-    ).toLocaleString()}`,
-    140,
+    `Subtotal : ₹${(
+      sale.subtotal ?? 0
+    ).toFixed(2)}`,
+    130,
     finalY
   );
 
-  // ------------------------------
+  doc.text(
+    `GST : ₹${(
+      sale.gstAmount ?? 0
+    ).toFixed(2)}`,
+    130,
+    finalY + 8
+  );
+
+  doc.text(
+    `Discount : ₹${(
+      sale.discount ?? 0
+    ).toFixed(2)}`,
+    130,
+    finalY + 16
+  );
+
+  doc.setFontSize(13);
+
+  doc.text(
+    `Grand Total : ₹${(
+      sale.grandTotal ??
+      sale.totalAmount ??
+      0
+    ).toFixed(2)}`,
+    130,
+    finalY + 28
+  );
+
+  doc.setFontSize(11);
+
+  doc.text(
+    `Payment : ${
+      sale.paymentMethod
+    }`,
+    130,
+    finalY + 40
+  );
+
+  doc.text(
+    `Cash Received : ₹${(
+      sale.cashReceived ?? 0
+    ).toFixed(2)}`,
+    130,
+    finalY + 48
+  );
+
+  doc.text(
+    `Change Returned : ₹${(
+      sale.changeReturned ?? 0
+    ).toFixed(2)}`,
+    130,
+    finalY + 56
+  );
+
+  // ==========================
   // Footer
-  // ------------------------------
+  // ==========================
 
   doc.setFontSize(10);
 
   doc.text(
-    "Thank you for visiting!",
+    "Thank you for choosing our Medical Shop.",
     14,
-    finalY + 25
+    finalY + 75
   );
 
   doc.text(
-    "Please visit again.",
+    "Medicines once sold will not be taken back.",
     14,
-    finalY + 31
+    finalY + 81
   );
 
-  doc.save(
-    `${sale.invoiceNumber}.pdf`
+  doc.text(
+    "Please keep this invoice for future reference.",
+    14,
+    finalY + 87
   );
+
+  doc.text(
+    "Get Well Soon!",
+    14,
+    finalY + 95
+  );
+
+  doc.save(`${sale.invoiceNumber}.pdf`);
 };

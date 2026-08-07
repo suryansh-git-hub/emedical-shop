@@ -5,21 +5,136 @@ import Medicine from "../models/medicineModel.js";
 import { MESSAGES } from "../constants/messages.js";
 
 // ==========================
-// Sales Report
+// Sales Report (Today / Weekly / Monthly / Yearly)
 // ==========================
-export const getSalesReportService = async () => {
-  const sales = await Sale.find()
-    .populate("customer", "customerName contactNumber")
-    .populate("createdBy", "name email")
-    .populate("medicines.medicine", "medicineName company")
-    .sort({ saleDate: -1 })
+
+export const getSalesReportService = async (
+  reportType = "today"
+) => {
+  let startDate = new Date();
+  let endDate = new Date();
+
+  switch (reportType) {
+    case "today":
+      startDate.setHours(0, 0, 0, 0);
+      break;
+
+    case "weekly":
+      startDate.setDate(startDate.getDate() - 7);
+      startDate.setHours(0, 0, 0, 0);
+      break;
+
+    case "monthly":
+      startDate = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        1
+      );
+      break;
+
+    case "yearly":
+      startDate = new Date(
+        startDate.getFullYear(),
+        0,
+        1
+      );
+      break;
+
+    default:
+      startDate.setHours(0, 0, 0, 0);
+  }
+
+  const sales = await Sale.find({
+    saleDate: {
+      $gte: startDate,
+      $lte: endDate,
+    },
+  })
+    .populate(
+      "customer",
+      "customerName contactNumber"
+    )
+    .populate(
+      "createdBy",
+      "name"
+    )
+    .populate(
+      "medicines.medicine",
+      "medicineName purchasePrice"
+    )
+    .sort({
+      saleDate: -1,
+    })
     .lean();
 
+  let totalRevenue = 0;
+  let totalProfit = 0;
+
+  const report = sales.map((sale) => {
+    let invoiceProfit = 0;
+
+    sale.medicines.forEach((item) => {
+      const purchasePrice =
+        Number(
+          item.medicine?.purchasePrice
+        ) || 0;
+
+      const sellingPrice =
+        Number(item.sellingPrice) || 0;
+
+      invoiceProfit +=
+        (sellingPrice - purchasePrice) *
+        item.quantity;
+    });
+
+    totalRevenue += sale.totalAmount;
+    totalProfit += invoiceProfit;
+
+    return {
+      _id: sale._id,
+
+      invoiceNumber:
+        sale.invoiceNumber,
+
+      customer:
+        sale.customer?.customerName ||
+        "-",
+
+      saleDate:
+        sale.saleDate,
+
+      totalMedicines:
+        sale.medicines.length,
+
+      revenue:
+        sale.totalAmount,
+
+      profit:
+        invoiceProfit,
+
+      createdBy:
+        sale.createdBy?.name ||
+        "-",
+    };
+  });
+
   return {
-    message: MESSAGES.SALES_FETCHED,
-    sales,
+    message:
+      "Sales report generated successfully.",
+
+    report,
+
+    summary: {
+      totalOrders:
+        report.length,
+
+      totalRevenue,
+
+      totalProfit,
+    },
   };
 };
+
 
 // ==========================
 // Purchase Report
@@ -45,7 +160,16 @@ export const getInventoryReportService = async () => {
   const inventory = await Inventory.find()
     .populate(
       "medicine",
-      "medicineName genericName company category batchNumber expiryDate"
+      `
+      medicineName
+      genericName
+      company
+      category
+      batchNumber
+      expiryDate
+      purchasePrice
+      sellingPrice
+      `
     )
     .sort({ currentStock: 1 })
     .lean();

@@ -1,5 +1,8 @@
 import Medicine from "../models/medicineModel.js";
 import { MESSAGES } from "../constants/messages.js";
+import Inventory from "../models/inventoryModel.js";
+import Purchase from "../models/purchaseModel.js";
+import Sale from "../models/saleModel.js";
 
 // =======================================
 // Create Medicine
@@ -229,6 +232,7 @@ if (Number(sellingPrice) < Number(purchasePrice)) {
 // Delete Medicine
 // =======================================
 export const deleteMedicineService = async (id) => {
+  // Check if medicine exists
   const medicine = await Medicine.findById(id);
 
   if (!medicine) {
@@ -236,6 +240,54 @@ export const deleteMedicineService = async (id) => {
     error.statusCode = 404;
     throw error;
   }
+
+  // ==========================
+  // Check Purchase History
+  // ==========================
+
+  const purchaseExists = await Purchase.exists({
+    "medicines.medicine": id,
+  });
+
+  if (purchaseExists) {
+    const error = new Error(
+      "Medicine cannot be deleted because it exists in purchase history."
+    );
+
+    error.statusCode = 400;
+
+    throw error;
+  }
+
+  // ==========================
+  // Check Sales History
+  // ==========================
+
+  const saleExists = await Sale.exists({
+    "medicines.medicine": id,
+  });
+
+  if (saleExists) {
+    const error = new Error(
+      "Medicine cannot be deleted because it exists in sales history."
+    );
+
+    error.statusCode = 400;
+
+    throw error;
+  }
+
+  // ==========================
+  // Delete Inventory Record
+  // ==========================
+
+  await Inventory.deleteOne({
+    medicine: id,
+  });
+
+  // ==========================
+  // Delete Medicine
+  // ==========================
 
   await Medicine.findByIdAndDelete(id);
 

@@ -181,20 +181,28 @@ function Dashboard() {
         <CategorySalesChart
           data={dashboard.categorySales}
         />
+
+         {isAdmin && (
+          <RecentPurchases
+            purchases={dashboard.recentPurchases}
+          />
+        )}
       </div>
 
       {/* Purchases & Top Selling */}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        {isAdmin && (
-          <RecentPurchases
-            purchases={dashboard.recentPurchases}
-          />
-        )}
+       
 
         <TopSellingMedicines
           medicines={
             dashboard.topSellingMedicines
+          }
+        />
+
+         <ExpiringMedicines
+          medicines={
+            dashboard.expiringMedicines
           }
         />
       </div>
@@ -202,11 +210,7 @@ function Dashboard() {
       {/* Expiring Medicines */}
 
       <div className="mt-8">
-        <ExpiringMedicines
-          medicines={
-            dashboard.expiringMedicines
-          }
-        />
+       
       </div>
     </>
   );

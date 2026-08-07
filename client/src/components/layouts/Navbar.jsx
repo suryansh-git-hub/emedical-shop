@@ -1,4 +1,4 @@
-import { Search, Bell, LogOut } from "lucide-react";
+import { Search,  LogOut } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 function Navbar() {
@@ -24,9 +24,7 @@ function Navbar() {
 
       {/* Right */}
       <div className="flex items-center gap-6">
-        <button className="relative">
-          <Bell size={22} />
-        </button>
+      
 
         <div className="text-right">
           <p className="font-semibold">

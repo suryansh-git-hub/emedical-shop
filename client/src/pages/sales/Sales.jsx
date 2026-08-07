@@ -1,83 +1,66 @@
-import { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Loader, Loader2 } from "lucide-react";
+import { Loader } from "lucide-react";
 
-import SalesForm from "../../components/sales/SalesForm";
-import SalesModal from "../../components/sales/SalesModal";
-import SalesTable from "../../components/sales/SalesTable";
-import AddBillButton from "../../components/sales/AddBillButton";
+import CustomerSearch from "../../components/sales/CustomerSearch";
+// import CustomerCard from "../../components/sales/CustomerCard";
+import MedicineSearch from "../../components/sales/MedicineSearch";
+import BillItemsTable from "../../components/sales/BillItemsTable";
+import BillSummary from "../../components/sales/BillSummary";
+// import SalesTable from "../../components/sales/SalesTable";
 
 import {
-  getSales,
-  getCustomers,
-  getMedicines,
-  addSale,
+ getCustomers,  getMedicines, addSale,
 } from "../../services/saleService";
 
-const initialFormData = {
-  customer: "",
-
-  saleDate: new Date()
-    .toISOString()
-    .split("T")[0],
-
-  medicines: [
-    {
-      medicine: "",
-      quantity: 1,
-      sellingPrice: "",
-      gst: 0,
-    },
-  ],
-
-  // Billing
-
-  discountType: "flat",
-
-  discount: 0,
-
-  paymentMethod: "Cash",
-
-  cashReceived: "",
-
-  notes: "",
-};
-
 const Sales = () => {
+  const navigate = useNavigate();
+
+  // ==========================
+  // Loading
+  // ==========================
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [sales, setSales] = useState([]);
+  // ==========================
+  // Master Data
+  // ==========================
+
+
   const [customers, setCustomers] = useState([]);
   const [medicines, setMedicines] = useState([]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState(initialFormData);
+  // ==========================
+  // Billing Data
+  // ==========================
 
-  // Filters
-  const [search, setSearch] = useState("");
-  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedCustomer, setSelectedCustomer] =
+    useState(null);
 
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [billItems, setBillItems] =
+    useState([]);
 
-  const selectedMedicine = location.state?.medicine || null;
+    const [paymentMethod, setPaymentMethod] = useState("Cash");
+const [cashReceived, setCashReceived] = useState("");
 
   // ==========================
   // Fetch Sales
   // ==========================
 
-  const fetchSales = async () => {
-    try {
-      const response = await getSales();
-      setSales(response.sales || []);
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to fetch sales."
-      );
-    }
-  };
+  // const fetchSales = async () => {
+  //   try {
+  //     const response = await getSales();
+
+  //     setSales(response.sales || []);
+  //   } catch (error) {
+  //     toast.error(
+  //       error.response?.data?.message ||
+  //         "Failed to fetch sales."
+  //     );
+  //   }
+  // };
 
   // ==========================
   // Fetch Customers
@@ -85,11 +68,16 @@ const Sales = () => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await getCustomers();
-      setCustomers(response.customers || []);
+      const response =
+        await getCustomers();
+
+      setCustomers(
+        response.customers || []
+      );
     } catch (error) {
       toast.error(
-        error.response?.data?.message || "Failed to fetch customers."
+        error.response?.data?.message ||
+          "Failed to fetch customers."
       );
     }
   };
@@ -98,207 +86,303 @@ const Sales = () => {
   // Fetch Medicines
   // ==========================
 
-  const fetchMedicines = async () => {
-    try {
-      const response = await getMedicines();
-      setMedicines(response.medicines || []);
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to fetch medicines."
-      );
-    }
-  };
+  const fetchMedicines =
+    async () => {
+      try {
+        const response =
+          await getMedicines();
+
+        setMedicines(
+          response.medicines || []
+        );
+      } catch (error) {
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to fetch medicines."
+        );
+      }
+    };
 
   // ==========================
   // Initial Load
   // ==========================
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
+    const loadData =
+      async () => {
+        try {
+          setLoading(true);
 
-        await Promise.all([
-          fetchSales(),
-          fetchCustomers(),
-          fetchMedicines(),
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
+          await Promise.all([
+            // fetchSales(),
+            fetchCustomers(),
+            fetchMedicines(),
+          ]);
+        } finally {
+          setLoading(false);
+        }
+      };
 
     loadData();
   }, []);
 
   // ==========================
-  // Open Billing from Inventory
+  // Select Customer
   // ==========================
 
-  useEffect(() => {
-    if (selectedMedicine) {
-      setFormData({
-        ...initialFormData,
-
-        saleDate: new Date()
-          .toISOString()
-          .split("T")[0],
-
-        medicines: [
-          {
-            medicine: selectedMedicine._id,
-            quantity: 1,
-            sellingPrice: "",
-            gst: selectedMedicine.gst || 0,
-          },
-        ],
-      });
-
-      setIsModalOpen(true);
-
-      navigate(location.pathname, {
-        replace: true,
-        state: null,
-      });
-    }
-  }, [selectedMedicine, navigate, location.pathname]);
-
-  // ==========================
-  // Add Bill
-  // ==========================
-
-  const handleAddBill = () => {
-    setFormData({
-      ...initialFormData,
-
-      saleDate: new Date()
-        .toISOString()
-        .split("T")[0],
-    });
-
-    setIsModalOpen(true);
+  const handleCustomerSelect = (
+    customer
+  ) => {
+    setSelectedCustomer(customer);
   };
 
   // ==========================
-  // Save Bill
+  // Add Medicine
   // ==========================
 
-  const handleSaveBill = async (e) => {
-    e.preventDefault();
+  const handleMedicineSelect = (
+    medicine
+  ) => {
+    const existing =
+      billItems.find(
+        (item) =>
+          item._id === medicine._id
+      );
 
-    // Customer Validation
+    // Already Added
 
-    if (!formData.customer) {
-      return toast.error("Please select a customer.");
+    if (existing) {
+      setBillItems((prev) =>
+        prev.map((item) =>
+          item._id === medicine._id
+            ? {
+                ...item,
+                quantity:
+                  item.quantity + 1,
+              }
+            : item
+        )
+      );
+
+      return;
     }
 
-    // Medicine Validation
+    // New Medicine
 
-    if (formData.medicines.some((item) => !item.medicine)) {
-      return toast.error("Please select medicine.");
-    }
+    setBillItems((prev) => [
+      ...prev,
+      {
+        _id: medicine._id,
 
-    // Cash Validation
+        medicine: medicine._id,
 
-    const subtotal = formData.medicines.reduce(
-      (sum, item) =>
-        sum + Number(item.quantity) * Number(item.sellingPrice),
-      0
+        medicineName:
+          medicine.medicineName,
+
+        genericName:
+          medicine.genericName,
+
+        batchNumber:
+          medicine.batchNumber,
+
+        stock:
+          medicine.stock,
+
+        quantity: 1,
+
+        gst:
+          medicine.gst || 0,
+
+        sellingPrice:
+          medicine.sellingPrice,
+
+        purchasePrice:
+          medicine.purchasePrice,
+      },
+    ]);
+  };
+
+  // ==========================
+  // Remove Medicine
+  // ==========================
+
+  // const removeMedicine = (
+  //   id
+  // ) => {
+  //   setBillItems((prev) =>
+  //     prev.filter(
+  //       (item) =>
+  //         item._id !== id
+  //     )
+  //   );
+  // };
+
+  // ==========================
+  // Clear Bill
+  // ==========================
+
+  const clearBill = () => {
+    setSelectedCustomer(null);
+
+    setBillItems([]);
+     setPaymentMethod("Cash");
+  setCashReceived("");
+  };
+
+    // ==========================
+  // Bill Calculations
+  // ==========================
+
+  const subtotal = billItems.reduce(
+    (sum, item) =>
+      sum +
+      item.quantity * item.sellingPrice,
+    0
+  );
+
+  const gstAmount = billItems.reduce(
+    (sum, item) =>
+      sum +
+      (item.quantity *
+        item.sellingPrice *
+        item.gst) /
+        100,
+    0
+  );
+
+const rewardDiscount = Math.min(
+  selectedCustomer?.rewardPoints || 0,
+  subtotal + gstAmount
+);
+
+  const grandTotal =
+    subtotal +
+    gstAmount -
+    rewardDiscount;
+
+  // ==========================
+  // Generate Bill
+  // ==========================
+
+const handleGenerateBill = async () => {
+  // ==========================
+  // Customer Validation
+  // ==========================
+
+  if (!selectedCustomer) {
+    return toast.error(
+      "Please select a customer."
+    );
+  }
+
+  // ==========================
+  // Medicine Validation
+  // ==========================
+
+  if (billItems.length === 0) {
+    return toast.error(
+      "Please add at least one medicine."
+    );
+  }
+
+  // ==========================
+  // Cash Validation
+  // ==========================
+
+  if (
+    paymentMethod === "Cash" &&
+    Number(cashReceived) < grandTotal
+  ) {
+    return toast.error(
+      "Cash received is less than bill amount."
+    );
+  }
+
+  try {
+    setSaving(true);
+
+    // ==========================
+    // Payload
+    // ==========================
+
+    const payload = {
+      customer: selectedCustomer._id,
+
+      saleDate: new Date(),
+
+      medicines: billItems.map((item) => ({
+        medicine: item.medicine,
+        quantity: Number(item.quantity),
+        sellingPrice: Number(item.sellingPrice),
+        gst: Number(item.gst),
+      })),
+
+      // Billing
+
+      discountType: "flat",
+
+      discount: rewardDiscount,
+
+      redeemPoints: rewardDiscount,
+
+      // Payment
+
+      paymentMethod,
+
+    
+       cashReceived:
+  paymentMethod === "Cash"
+    ? Number(cashReceived || 0)
+    : 0,
+
+      notes: "",
+    };
+
+    console.log(
+      "========== BILL =========="
+    );
+    console.log(payload);
+
+    const response = await addSale(
+      payload
     );
 
-    const gstAmount = formData.medicines.reduce((sum, item) => {
-      return (
-        sum +
-        (Number(item.quantity) *
-          Number(item.sellingPrice) *
-          Number(item.gst || 0)) /
-          100
+    toast.success(response.message);
+
+    // ==========================
+    // Reset Billing Screen
+    // ==========================
+
+    clearBill();
+
+    // ==========================
+    // Go To Invoice
+    // ==========================
+
+    if (response.sale?._id) {
+      navigate(
+        `/sales/invoice/${response.sale._id}`
       );
-    }, 0);
-
-    let discountAmount = 0;
-
-    if (formData.discountType === "percentage") {
-      discountAmount = (subtotal * Number(formData.discount || 0)) / 100;
-    } else {
-      discountAmount = Number(formData.discount || 0);
     }
-
-    const grandTotal = subtotal + gstAmount - discountAmount;
-
-    if (
-      formData.paymentMethod === "Cash" &&
-      Number(formData.cashReceived) < grandTotal
-    ) {
-      return toast.error("Cash received is less than Grand Total.");
-    }
-
-    try {
-      setSaving(true);
-
-      const payload = {
-        ...formData,
-
-        medicines: formData.medicines.map((item) => ({
-          medicine: item.medicine,
-          quantity: Number(item.quantity),
-          sellingPrice: Number(item.sellingPrice),
-          gst: Number(item.gst || 0),
-        })),
-
-        discount: Number(formData.discount),
-
-        cashReceived: Number(formData.cashReceived || 0),
-      };
-console.log("========== FRONTEND PAYLOAD ==========");
-console.log(payload);
-      const response = await addSale(payload);
-
-      toast.success(response.message);
-
-      setIsModalOpen(false);
-
-      setFormData({
-        ...initialFormData,
-
-        saleDate: new Date()
-          .toISOString()
-          .split("T")[0],
-      });
-
-      fetchSales();
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to create bill."
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message ||
+        "Failed to generate bill."
+    );
+  } finally {
+    setSaving(false);
+  }
+};
 
   // ==========================
-  // Filter Sales
+  // Billing History
   // ==========================
 
-  const filteredSales = useMemo(() => {
-    return sales.filter((sale) => {
-      const searchMatch =
-        sale.invoiceNumber
-          ?.toLowerCase()
-          .includes(search.toLowerCase()) ||
-        sale.customer?.customerName
-          ?.toLowerCase()
-          .includes(search.toLowerCase());
 
-      const dateMatch = selectedDate
-        ? new Date(sale.saleDate)
-            .toISOString()
-            .split("T")[0] === selectedDate
-        : true;
 
-      return searchMatch && dateMatch;
-    });
-  }, [sales, search, selectedDate]);
+  // ==========================
+  // Loading
+  // ==========================
 
   if (loading) {
     return (
@@ -308,70 +392,139 @@ console.log(payload);
     );
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
+    return (
+    <div className="space-y-8">
+
+      {/* ==========================
+          Header
+      ========================== */}
 
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Billing Management</h1>
 
-          <p className="text-gray-500">
-            Create and manage customer bills
+        <div>
+          <h1 className="text-3xl font-bold">
+            Billing
+          </h1>
+
+          <p className="mt-1 text-gray-500">
+            Create customer invoices quickly and efficiently.
           </p>
         </div>
 
-        <AddBillButton onClick={handleAddBill} />
       </div>
 
-      {/* Filters */}
+      {/* ==========================
+          Customer Search
+      ========================== */}
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <input
-          type="text"
-          placeholder="Search by Invoice or Customer..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="rounded-lg border px-4 py-2 outline-none focus:border-blue-500"
-        />
+      <CustomerSearch
+        customers={customers}
+        selectedCustomer={selectedCustomer}
+        onSelectCustomer={handleCustomerSelect}
+      />
 
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.target.value)}
-          className="rounded-lg border px-4 py-2 outline-none focus:border-blue-500"
-        />
+
+      {/* ==========================
+          Medicine Search
+      ========================== */}
+
+      <MedicineSearch
+        medicines={medicines}
+        onSelectMedicine={handleMedicineSelect}
+      />
+
+      {/* ==========================
+          Selected Medicines
+      ========================== */}
+
+      <BillItemsTable
+        items={billItems}
+        setItems={setBillItems}
+      />
+
+      {/* ==========================
+          Billing Summary + Generate
+      ========================== */}
+
+      <div className="grid gap-6 lg:grid-cols-3">
+
+        {/* Summary */}
+
+        <div className="lg:col-span-2">
+
+          <BillSummary
+            items={billItems}
+            customer={selectedCustomer}
+             paymentMethod={paymentMethod}
+  setPaymentMethod={setPaymentMethod}
+  cashReceived={cashReceived}
+  setCashReceived={setCashReceived}
+          />
+
+        </div>
+
+        {/* Generate Bill */}
+
+        <div className="rounded-xl border bg-white p-6 shadow-sm">
+
+          <h2 className="mb-6 text-xl font-semibold">
+            Actions
+          </h2>
+
+          <button
+            onClick={handleGenerateBill}
+            disabled={
+              saving ||
+              !selectedCustomer ||
+              billItems.length === 0
+            }
+            className="w-full rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {saving
+              ? "Generating..."
+              : "Generate Bill"}
+          </button>
+
+          <button
+            onClick={clearBill}
+            disabled={saving}
+            className="mt-4 w-full rounded-lg border border-red-500 px-6 py-3 font-semibold text-red-600 transition hover:bg-red-50"
+          >
+            Clear Bill
+          </button>
+
+        </div>
+
       </div>
 
-      {/* Sales Table */}
+      {/* ==========================
+          Billing History
+      ========================== */}
+{/* 
+      <div className="rounded-xl bg-white shadow">
 
-      <SalesTable sales={filteredSales} />
+        <div className="border-b px-6 py-4">
 
-      {/* Billing Modal */}
+          <h2 className="text-xl font-semibold">
+            Recent Bills
+          </h2>
 
-      <SalesModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setFormData({
-            ...initialFormData,
+          <p className="text-sm text-gray-500">
+            Recently generated invoices.
+          </p>
 
-            saleDate: new Date()
-              .toISOString()
-              .split("T")[0],
-          });
-        }}
-      >
-        <SalesForm
-          formData={formData}
-          setFormData={setFormData}
-          customers={customers}
-          medicines={medicines}
-          onSubmit={handleSaveBill}
-          selectedMedicine={selectedMedicine}
-          saving={saving}
+        </div>
+
+        <SalesTable
+          sales={latestSales}
         />
-      </SalesModal>
+
+      </div> */}
+
+            {/* ==========================
+          End Page
+      ========================== */}
+
     </div>
   );
 };

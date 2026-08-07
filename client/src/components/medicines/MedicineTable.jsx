@@ -2,7 +2,13 @@ import { Pencil, Trash2 } from "lucide-react";
 
 const IMAGE_URL = import.meta.env.VITE_BASE_URL;
 
-function MedicineTable({ medicines, loading,onEdit, onDelete,isAdmin }) {
+function MedicineTable({
+  medicines,
+  loading,
+  onEdit,
+  onDelete,
+  isAdmin,
+}) {
   if (loading) {
     return (
       <div className="rounded-lg border bg-white p-8 text-center">
@@ -14,6 +20,8 @@ function MedicineTable({ medicines, loading,onEdit, onDelete,isAdmin }) {
   return (
     <div className="overflow-x-auto rounded-lg border bg-white shadow-sm">
       <table className="min-w-full text-sm">
+        {/* ================= Header ================= */}
+
         <thead className="bg-gray-100">
           <tr>
             <th className="p-3 text-left">Image</th>
@@ -28,19 +36,22 @@ function MedicineTable({ medicines, loading,onEdit, onDelete,isAdmin }) {
             <th className="p-3 text-center">Selling</th>
             <th className="p-3 text-center">GST</th>
             <th className="p-3 text-center">Expiry</th>
-           {isAdmin && (
-  <th className="p-3 text-center">
-    Actions
-  </th>
-)}
+
+            {isAdmin && (
+              <th className="p-3 text-center">
+                Actions
+              </th>
+            )}
           </tr>
         </thead>
+
+        {/* ================= Body ================= */}
 
         <tbody>
           {medicines.length === 0 ? (
             <tr>
               <td
-             colSpan={isAdmin ? 13 : 12} 
+                colSpan={isAdmin ? 13 : 12}
                 className="p-6 text-center text-gray-500"
               >
                 No medicines found.
@@ -53,6 +64,7 @@ function MedicineTable({ medicines, loading,onEdit, onDelete,isAdmin }) {
                 className="border-t hover:bg-gray-50"
               >
                 {/* Image */}
+
                 <td className="p-3">
                   {medicine.medicineImage ? (
                     <img
@@ -67,32 +79,38 @@ function MedicineTable({ medicines, loading,onEdit, onDelete,isAdmin }) {
                   )}
                 </td>
 
-                {/* Medicine Name */}
+                {/* Medicine */}
+
                 <td className="p-3 font-medium">
                   {medicine.medicineName}
                 </td>
 
-                {/* Generic Name */}
+                {/* Generic */}
+
                 <td className="p-3">
                   {medicine.genericName}
                 </td>
 
                 {/* Company */}
+
                 <td className="p-3">
                   {medicine.company}
                 </td>
 
                 {/* Category */}
+
                 <td className="p-3">
                   {medicine.category}
                 </td>
 
                 {/* Batch */}
+
                 <td className="p-3">
                   {medicine.batchNumber}
                 </td>
 
                 {/* Stock */}
+
                 <td
                   className={`p-3 text-center font-semibold ${
                     medicine.stock <= 10
@@ -104,52 +122,64 @@ function MedicineTable({ medicines, loading,onEdit, onDelete,isAdmin }) {
                 </td>
 
                 {/* Unit */}
+
                 <td className="p-3 text-center">
                   {medicine.unit}
                 </td>
 
-                {/* Purchase Price */}
+                {/* Purchase */}
+
                 <td className="p-3 text-center">
                   ₹{medicine.purchasePrice}
                 </td>
 
-                {/* Selling Price */}
+                {/* Selling */}
+
                 <td className="p-3 text-center">
                   ₹{medicine.sellingPrice}
                 </td>
 
                 {/* GST */}
+
                 <td className="p-3 text-center">
                   {medicine.gst}%
                 </td>
 
                 {/* Expiry */}
+
                 <td className="p-3 text-center">
                   {new Date(
                     medicine.expiryDate
                   ).toLocaleDateString("en-IN")}
                 </td>
 
-                {/* Actions */}
-               {isAdmin && (
-  <td className="p-3">
-    <div className="flex justify-center gap-2">
-      <button
-        onClick={() => onEdit(medicine)}
-        className="rounded-lg bg-yellow-500 p-2 text-white transition hover:bg-yellow-600"
-      >
-        <Pencil size={16} />
-      </button>
+                {/* Admin Actions */}
 
-      <button
-        onClick={() => onDelete(medicine._id)}
-        className="rounded-lg bg-red-500 p-2 text-white transition hover:bg-red-600"
-      >
-        <Trash2 size={16} />
-      </button>
-    </div>
-  </td>
-)}
+                {isAdmin && (
+                  <td className="p-3">
+                    <div className="flex justify-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onEdit(medicine)
+                        }
+                        className="rounded-lg bg-yellow-500 p-2 text-white transition hover:bg-yellow-600"
+                      >
+                        <Pencil size={16} />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onDelete(medicine._id)
+                        }
+                        className="rounded-lg bg-red-500 p-2 text-white transition hover:bg-red-600"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </td>
+                )}
               </tr>
             ))
           )}

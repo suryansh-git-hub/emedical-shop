@@ -170,42 +170,45 @@ const isAdmin = user?.role === "admin";
     }
   };
 
-  // ==========================
-  // Edit
-  // ==========================
+// ==========================
+// Edit
+// ==========================
 
-  const handleEdit = (medicine) => {
-    setEditingMedicine(medicine);
+const handleEdit = (medicine) => {
+  if (!isAdmin) return;
 
-    setOpen(true);
-  };
+  setEditingMedicine(medicine);
+  setOpen(true);
+};
 
-  // ==========================
-  // Delete
-  // ==========================
+// ==========================
+// Delete
+// ==========================
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this medicine?"
+const handleDelete = async (id) => {
+  if (!isAdmin) return;
+
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this medicine?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    await deleteMedicine(id);
+
+    toast.success(
+      "Medicine deleted successfully"
     );
 
-    if (!confirmDelete) return;
-
-    try {
-      await deleteMedicine(id);
-
-      toast.success(
-        "Medicine deleted successfully"
-      );
-
-      fetchMedicines();
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message ||
-          "Delete failed"
-      );
-    }
-  };
+    fetchMedicines();
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message ||
+        "Delete failed"
+    );
+  }
+};
 
   return (
     <div className="space-y-6">

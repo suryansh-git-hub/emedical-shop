@@ -34,6 +34,10 @@ const CustomerTable = ({
                 Contact Number
               </th>
 
+              <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
+                Reward Points
+              </th>
+
               <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
                 Email
               </th>
@@ -54,25 +58,42 @@ const CustomerTable = ({
                 key={customer._id}
                 className="border-t hover:bg-gray-50"
               >
+                {/* Customer Name */}
                 <td className="px-6 py-4 font-medium">
                   {customer.customerName}
                 </td>
 
+                {/* Contact */}
                 <td className="px-6 py-4">
                   {customer.contactNumber}
                 </td>
 
+                {/* Reward Points */}
+                <td className="px-6 py-4 text-center">
+                  <span
+                    className={`inline-flex rounded-full px-3 py-1 text-sm font-semibold ${
+                      (customer.rewardPoints || 0) > 0
+                        ? "bg-green-100 text-green-700"
+                        : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    ⭐ {customer.rewardPoints || 0}
+                  </span>
+                </td>
+
+                {/* Email */}
                 <td className="px-6 py-4">
                   {customer.email}
                 </td>
 
+                {/* Address */}
                 <td className="max-w-xs break-words px-6 py-4">
                   {customer.address}
                 </td>
 
+                {/* Actions */}
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-center gap-3">
-
                     <button
                       onClick={() => onHistory(customer)}
                       className="rounded-lg bg-green-100 p-2 text-green-600 transition hover:bg-green-200"
@@ -96,7 +117,6 @@ const CustomerTable = ({
                     >
                       <Trash2 size={18} />
                     </button>
-
                   </div>
                 </td>
               </tr>

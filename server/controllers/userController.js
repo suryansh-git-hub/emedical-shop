@@ -1,4 +1,14 @@
-import { createUserService,getAllUsersService,getUserByIdService,updateUserService,} from "../services/userService.js";
+import {
+  createUserService,
+  getAllUsersService,
+  getUserByIdService,
+  updateUserService,
+  changeUserStatusService,
+} from "../services/userService.js";
+
+// =======================================
+// Create User
+// =======================================
 
 export const createUser = async (req, res) => {
   try {
@@ -17,9 +27,15 @@ export const createUser = async (req, res) => {
   }
 };
 
+// =======================================
+// Get All Users
+// =======================================
+
 export const getAllUsers = async (req, res) => {
   try {
-    const result = await getAllUsersService();
+    const { search = "" } = req.query;
+
+    const result = await getAllUsersService(search);
 
     res.status(200).json({
       success: true,
@@ -34,9 +50,15 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
+// =======================================
+// Get User By ID
+// =======================================
+
 export const getUserById = async (req, res) => {
   try {
-    const result = await getUserByIdService(req.params.id);
+    const result = await getUserByIdService(
+      req.params.id
+    );
 
     res.status(200).json({
       success: true,
@@ -51,9 +73,44 @@ export const getUserById = async (req, res) => {
   }
 };
 
+// =======================================
+// Update User
+// =======================================
+
 export const updateUser = async (req, res) => {
   try {
-    const result = await updateUserService(req.params.id, req.body);
+    const result = await updateUserService(
+      req.params.id,
+      req.body
+    );
+
+    res.status(200).json({
+      success: true,
+      message: result.message,
+      user: result.user,
+    });
+  } catch (error) {
+    res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// =======================================
+// Change User Status
+// =======================================
+
+export const changeUserStatus = async (
+  req,
+  res
+) => {
+  try {
+    const result =
+      await changeUserStatusService(
+        req.params.id,
+        req.body.isActive
+      );
 
     res.status(200).json({
       success: true,

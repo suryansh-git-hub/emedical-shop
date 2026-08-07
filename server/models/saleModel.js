@@ -87,6 +87,17 @@ const saleSchema = new mongoose.Schema(
       default: 0,
       min: 0,
     },
+    redeemedPoints: {
+  type: Number,
+  default: 0,
+  min: 0,
+},
+
+earnedPoints: {
+  type: Number,
+  default: 0,
+  min: 0,
+},
 
     grandTotal: {
       type: Number,

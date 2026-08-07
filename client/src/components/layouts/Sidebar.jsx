@@ -16,7 +16,7 @@ function Sidebar() {
   return (
     <aside className="w-64 bg-slate-900 text-white">
       <div className="border-b border-slate-700 p-6">
-        <h1 className="text-2xl font-bold">MediCare</h1>
+        <h1 className="text-2xl font-bold">eMediShop</h1>
       </div>
 
       <nav className="mt-4 px-3">

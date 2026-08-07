@@ -1,21 +1,24 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Loader } from "lucide-react";
+import { exportToExcel } from "../../utils/exportExcel";
+import { exportToPDF } from "../../utils/exportToPDF";
+import ReportCard from "../../components/reports/ReportCard";
+import ProfitCard from "../../components/reports/ProfitCard";
 
+import PurchaseReportTable from "../../components/reports/PurchaseReportTable";
+import InventoryReportTable from "../../components/reports/InventoryReportTable";
 import BestSellingTable from "../../components/reports/BestSellingTable";
 import ExpiredMedicinesTable from "../../components/reports/ExpiredMedicinesTable";
-import InventoryReportTable from "../../components/reports/InventoryReportTable";
-import LowStockTable from "../../components/dashboard/LowStockTable";
-import ProfitCard from "../../components/reports/ProfitCard";
-import PurchaseReportTable from "../../components/reports/PurchaseReportTable";
-import ReportCard from "../../components/reports/ReportCard";
-import SalesReportTable from "../../components/reports/SalesReportTable";
+
+
+import ReportGenerator from "../../components/reports/ReportGenerator";
+import GeneratedReportTable from "../../components/reports/GeneratedReportTable";
 
 import {
   getSalesReport,
   getPurchaseReport,
   getInventoryReport,
-  getLowStockReport,
   getExpiredMedicinesReport,
   getTodaySalesReport,
   getWeeklySalesReport,
@@ -25,68 +28,289 @@ import {
 } from "../../services/reportService";
 
 const Reports = () => {
-  const [loading, setLoading] = useState(true);
+const [loading, setLoading] =
+  useState(true);
 
-  const [salesReport, setSalesReport] = useState([]);
-  const [purchaseReport, setPurchaseReport] = useState([]);
-  const [inventoryReport, setInventoryReport] = useState([]);
-  const [lowStockReport, setLowStockReport] = useState([]);
-  const [expiredMedicinesReport, setExpiredMedicinesReport] = useState([]);
-  const [bestSellingReport, setBestSellingReport] = useState([]);
+// Existing reports
 
-  const [todaySales, setTodaySales] = useState(0);
-  const [weeklySales, setWeeklySales] = useState(0);
-  const [monthlySales, setMonthlySales] = useState(0);
-  const [profit, setProfit] = useState(0);
+const [purchaseReport, setPurchaseReport] =
+  useState([]);
 
-  const loadReports = async () => {
+const [inventoryReport, setInventoryReport] =
+  useState([]);
+
+const [
+  expiredMedicinesReport,
+  setExpiredMedicinesReport,
+] = useState([]);
+
+const [
+  bestSellingReport,
+  setBestSellingReport,
+] = useState([]);
+
+// Cards
+
+const [todaySales, setTodaySales] =
+  useState(0);
+
+const [weeklySales, setWeeklySales] =
+  useState(0);
+
+const [monthlySales, setMonthlySales] =
+  useState(0);
+
+const [profit, setProfit] =
+  useState(0);
+
+// Generated Report
+
+const [generatedReport, setGeneratedReport] =
+  useState([]);
+
+const [reportSummary, setReportSummary] =
+  useState({
+    totalOrders: 0,
+    totalRevenue: 0,
+    totalProfit: 0,
+});
+
+const [reportTitle, setReportTitle] =
+  useState("");
+
+const [hasGenerated, setHasGenerated] =
+  useState(false);
+
+ const loadReports = async () => {
+  try {
+    setLoading(true);
+
+    const [
+      purchases,
+      inventory,
+      expired,
+      today,
+      weekly,
+      monthly,
+      profitData,
+      bestSelling,
+    ] = await Promise.all([
+      getPurchaseReport(),
+      getInventoryReport(),
+      getExpiredMedicinesReport(),
+      getTodaySalesReport(),
+      getWeeklySalesReport(),
+      getMonthlySalesReport(),
+      getProfitReport(),
+      getBestSellingMedicinesReport(),
+    ]);
+
+    setPurchaseReport(
+      purchases.purchases || []
+    );
+
+    setInventoryReport(
+      inventory.inventory || []
+    );
+
+    setExpiredMedicinesReport(
+      expired.expiredMedicines || []
+    );
+
+    setBestSellingReport(
+      bestSelling.bestSellingMedicines ||
+        []
+    );
+
+    setTodaySales(
+      today.totalSales || 0
+    );
+
+    setWeeklySales(
+      weekly.totalSales || 0
+    );
+
+    setMonthlySales(
+      monthly.totalSales || 0
+    );
+
+    setProfit(
+      profitData.totalProfit || 0
+    );
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message ||
+        "Failed to load reports."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleGenerateReport =
+  async (type) => {
     try {
-      setLoading(true);
+      const response =
+        await getSalesReport(type);
 
-      const [
-        sales,
-        purchases,
-        inventory,
-        lowStock,
-        expired,
-        today,
-        weekly,
-        monthly,
-        profitData,
-        bestSelling,
-      ] = await Promise.all([
-        getSalesReport(),
-        getPurchaseReport(),
-        getInventoryReport(),
-        getLowStockReport(),
-        getExpiredMedicinesReport(),
-        getTodaySalesReport(),
-        getWeeklySalesReport(),
-        getMonthlySalesReport(),
-        getProfitReport(),
-        getBestSellingMedicinesReport(),
-      ]);
+      setGeneratedReport(
+        response.report || []
+      );
 
-      setSalesReport(sales.sales || []);
-      setPurchaseReport(purchases.purchases || []);
-      setInventoryReport(inventory.inventory || []);
-      setLowStockReport(lowStock.medicines || []);
-      setExpiredMedicinesReport(expired.medicines || []);
-      setBestSellingReport(bestSelling.medicines || []);
+      setReportSummary(
+        response.summary
+      );
 
-      setTodaySales(today.totalSales || 0);
-      setWeeklySales(weekly.totalSales || 0);
-      setMonthlySales(monthly.totalSales || 0);
-      setProfit(profitData.totalProfit || 0);
+      switch (type) {
+        case "today":
+          setReportTitle(
+            "Today's Sales Report"
+          );
+          break;
+
+        case "weekly":
+          setReportTitle(
+            "Weekly Sales Report"
+          );
+          break;
+
+        case "monthly":
+          setReportTitle(
+            "Monthly Sales Report"
+          );
+          break;
+
+        case "yearly":
+          setReportTitle(
+            "Yearly Sales Report"
+          );
+          break;
+
+        default:
+          setReportTitle(
+            "Sales Report"
+          );
+      }
+
+      setHasGenerated(true);
+
+      toast.success(
+        "Report generated successfully."
+      );
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
-          "Failed to load reports."
+          "Failed to generate report."
       );
-    } finally {
-      setLoading(false);
     }
   };
+
+const handleExportExcel = () => {
+  if (!generatedReport.length) {
+    toast.error("Generate a report first.");
+    return;
+  }
+
+  const excelData = generatedReport.map(
+    (item) => ({
+      Invoice: item.invoiceNumber,
+
+      Customer: item.customer,
+
+      Date: new Date(
+        item.saleDate
+      ).toLocaleDateString(),
+
+      Medicines: item.totalMedicines,
+
+      Revenue: `₹${Number(
+        item.revenue
+      ).toFixed(2)}`,
+
+      Profit: `₹${Number(
+        item.profit
+      ).toFixed(2)}`,
+
+      "Created By": item.createdBy,
+    })
+  );
+
+  // Summary
+
+  excelData.push({});
+
+  excelData.push({
+    Invoice: "Total Orders",
+    Customer: reportSummary.totalOrders,
+  });
+
+  excelData.push({
+    Invoice: "Total Revenue",
+    Customer: `₹${Number(
+      reportSummary.totalRevenue
+    ).toFixed(2)}`,
+  });
+
+  excelData.push({
+    Invoice: "Total Profit",
+    Customer: `₹${Number(
+      reportSummary.totalProfit
+    ).toFixed(2)}`,
+  });
+
+  exportToExcel(
+    excelData,
+    "Sales Report",
+    reportTitle
+  );
+
+  toast.success(
+    "Excel exported successfully."
+  );
+};
+
+const handleExportPDF = () => {
+  if (!generatedReport.length) {
+    toast.error("Generate a report first.");
+    return;
+  }
+
+exportToPDF({
+  title: reportTitle,
+
+  fileName: reportTitle,
+
+  headers: [
+    "Invoice",
+    "Customer",
+    "Date",
+    "Medicines",
+    "Revenue",
+    "Profit",
+    "Created By",
+  ],
+
+  rows: generatedReport.map((item) => [
+    item.invoiceNumber,
+    item.customer,
+    new Date(item.saleDate).toLocaleDateString(),
+    item.totalMedicines,
+    `₹${item.revenue}`,
+    `₹${item.profit}`,
+    item.createdBy,
+  ]),
+
+  summary: {
+    "Total Orders": reportSummary.totalOrders,
+    "Total Revenue": `₹${reportSummary.totalRevenue}`,
+    "Total Profit": `₹${reportSummary.totalProfit}`,
+  },
+});
+
+  toast.success(
+    "PDF exported successfully."
+  );
+};
 
   useEffect(() => {
     loadReports();
@@ -100,70 +324,93 @@ const Reports = () => {
     );
   }
 
-  return (
-    <div className="space-y-8">
-      {/* Heading */}
+ return (
+  <div className="space-y-8">
 
-      <div>
-        <h1 className="text-2xl font-bold">
-          Reports & Analytics
-        </h1>
+    {/* Heading */}
 
-        <p className="text-gray-500">
-          View business insights and statistics
-        </p>
-      </div>
+    <div>
+      <h1 className="text-2xl font-bold">
+        Reports & Analytics
+      </h1>
 
-      {/* Summary Cards */}
-
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <ReportCard
-          title="Today's Sales"
-          value={`₹${todaySales.toLocaleString()}`}
-        />
-
-        <ReportCard
-          title="Weekly Sales"
-          value={`₹${weeklySales.toLocaleString()}`}
-        />
-
-        <ReportCard
-          title="Monthly Sales"
-          value={`₹${monthlySales.toLocaleString()}`}
-        />
-
-        <ProfitCard profit={profit} />
-      </div>
-
-      {/* Sales Report */}
-
-      <SalesReportTable sales={salesReport} />
-
-      {/* Purchase Report */}
-
-      <PurchaseReportTable purchases={purchaseReport} />
-
-      {/* Inventory Report */}
-
-      <InventoryReportTable inventory={inventoryReport} />
-
-      {/* Bottom Grid */}
-
-      <div className="grid gap-6 xl:grid-cols-2">
-        <LowStockTable medicines={lowStockReport} />
-
-        <ExpiredMedicinesTable
-          medicines={expiredMedicinesReport}
-        />
-      </div>
-
-      {/* Best Selling Medicines */}
-
-      <BestSellingTable
-        medicines={bestSellingReport}
-      />
+      <p className="text-gray-500">
+        View business insights and statistics
+      </p>
     </div>
-  );
+
+    {/* Summary Cards */}
+
+    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+
+      <ReportCard
+        title="Today's Sales"
+        value={`₹${todaySales.toLocaleString()}`}
+      />
+
+      <ReportCard
+        title="Weekly Sales"
+        value={`₹${weeklySales.toLocaleString()}`}
+      />
+
+      <ReportCard
+        title="Monthly Sales"
+        value={`₹${monthlySales.toLocaleString()}`}
+      />
+
+      <ProfitCard
+        profit={profit}
+      />
+
+    </div>
+
+    {/* Report Generator */}
+
+    <ReportGenerator
+      hasReport={hasGenerated}
+      onGenerate={handleGenerateReport}
+      onExportExcel={handleExportExcel}
+      onExportPDF={handleExportPDF}
+    />
+
+    {/* Generated Report */}
+
+    <GeneratedReportTable
+      title={reportTitle}
+      reports={generatedReport}
+      summary={reportSummary}
+    />
+
+    {/* Purchase Report */}
+
+    <PurchaseReportTable
+      purchases={purchaseReport}
+    />
+
+    {/* Inventory Report */}
+
+    <InventoryReportTable
+      inventory={inventoryReport}
+    />
+
+  
+
+    {/* Best Selling */}
+
+    <BestSellingTable
+      medicines={bestSellingReport}
+    />
+
+      {/* Bottom Reports */}
+
+      <ExpiredMedicinesTable
+        medicines={
+          expiredMedicinesReport
+        }
+      />
+
+  </div>
+);
 };
 
 export default Reports;

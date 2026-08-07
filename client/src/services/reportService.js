@@ -6,8 +6,12 @@ Sales Report
 ==========================
 */
 
-export const getSalesReport = async () => {
-  const response = await api.get("/reports/sales");
+export const getSalesReport = async (
+  reportType = "today"
+) => {
+  const response = await api.get(
+    `/reports/sales?type=${reportType}`
+  );
 
   return response.data;
 };
@@ -18,11 +22,14 @@ Purchase Report
 ==========================
 */
 
-export const getPurchaseReport = async () => {
-  const response = await api.get("/reports/purchases");
+export const getPurchaseReport =
+  async () => {
+    const response = await api.get(
+      "/reports/purchases"
+    );
 
-  return response.data;
-};
+    return response.data;
+  };
 
 /*
 ==========================
@@ -30,23 +37,16 @@ Inventory Report
 ==========================
 */
 
-export const getInventoryReport = async () => {
-  const response = await api.get("/reports/inventory");
+export const getInventoryReport =
+  async () => {
+    const response = await api.get(
+      "/reports/inventory"
+    );
 
-  return response.data;
-};
+    return response.data;
+  };
 
 /*
-==========================
-Low Stock Report
-==========================
-*/
-
-export const getLowStockReport = async () => {
-  const response = await api.get("/reports/low-stock");
-
-  return response.data;
-};
 
 /*
 ==========================
@@ -54,59 +54,74 @@ Expired Medicines
 ==========================
 */
 
-export const getExpiredMedicinesReport = async () => {
-  const response = await api.get("/reports/expired-medicines");
+export const getExpiredMedicinesReport =
+  async () => {
+    const response = await api.get(
+      "/reports/expired-medicines"
+    );
 
-  return response.data;
-};
-
-/*
-==========================
-Today's Sales
-==========================
-*/
-
-export const getTodaySalesReport = async () => {
-  const response = await api.get("/reports/sales/today");
-
-  return response.data;
-};
+    return response.data;
+  };
 
 /*
 ==========================
-Weekly Sales
+Today's Sales Card
 ==========================
 */
 
-export const getWeeklySalesReport = async () => {
-  const response = await api.get("/reports/sales/weekly");
+export const getTodaySalesReport =
+  async () => {
+    const response = await api.get(
+      "/reports/sales/today"
+    );
 
-  return response.data;
-};
+    return response.data;
+  };
 
 /*
 ==========================
-Monthly Sales
+Weekly Sales Card
 ==========================
 */
 
-export const getMonthlySalesReport = async () => {
-  const response = await api.get("/reports/sales/monthly");
+export const getWeeklySalesReport =
+  async () => {
+    const response = await api.get(
+      "/reports/sales/weekly"
+    );
 
-  return response.data;
-};
+    return response.data;
+  };
 
 /*
 ==========================
-Profit Report
+Monthly Sales Card
 ==========================
 */
 
-export const getProfitReport = async () => {
-  const response = await api.get("/reports/profit");
+export const getMonthlySalesReport =
+  async () => {
+    const response = await api.get(
+      "/reports/sales/monthly"
+    );
 
-  return response.data;
-};
+    return response.data;
+  };
+
+/*
+==========================
+Profit Card
+==========================
+*/
+
+export const getProfitReport =
+  async () => {
+    const response = await api.get(
+      "/reports/profit"
+    );
+
+    return response.data;
+  };
 
 /*
 ==========================
@@ -114,8 +129,11 @@ Best Selling Medicines
 ==========================
 */
 
-export const getBestSellingMedicinesReport = async () => {
-  const response = await api.get("/reports/best-selling");
+export const getBestSellingMedicinesReport =
+  async () => {
+    const response = await api.get(
+      "/reports/best-selling"
+    );
 
-  return response.data;
-};
+    return response.data;
+  };

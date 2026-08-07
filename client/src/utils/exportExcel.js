@@ -3,6 +3,7 @@ import { saveAs } from "file-saver";
 
 export const exportToExcel = (
   data,
+  sheetName = "Report",
   fileName = "Report"
 ) => {
   if (!data || data.length === 0) {
@@ -16,7 +17,7 @@ export const exportToExcel = (
   XLSX.utils.book_append_sheet(
     workbook,
     worksheet,
-    "Report"
+    sheetName
   );
 
   const excelBuffer = XLSX.write(workbook, {

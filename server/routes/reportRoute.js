@@ -5,7 +5,12 @@ import {
   getPurchaseReport,
   getInventoryReport,
   getLowStockReport,
-  getExpiredMedicinesReport,getTodaySalesReport,getWeeklySalesReport,getMonthlySalesReport,getProfitReport,getBestSellingMedicinesReport,
+  getExpiredMedicinesReport,
+  getTodaySalesReport,
+  getWeeklySalesReport,
+  getMonthlySalesReport,
+  getProfitReport,
+  getBestSellingMedicinesReport,
 } from "../controllers/reportController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -20,7 +25,10 @@ const router = express.Router();
 router.get(
   "/sales",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getSalesReport
 );
 
@@ -30,7 +38,10 @@ router.get(
 router.get(
   "/purchases",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getPurchaseReport
 );
 
@@ -40,7 +51,10 @@ router.get(
 router.get(
   "/inventory",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getInventoryReport
 );
 
@@ -50,7 +64,10 @@ router.get(
 router.get(
   "/low-stock",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getLowStockReport
 );
 
@@ -60,31 +77,51 @@ router.get(
 router.get(
   "/expired-medicines",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getExpiredMedicinesReport
 );
+
+// ==========================
+// Dashboard Summary Cards
+// (Keep these routes)
+// ==========================
 
 router.get(
   "/sales/today",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getTodaySalesReport
 );
 
 router.get(
   "/sales/weekly",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getWeeklySalesReport
 );
 
 router.get(
   "/sales/monthly",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getMonthlySalesReport
 );
 
+// ==========================
+// Profit Report
+// ==========================
 router.get(
   "/profit",
   authMiddleware,
@@ -95,6 +132,9 @@ router.get(
   getProfitReport
 );
 
+// ==========================
+// Best Selling Medicines
+// ==========================
 router.get(
   "/best-selling",
   authMiddleware,
