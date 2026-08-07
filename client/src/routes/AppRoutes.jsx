@@ -6,19 +6,19 @@ import ForgotPassword from "../pages/auth/ForgotPassword";
 
 import Dashboard from "../pages/dashboard/Dashboard";
 import Sales from "../pages/sales/Sales";
+import InvoicePage from "../pages/sales/InvoicePage";
+
 import Medicines from "../pages/medicines/Medicines";
 import Suppliers from "../pages/suppliers/Suppliers";
 import Customers from "../pages/customers/Customers";
 import Purchases from "../pages/purchases/Purchases";
-import Inventory from "../pages/Inventory/Inventory";
+import Inventory from "../pages/inventory/Inventory";
 import Reports from "../pages/reports/Reports";
-import Users from "../pages/users/Users"; // 
+import Users from "../pages/users/Users";
 import NotFound from "../pages/NotFound";
-import InvoicePage from "../pages/sales/InvoicePage";
 
 import ProtectedRoute from "./ProtectedRoute";
 import RoleProtectedRoute from "./RoleProtectedRoute";
-
 import DashboardLayout from "../components/layouts/DashboardLayout";
 
 function AppRoutes() {
@@ -57,7 +57,7 @@ function AppRoutes() {
               element={<Customers />}
             />
 
-             <Route
+            <Route
               path="/inventory"
               element={<Inventory />}
             />
@@ -67,12 +67,12 @@ function AppRoutes() {
               element={<Sales />}
             />
 
-            <Route
-  path="/sales/invoice/:id"
-  element={<InvoicePage />}
-/>
+            {/* Invoice Page */}
 
-           
+            <Route
+              path="/sales/invoice/:id"
+              element={<InvoicePage />}
+            />
 
             <Route
               path="/medicines"
@@ -102,8 +102,6 @@ function AppRoutes() {
                 path="/reports"
                 element={<Reports />}
               />
-
-              {/* ✅ User Management */}
 
               <Route
                 path="/users"
