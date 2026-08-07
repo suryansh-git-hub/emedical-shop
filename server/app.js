@@ -18,7 +18,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
@@ -26,7 +26,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Serve uploaded images
+// Serve uploaded images
 app.use(
   "/uploads",
   express.static(path.join(process.cwd(), "uploads"))
@@ -34,7 +34,6 @@ app.use(
 
 app.use("/api/auth", authRoute);
 app.use("/api/users", userRoute);
-
 app.use("/api/medicines", medicineRoute);
 app.use("/api/suppliers", supplierRoute);
 app.use("/api/customers", customerRoute);
