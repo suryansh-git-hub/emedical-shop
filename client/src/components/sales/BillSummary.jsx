@@ -7,6 +7,9 @@ const BillSummary = ({
   setPaymentMethod,
   cashReceived,
   setCashReceived,
+  onGenerateBill,
+  onClearBill,
+  saving,
 }) => {
   // ==========================
   // Calculations
@@ -14,9 +17,7 @@ const BillSummary = ({
 
   const subtotal = items.reduce(
     (sum, item) =>
-      sum +
-      item.quantity *
-        item.sellingPrice,
+      sum + item.quantity * item.sellingPrice,
     0
   );
 
@@ -43,9 +44,13 @@ const BillSummary = ({
   );
 
   return (
-    <div className="rounded-xl border bg-white p-6 shadow-sm">
+    <div className="w-full rounded-xl border bg-white p-8 shadow-sm">
 
-      <h2 className="mb-6 text-xl font-semibold">
+      {/* ==========================
+          Heading
+      ========================== */}
+
+      <h2 className="mb-6 text-2xl font-semibold">
         Bill Summary
       </h2>
 
@@ -59,8 +64,7 @@ const BillSummary = ({
           <span>Subtotal</span>
 
           <span className="font-medium">
-            ₹
-            {subtotal.toLocaleString()}
+            ₹{subtotal.toLocaleString()}
           </span>
         </div>
 
@@ -68,8 +72,7 @@ const BillSummary = ({
           <span>GST</span>
 
           <span className="font-medium">
-            ₹
-            {gstAmount.toLocaleString()}
+            ₹{gstAmount.toLocaleString()}
           </span>
         </div>
 
@@ -77,20 +80,20 @@ const BillSummary = ({
           <span>Reward Discount</span>
 
           <span>
-            - ₹
-            {rewardDiscount.toLocaleString()}
+            - ₹{rewardDiscount.toLocaleString()}
           </span>
         </div>
 
         <hr />
 
-        <div className="flex justify-between text-2xl font-bold">
+        <div className="flex justify-between text-3xl font-bold">
+
           <span>Grand Total</span>
 
           <span className="text-blue-600">
-            ₹
-            {grandTotal.toLocaleString()}
+            ₹{grandTotal.toLocaleString()}
           </span>
+
         </div>
 
       </div>
@@ -101,7 +104,7 @@ const BillSummary = ({
 
       <div className="mt-8 rounded-xl bg-blue-50 p-5">
 
-        <div className="mb-3 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between">
 
           <span>
             Reward Points Used
@@ -202,6 +205,36 @@ const BillSummary = ({
           </div>
 
         )}
+
+      </div>
+
+      {/* ==========================
+          Actions
+      ========================== */}
+
+      <div className="mt-8 border-t pt-6 space-y-4">
+
+        <button
+          onClick={onGenerateBill}
+          disabled={
+            saving ||
+            !customer ||
+            items.length === 0
+          }
+          className="w-full rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {saving
+            ? "Generating..."
+            : "Generate Bill"}
+        </button>
+
+        <button
+          onClick={onClearBill}
+          disabled={saving}
+          className="w-full rounded-lg border border-red-500 px-6 py-3 font-semibold text-red-600 transition hover:bg-red-50"
+        >
+          Clear Bill
+        </button>
 
       </div>
 

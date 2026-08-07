@@ -446,11 +446,11 @@ const handleGenerateBill = async () => {
           Billing Summary + Generate
       ========================== */}
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="w-full">
 
         {/* Summary */}
 
-        <div className="lg:col-span-2">
+        <div className="w-full">
 
           <BillSummary
             items={billItems}
@@ -459,39 +459,10 @@ const handleGenerateBill = async () => {
   setPaymentMethod={setPaymentMethod}
   cashReceived={cashReceived}
   setCashReceived={setCashReceived}
+    onGenerateBill={handleGenerateBill}
+  onClearBill={clearBill}
+  saving={saving}
           />
-
-        </div>
-
-        {/* Generate Bill */}
-
-        <div className="rounded-xl border bg-white p-6 shadow-sm">
-
-          <h2 className="mb-6 text-xl font-semibold">
-            Actions
-          </h2>
-
-          <button
-            onClick={handleGenerateBill}
-            disabled={
-              saving ||
-              !selectedCustomer ||
-              billItems.length === 0
-            }
-            className="w-full rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {saving
-              ? "Generating..."
-              : "Generate Bill"}
-          </button>
-
-          <button
-            onClick={clearBill}
-            disabled={saving}
-            className="mt-4 w-full rounded-lg border border-red-500 px-6 py-3 font-semibold text-red-600 transition hover:bg-red-50"
-          >
-            Clear Bill
-          </button>
 
         </div>
 
