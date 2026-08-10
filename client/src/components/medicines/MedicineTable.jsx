@@ -1,194 +1,507 @@
-import { Pencil, Trash2 } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  Package,
+  CalendarClock,
+} from "lucide-react";
 
 const IMAGE_URL = import.meta.env.VITE_BASE_URL.replace(
   /\/api\/?$/,
   ""
 );
 
+// ==========================================
+// Get expiry status
+// ==========================================
+
+const getExpiryStatus = (expiryDate) => {
+  const today = new Date();
+  const expiry = new Date(expiryDate);
+
+  today.setHours(0, 0, 0, 0);
+  expiry.setHours(0, 0, 0, 0);
+
+  const difference =
+    expiry.getTime() - today.getTime();
+
+  const daysLeft = Math.ceil(
+    difference / (1000 * 60 * 60 * 24)
+  );
+
+  if (daysLeft < 0) {
+    return {
+      label: "Expired",
+      className: "bg-red-50 text-red-600",
+      dotClass: "bg-red-500",
+    };
+  }
+
+  if (daysLeft <= 30) {
+    return {
+      label: "Expiring Soon",
+      className: "bg-orange-50 text-orange-600",
+      dotClass: "bg-orange-500",
+    };
+  }
+
+  return {
+    label: "Valid",
+    className: "bg-green-50 text-green-600",
+    dotClass: "bg-green-500",
+  };
+};
+
+// ==========================================
+// Medicine Table
+// ==========================================
+
 function MedicineTable({
-  medicines,
+  medicines = [],
   loading,
   onEdit,
   onDelete,
   isAdmin,
 }) {
+  // ==========================================
+  // Loading
+  // ==========================================
+
   if (loading) {
     return (
-      <div className="rounded-lg border bg-white p-8 text-center">
-        Loading medicines...
+      <div className="flex min-h-[350px] flex-col items-center justify-center">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-50">
+          <Package
+            size={24}
+            className="animate-pulse text-blue-600"
+          />
+        </div>
+
+        <p className="font-medium text-slate-700">
+          Loading medicines...
+        </p>
+
+        <p className="mt-1 text-sm text-slate-400">
+          Please wait while we fetch your inventory.
+        </p>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // Empty State
+  // ==========================================
+
+  if (medicines.length === 0) {
+    return (
+      <div className="flex min-h-[350px] flex-col items-center justify-center">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
+          <Package
+            size={28}
+            className="text-slate-400"
+          />
+        </div>
+
+        <h3 className="font-semibold text-slate-800">
+          No medicines found
+        </h3>
+
+        <p className="mt-1 max-w-sm text-center text-sm text-slate-500">
+          Try changing your search or filters to
+          find medicines in your inventory.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border bg-white shadow-sm">
-      <table className="min-w-full text-sm">
-        {/* ================= Header ================= */}
+    <table className="w-full min-w-[1250px]">
 
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-3 text-left">Image</th>
-            <th className="p-3 text-left">Medicine</th>
-            <th className="p-3 text-left">Generic</th>
-            <th className="p-3 text-left">Company</th>
-            <th className="p-3 text-left">Category</th>
-            <th className="p-3 text-left">Batch</th>
-            <th className="p-3 text-center">Stock</th>
-            <th className="p-3 text-center">Unit</th>
-            <th className="p-3 text-center">Purchase</th>
-            <th className="p-3 text-center">Selling</th>
-            <th className="p-3 text-center">GST</th>
-            <th className="p-3 text-center">Expiry</th>
+      {/* ==========================================
+          Header
+      ========================================== */}
 
-            {isAdmin && (
-              <th className="p-3 text-center">
-                Actions
-              </th>
-            )}
-          </tr>
-        </thead>
+      <thead className="bg-slate-50">
 
-        {/* ================= Body ================= */}
+        <tr className="border-b border-slate-200">
 
-        <tbody>
-          {medicines.length === 0 ? (
-            <tr>
-              <td
-                colSpan={isAdmin ? 13 : 12}
-                className="p-6 text-center text-gray-500"
-              >
-                No medicines found.
-              </td>
-            </tr>
-          ) : (
-            medicines.map((medicine) => (
-              <tr
-                key={medicine._id}
-                className="border-t hover:bg-gray-50"
-              >
-                {/* Image */}
+          <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Medicine
+          </th>
 
-                <td className="p-3">
+          <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Generic
+          </th>
+
+          <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Company
+          </th>
+
+          <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Category
+          </th>
+
+          <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Batch
+          </th>
+
+          <th className="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Stock
+          </th>
+
+          <th className="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Unit
+          </th>
+
+          <th className="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Purchase
+          </th>
+
+          <th className="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Selling
+          </th>
+
+          <th className="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
+            GST
+          </th>
+
+          <th className="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
+            Expiry
+          </th>
+
+          {isAdmin && (
+            <th className="px-4 py-4 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Actions
+            </th>
+          )}
+
+        </tr>
+
+      </thead>
+
+      {/* ==========================================
+          Body
+      ========================================== */}
+
+      <tbody>
+
+        {medicines.map((medicine) => {
+
+          const expiryStatus = getExpiryStatus(
+            medicine.expiryDate
+          );
+
+          return (
+            <tr
+              key={medicine._id}
+              className="
+                border-b
+                border-slate-100
+                transition
+                hover:bg-slate-50
+              "
+            >
+
+              {/* ==================================
+                  Medicine
+              ================================== */}
+
+              <td className="px-4 py-4">
+
+                <div className="flex items-center gap-3">
+
                   {medicine.medicineImage ? (
                     <img
                       src={`${IMAGE_URL}/uploads/${medicine.medicineImage}`}
                       alt={medicine.medicineName}
-                      className="h-12 w-12 rounded-lg border object-cover"
+                      className="
+                        h-12
+                        w-12
+                        shrink-0
+                        rounded-xl
+                        border
+                        border-slate-200
+                        bg-white
+                        object-cover
+                      "
+                      onError={(e) => {
+                        e.currentTarget.style.display =
+                          "none";
+                      }}
                     />
                   ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg border bg-gray-100 text-xs text-gray-400">
-                      No Image
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50">
+                      <Package
+                        size={20}
+                        className="text-blue-500"
+                      />
                     </div>
                   )}
+
+                  <div className="min-w-0">
+
+                    <p className="font-semibold text-slate-800">
+                      {medicine.medicineName}
+                    </p>
+
+                    <p className="mt-1 text-xs text-slate-400">
+                      Medicine
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </td>
+
+              {/* ==================================
+                  Generic
+              ================================== */}
+
+              <td className="px-4 py-4 text-sm text-slate-600">
+                {medicine.genericName || "—"}
+              </td>
+
+              {/* ==================================
+                  Company
+              ================================== */}
+
+              <td className="px-4 py-4">
+
+                <span className="text-sm font-medium text-slate-700">
+                  {medicine.company || "—"}
+                </span>
+
+              </td>
+
+              {/* ==================================
+                  Category
+              ================================== */}
+
+              <td className="px-4 py-4">
+
+                <span className="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+                  {medicine.category || "—"}
+                </span>
+
+              </td>
+
+              {/* ==================================
+                  Batch
+              ================================== */}
+
+              <td className="px-4 py-4">
+
+                <span className="rounded-md bg-slate-100 px-2 py-1 font-mono text-xs font-medium text-slate-600">
+                  {medicine.batchNumber || "—"}
+                </span>
+
+              </td>
+
+              {/* ==================================
+                  Stock
+              ================================== */}
+
+              <td className="px-4 py-4 text-center">
+
+                <div className="flex flex-col items-center gap-1">
+
+                  <span
+                    className={`font-bold ${
+                      medicine.stock <= 10
+                        ? "text-red-600"
+                        : "text-green-600"
+                    }`}
+                  >
+                    {medicine.stock}
+                  </span>
+
+                  <span
+                    className={`
+                      rounded-full
+                      px-2
+                      py-0.5
+                      text-[10px]
+                      font-semibold
+                      ${
+                        medicine.stock <= 10
+                          ? "bg-red-50 text-red-600"
+                          : "bg-green-50 text-green-600"
+                      }
+                    `}
+                  >
+                    {medicine.stock <= 10
+                      ? "Low Stock"
+                      : "In Stock"}
+                  </span>
+
+                </div>
+
+              </td>
+
+              {/* ==================================
+                  Unit
+              ================================== */}
+
+              <td className="px-4 py-4 text-center text-sm text-slate-600">
+                {medicine.unit || "—"}
+              </td>
+
+              {/* ==================================
+                  Purchase Price
+              ================================== */}
+
+              <td className="px-4 py-4 text-center">
+
+                <span className="font-medium text-slate-700">
+                  ₹
+                  {Number(
+                    medicine.purchasePrice || 0
+                  ).toLocaleString("en-IN")}
+                </span>
+
+              </td>
+
+              {/* ==================================
+                  Selling Price
+              ================================== */}
+
+              <td className="px-4 py-4 text-center">
+
+                <span className="font-semibold text-green-600">
+                  ₹
+                  {Number(
+                    medicine.sellingPrice || 0
+                  ).toLocaleString("en-IN")}
+                </span>
+
+              </td>
+
+              {/* ==================================
+                  GST
+              ================================== */}
+
+              <td className="px-4 py-4 text-center">
+
+                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                  {medicine.gst || 0}%
+                </span>
+
+              </td>
+
+              {/* ==================================
+                  Expiry
+              ================================== */}
+
+              <td className="px-4 py-4">
+
+                <div className="flex flex-col items-center gap-1">
+
+                  <span
+                    className={`
+                      inline-flex
+                      items-center
+                      gap-1.5
+                      rounded-full
+                      px-2.5
+                      py-1
+                      text-xs
+                      font-semibold
+                      ${expiryStatus.className}
+                    `}
+                  >
+                    <span
+                      className={`
+                        h-1.5
+                        w-1.5
+                        rounded-full
+                        ${expiryStatus.dotClass}
+                      `}
+                    />
+
+                    {expiryStatus.label}
+                  </span>
+
+                  <div className="flex items-center gap-1 text-xs text-slate-400">
+
+                    <CalendarClock size={12} />
+
+                    {new Date(
+                      medicine.expiryDate
+                    ).toLocaleDateString("en-IN")}
+
+                  </div>
+
+                </div>
+
+              </td>
+
+              {/* ==================================
+                  Actions
+              ================================== */}
+
+              {isAdmin && (
+                <td className="px-4 py-4">
+
+                  <div className="flex justify-center gap-2">
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onEdit(medicine)
+                      }
+                      title="Edit medicine"
+                      className="
+                        flex
+                        h-9
+                        w-9
+                        items-center
+                        justify-center
+                        rounded-lg
+                        bg-amber-50
+                        text-amber-600
+                        transition
+                        hover:bg-amber-100
+                        hover:text-amber-700
+                      "
+                    >
+                      <Pencil size={16} />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onDelete(medicine._id)
+                      }
+                      title="Delete medicine"
+                      className="
+                        flex
+                        h-9
+                        w-9
+                        items-center
+                        justify-center
+                        rounded-lg
+                        bg-red-50
+                        text-red-600
+                        transition
+                        hover:bg-red-100
+                        hover:text-red-700
+                      "
+                    >
+                      <Trash2 size={16} />
+                    </button>
+
+                  </div>
+
                 </td>
+              )}
 
-                {/* Medicine */}
+            </tr>
+          );
+        })}
 
-                <td className="p-3 font-medium">
-                  {medicine.medicineName}
-                </td>
+      </tbody>
 
-                {/* Generic */}
-
-                <td className="p-3">
-                  {medicine.genericName}
-                </td>
-
-                {/* Company */}
-
-                <td className="p-3">
-                  {medicine.company}
-                </td>
-
-                {/* Category */}
-
-                <td className="p-3">
-                  {medicine.category}
-                </td>
-
-                {/* Batch */}
-
-                <td className="p-3">
-                  {medicine.batchNumber}
-                </td>
-
-                {/* Stock */}
-
-                <td
-                  className={`p-3 text-center font-semibold ${
-                    medicine.stock <= 10
-                      ? "text-red-600"
-                      : "text-green-600"
-                  }`}
-                >
-                  {medicine.stock}
-                </td>
-
-                {/* Unit */}
-
-                <td className="p-3 text-center">
-                  {medicine.unit}
-                </td>
-
-                {/* Purchase */}
-
-                <td className="p-3 text-center">
-                  ₹{medicine.purchasePrice}
-                </td>
-
-                {/* Selling */}
-
-                <td className="p-3 text-center">
-                  ₹{medicine.sellingPrice}
-                </td>
-
-                {/* GST */}
-
-                <td className="p-3 text-center">
-                  {medicine.gst}%
-                </td>
-
-                {/* Expiry */}
-
-                <td className="p-3 text-center">
-                  {new Date(
-                    medicine.expiryDate
-                  ).toLocaleDateString("en-IN")}
-                </td>
-
-                {/* Admin Actions */}
-
-                {isAdmin && (
-                  <td className="p-3">
-                    <div className="flex justify-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          onEdit(medicine)
-                        }
-                        className="rounded-lg bg-yellow-500 p-2 text-white transition hover:bg-yellow-600"
-                      >
-                        <Pencil size={16} />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          onDelete(medicine._id)
-                        }
-                        className="rounded-lg bg-red-500 p-2 text-white transition hover:bg-red-600"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                )}
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+    </table>
   );
 }
 

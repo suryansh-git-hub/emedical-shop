@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import {
+  Pill,
+  RefreshCw,
+  PackageSearch,
+} from "lucide-react";
+
 import { useAuth } from "../../context/AuthContext";
 
-import PageHeader from "../../components/common/PageHeader";
 import AddMedicineButton from "../../components/medicines/AddMedicineButton";
 import MedicineSearch from "../../components/medicines/MedicineSearch";
 import MedicineFilters from "../../components/medicines/MedicineFilters";
@@ -19,37 +24,50 @@ import {
 } from "../../services/medicineService";
 
 function Medicines() {
+  const { user } = useAuth();
+
+  const isAdmin = user?.role === "admin";
+
+  // ==========================================
+  // Modal
+  // ==========================================
+
   const [open, setOpen] = useState(false);
+
+  const [editingMedicine, setEditingMedicine] =
+    useState(null);
+
+  // ==========================================
+  // Medicines
+  // ==========================================
 
   const [medicines, setMedicines] = useState([]);
 
   const [loading, setLoading] = useState(true);
 
-  const [editingMedicine, setEditingMedicine] =
-    useState(null);
-
-  // ==========================
+  // ==========================================
   // Search
-  // ==========================
+  // ==========================================
 
   const [search, setSearch] = useState("");
 
-  // ==========================
+  // Search value actually used by API
+  const [debouncedSearch, setDebouncedSearch] =
+    useState("");
+
+  // ==========================================
   // Filters
-  // ==========================
+  // ==========================================
 
-  const [category, setCategory] =
-    useState("");
+  const [category, setCategory] = useState("");
 
-  const [company, setCompany] =
-    useState("");
+  const [company, setCompany] = useState("");
 
-  const [expiry, setExpiry] =
-    useState("");
+  const [expiry, setExpiry] = useState("");
 
-  // ==========================
+  // ==========================================
   // Sorting
-  // ==========================
+  // ==========================================
 
   const [sortBy, setSortBy] =
     useState("createdAt");
@@ -57,29 +75,40 @@ function Medicines() {
   const [order, setOrder] =
     useState("desc");
 
-  // ==========================
+  // ==========================================
   // Pagination
-  // ==========================
+  // ==========================================
 
   const [page, setPage] = useState(1);
 
   const [totalPages, setTotalPages] =
     useState(1);
 
-    const { user } = useAuth();
+  // ==========================================
+  // DEBOUNCING
+  // ==========================================
 
-const isAdmin = user?.role === "admin";
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 500);
 
-  // ==========================
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [search]);
+
+  // ==========================================
   // Fetch Medicines
-  // ==========================
+  // ==========================================
 
   const fetchMedicines = async () => {
     try {
       setLoading(true);
 
       const response = await getMedicines({
-        search,
+        search: debouncedSearch,
         category,
         company,
         expiry,
@@ -89,9 +118,11 @@ const isAdmin = user?.role === "admin";
         limit: 10,
       });
 
-      setMedicines(response.medicines);
+      setMedicines(response.medicines || []);
 
-      setTotalPages(response.totalPages);
+      setTotalPages(
+        response.totalPages || 1
+      );
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
@@ -102,15 +133,25 @@ const isAdmin = user?.role === "admin";
     }
   };
 
+  // ==========================================
+  // Fetch when filters/search/page changes
+  // ==========================================
+
   useEffect(() => {
     fetchMedicines();
   }, [
-    search,category,company,expiry,sortBy,order, page,
+    debouncedSearch,
+    category,
+    company,
+    expiry,
+    sortBy,
+    order,
+    page,
   ]);
 
-  // ==========================
+  // ==========================================
   // Add / Edit Medicine
-  // ==========================
+  // ==========================================
 
   const handleSubmit = async (data) => {
     try {
@@ -156,7 +197,6 @@ const isAdmin = user?.role === "admin";
       await fetchMedicines();
 
       setEditingMedicine(null);
-
       setOpen(false);
 
       return true;
@@ -170,123 +210,329 @@ const isAdmin = user?.role === "admin";
     }
   };
 
-// ==========================
-// Edit
-// ==========================
+  // ==========================================
+  // Edit Medicine
+  // ==========================================
 
-const handleEdit = (medicine) => {
-  if (!isAdmin) return;
+  const handleEdit = (medicine) => {
+    if (!isAdmin) return;
 
-  setEditingMedicine(medicine);
-  setOpen(true);
-};
+    setEditingMedicine(medicine);
+    setOpen(true);
+  };
 
-// ==========================
-// Delete
-// ==========================
+  // ==========================================
+  // Delete Medicine
+  // ==========================================
 
-const handleDelete = async (id) => {
-  if (!isAdmin) return;
+  const handleDelete = async (id) => {
+    if (!isAdmin) return;
 
-  const confirmDelete = window.confirm(
-    "Are you sure you want to delete this medicine?"
-  );
-
-  if (!confirmDelete) return;
-
-  try {
-    await deleteMedicine(id);
-
-    toast.success(
-      "Medicine deleted successfully"
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this medicine?"
     );
 
-    fetchMedicines();
-  } catch (error) {
-    toast.error(
-      error.response?.data?.message ||
-        "Delete failed"
-    );
-  }
-};
+    if (!confirmDelete) return;
+
+    try {
+      await deleteMedicine(id);
+
+      toast.success(
+        "Medicine deleted successfully"
+      );
+
+      await fetchMedicines();
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Delete failed"
+      );
+    }
+  };
+
+  // ==========================================
+  // Reset Filters
+  // ==========================================
+
+  const handleResetFilters = () => {
+    setSearch("");
+    setDebouncedSearch("");
+
+    setCategory("");
+    setCompany("");
+    setExpiry("");
+
+    setSortBy("createdAt");
+    setOrder("desc");
+
+    setPage(1);
+  };
+
+  // ==========================================
+  // Open Add Medicine
+  // ==========================================
+
+  const handleAddMedicine = () => {
+    setEditingMedicine(null);
+    setOpen(true);
+  };
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Medicine Management"
-        subtitle="Manage all medicines in your inventory"
-      />
+    <div className="space-y-6 pb-8">
 
-      {/* Add Medicine Button */}
-     {isAdmin && (
-  <div className="flex justify-end">
-    <AddMedicineButton
-      onClick={() => {
-        setEditingMedicine(null);
-        setOpen(true);
-      }}
-    />
-  </div>
-)}
+      {/* ==========================================
+          PAGE HEADER
+      ========================================== */}
 
-      {/* Search */}
-      <MedicineSearch
-        search={search}
-        setSearch={setSearch}
-        setPage={setPage}
-      />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 
-      {/* Filters */}
-      <MedicineFilters
-        category={category}
-        setCategory={setCategory}
-        company={company}
-        setCompany={setCompany}
-        expiry={expiry}
-        setExpiry={setExpiry}
-        sortBy={sortBy}
-        setSortBy={setSortBy}
-        order={order}
-        setOrder={setOrder}
-        setPage={setPage}
-      />
+        <div>
 
-      {/* Medicine Table */}
-    <MedicineTable
-  medicines={medicines}
-  loading={loading}
-  onEdit={handleEdit}
-  onDelete={handleDelete}
-  isAdmin={isAdmin}
-/>
+          <div className="mb-2 flex items-center gap-2">
 
-      {/* Pagination */}
-      <MedicinePagination
-        page={page}
-        setPage={setPage}
-        totalPages={totalPages}
-      />
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50">
+              <Pill
+                size={19}
+                className="text-blue-600"
+              />
+            </div>
 
-      {/* Add / Edit Medicine Modal */}
-   {isAdmin && (
-  <MedicineModal
-    isOpen={open}
-    onClose={() => {
-      setOpen(false);
-      setEditingMedicine(null);
-    }}
-    title={
-      editingMedicine
-        ? "Edit Medicine"
-        : "Add Medicine"
-    }
-  >
-    <MedicineForm
-      onSubmit={handleSubmit}
-      defaultValues={editingMedicine}
-    />
-  </MedicineModal>
-)}
+            <span className="text-sm font-semibold text-blue-600">
+              Inventory Management
+            </span>
+
+          </div>
+
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            Medicines
+          </h1>
+
+          <p className="mt-1 text-sm text-slate-500 sm:text-base">
+            Manage medicines, stock, pricing and expiry details.
+          </p>
+
+        </div>
+
+        {isAdmin && (
+          <AddMedicineButton
+            onClick={handleAddMedicine}
+          />
+        )}
+
+      </div>
+
+      {/* ==========================================
+          SEARCH & FILTERS
+      ========================================== */}
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+
+        <div className="mb-5 flex items-center justify-between">
+
+          <div>
+            <h2 className="text-base font-semibold text-slate-900">
+              Find Medicines
+            </h2>
+
+            <p className="mt-1 text-sm text-slate-500">
+              Search and filter your medicine inventory.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="
+              hidden
+              items-center
+              gap-2
+              rounded-lg
+              border
+              border-slate-200
+              px-3
+              py-2
+              text-sm
+              font-medium
+              text-slate-600
+              transition
+              hover:border-blue-200
+              hover:bg-blue-50
+              hover:text-blue-600
+              sm:flex
+            "
+          >
+            <RefreshCw size={15} />
+            Reset
+          </button>
+
+        </div>
+
+        <div className="space-y-4">
+
+          {/* Search */}
+
+          <MedicineSearch
+            search={search}
+            setSearch={setSearch}
+            setPage={setPage}
+          />
+
+          {/* Filters */}
+
+          <MedicineFilters
+            category={category}
+            setCategory={setCategory}
+            company={company}
+            setCompany={setCompany}
+            expiry={expiry}
+            setExpiry={setExpiry}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            order={order}
+            setOrder={setOrder}
+            setPage={setPage}
+          />
+
+          {/* Mobile Reset */}
+
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="
+              flex
+              w-full
+              items-center
+              justify-center
+              gap-2
+              rounded-lg
+              border
+              border-slate-200
+              px-3
+              py-2
+              text-sm
+              font-medium
+              text-slate-600
+              transition
+              hover:bg-slate-50
+              sm:hidden
+            "
+          >
+            <RefreshCw size={15} />
+            Reset Filters
+          </button>
+
+        </div>
+
+        {/* Debounce indicator */}
+
+        {search !== debouncedSearch && (
+          <div className="mt-3 flex items-center gap-2 text-xs text-slate-400">
+            <RefreshCw
+              size={13}
+              className="animate-spin"
+            />
+
+            Searching...
+          </div>
+        )}
+
+      </div>
+
+      {/* ==========================================
+          MEDICINE INVENTORY
+      ========================================== */}
+
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+        {/* Table Header */}
+
+        <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+
+          <div className="flex items-center gap-3">
+
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100">
+              <PackageSearch
+                size={20}
+                className="text-slate-600"
+              />
+            </div>
+
+            <div>
+              <h2 className="font-semibold text-slate-900">
+                Medicine Inventory
+              </h2>
+
+              <p className="text-sm text-slate-500">
+                {loading
+                  ? "Loading medicines..."
+                  : `${medicines.length} medicines displayed`}
+              </p>
+            </div>
+
+          </div>
+
+          {!loading && (
+            <div className="w-fit rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600">
+              Page {page} of {totalPages}
+            </div>
+          )}
+
+        </div>
+
+        {/* Table */}
+
+        <div className="overflow-x-auto">
+
+          <MedicineTable
+            medicines={medicines}
+            loading={loading}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            isAdmin={isAdmin}
+          />
+
+        </div>
+
+        {/* Pagination */}
+
+        {!loading && medicines.length > 0 && (
+          <div className="border-t border-slate-200 px-5 py-4">
+
+            <MedicinePagination
+              page={page}
+              setPage={setPage}
+              totalPages={totalPages}
+            />
+
+          </div>
+        )}
+
+      </div>
+
+      {/* ==========================================
+          ADD / EDIT MEDICINE MODAL
+      ========================================== */}
+
+      {isAdmin && (
+        <MedicineModal
+          isOpen={open}
+          onClose={() => {
+            setOpen(false);
+            setEditingMedicine(null);
+          }}
+          title={
+            editingMedicine
+              ? "Edit Medicine"
+              : "Add Medicine"
+          }
+        >
+          <MedicineForm
+            onSubmit={handleSubmit}
+            defaultValues={editingMedicine}
+          />
+        </MedicineModal>
+      )}
+
     </div>
   );
 }

@@ -101,9 +101,6 @@ function Dashboard() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 
         <div>
-          <p className="mb-1 text-sm font-medium text-blue-600">
-            Overview
-          </p>
 
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             Dashboard

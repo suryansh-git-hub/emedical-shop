@@ -1,46 +1,115 @@
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
+
 import { Link } from "react-router-dom";
 
 function TopSellingMedicines({ medicines = [] }) {
+  const chartData = medicines.map((medicine) => ({
+    name: medicine.medicineName,
+    quantity: Number(medicine.quantitySold || 0),
+  }));
+
   return (
-    <div className="rounded-xl border bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+      {/* Header */}
       <div className="mb-5 flex items-center justify-between">
-        <h2 className="text-xl font-semibold">
-          Top Selling Medicines
-        </h2>
+        <div>
+          <h2 className="text-lg font-bold text-slate-900">
+            Top Selling Medicines
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Best performing medicines by quantity sold
+          </p>
+        </div>
 
         <Link
           to="/reports"
-          className="text-blue-600 hover:underline"
+          className="rounded-lg px-3 py-2 text-sm font-semibold text-blue-600 transition hover:bg-blue-50"
         >
-          View Report
+          View Report →
         </Link>
       </div>
 
-      {medicines.length === 0 ? (
-        <div className="py-8 text-center text-gray-500">
+      {chartData.length === 0 ? (
+        <div className="flex h-[300px] items-center justify-center rounded-xl bg-slate-50 text-sm text-slate-500">
           No sales data available.
         </div>
       ) : (
-        medicines.map((medicine, index) => (
-          <div
-            key={index}
-            className="mb-4 flex items-center justify-between rounded-lg border p-3 hover:bg-gray-50"
+        <ResponsiveContainer
+          width="100%"
+          height={300}
+        >
+          <BarChart
+            data={chartData}
+            layout="vertical"
+            margin={{
+              top: 5,
+              right: 20,
+              left: 10,
+              bottom: 5,
+            }}
           >
-            <div>
-              <p className="font-medium">
-                {medicine.medicineName}
-              </p>
+            <CartesianGrid
+              stroke="#e2e8f0"
+              strokeDasharray="4 4"
+              horizontal={false}
+            />
 
-              <p className="text-sm text-gray-500">
-                Rank #{index + 1}
-              </p>
-            </div>
+            <XAxis
+              type="number"
+              axisLine={false}
+              tickLine={false}
+              allowDecimals={false}
+              tick={{
+                fill: "#64748b",
+                fontSize: 12,
+              }}
+            />
 
-            <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
-              {medicine.quantitySold} Sold
-            </span>
-          </div>
-        ))
+            <YAxis
+              type="category"
+              dataKey="name"
+              width={90}
+              axisLine={false}
+              tickLine={false}
+              tick={{
+                fill: "#334155",
+                fontSize: 12,
+              }}
+            />
+
+            <Tooltip
+              cursor={{
+                fill: "#f8fafc",
+              }}
+              contentStyle={{
+                borderRadius: "12px",
+                border: "1px solid #e2e8f0",
+                boxShadow:
+                  "0 10px 25px rgba(15, 23, 42, 0.1)",
+              }}
+              formatter={(value) => [
+                `${value} units`,
+                "Sold",
+              ]}
+            />
+
+            <Bar
+              dataKey="quantity"
+              fill="#2563eb"
+              radius={[0, 8, 8, 0]}
+              barSize={22}
+            />
+          </BarChart>
+        </ResponsiveContainer>
       )}
     </div>
   );
