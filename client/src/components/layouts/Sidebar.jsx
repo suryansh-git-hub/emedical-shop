@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { navigation } from "../../constants/navigation";
 import { useAuth } from "../../context/AuthContext";
 
-function Sidebar() {
+function Sidebar({ collapsed = false }) {
   const { user } = useAuth();
 
   const filteredNavigation = navigation.filter((item) => {
@@ -14,57 +14,114 @@ function Sidebar() {
   });
 
   return (
-    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col border-r border-slate-800 bg-slate-950 text-white">
+    <aside
+      className={`
+        sticky top-0 flex h-screen shrink-0 flex-col
+        border-r border-slate-800
+        bg-slate-950 text-white
+        transition-all duration-300 ease-in-out
+        ${collapsed ? "w-20" : "w-64"}
+      `}
+    >
 
       {/* ================= Logo ================= */}
-      <div className="flex h-16 items-center border-b border-slate-800 px-6">
+      <div
+        className={`
+          flex h-16 items-center border-b border-slate-800
+          ${collapsed ? "justify-center px-2" : "px-5"}
+        `}
+      >
 
-        <div className="flex items-center gap-3">
+        <div
+          className={`
+            flex items-center
+            ${collapsed ? "justify-center" : "gap-3"}
+          `}
+        >
 
-          {/* Logo Icon */}
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-sm font-bold shadow-lg shadow-blue-600/20">
+          {/* Logo */}
+          <div
+            className="
+              flex h-10 w-10 shrink-0
+              items-center justify-center
+              rounded-xl
+              bg-blue-600
+              text-sm font-bold
+              text-white
+              shadow-lg
+              shadow-blue-600/20
+            "
+          >
             eM
           </div>
 
           {/* Logo Text */}
-          <div>
-            <h1 className="text-lg font-bold tracking-tight">
-              eMediShop
-            </h1>
+          {!collapsed && (
+            <div className="overflow-hidden">
 
-            <p className="text-[10px] text-slate-400">
-              Medical Management
-            </p>
-          </div>
+              <h1 className="whitespace-nowrap text-lg font-bold tracking-tight">
+                eMediShop
+              </h1>
+
+              <p className="whitespace-nowrap text-[10px] text-slate-400">
+                Medical Management
+              </p>
+
+            </div>
+          )}
 
         </div>
 
       </div>
 
-      {/* ================= User Info ================= */}
-      <div className="border-b border-slate-800 px-4 py-4">
+      {/* ================= User ================= */}
+      <div
+        className={`
+          border-b border-slate-800
+          ${collapsed ? "p-3" : "px-4 py-4"}
+        `}
+      >
 
-        <div className="flex items-center gap-3 rounded-xl bg-slate-900 px-3 py-3">
+        <div
+          className={`
+            flex items-center rounded-xl bg-slate-900
+            ${collapsed
+              ? "justify-center p-2"
+              : "gap-3 px-3 py-3"
+            }
+          `}
+        >
 
           {/* Avatar */}
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-bold">
+          <div
+            className="
+              flex h-9 w-9 shrink-0
+              items-center justify-center
+              rounded-full
+              bg-blue-600
+              text-sm font-bold
+              text-white
+            "
+          >
             {(user?.name || "Admin")
               .charAt(0)
               .toUpperCase()}
           </div>
 
           {/* User Details */}
-          <div className="min-w-0">
+          {!collapsed && (
+            <div className="min-w-0">
 
-            <p className="truncate text-sm font-semibold text-white">
-              {user?.name || "Admin"}
-            </p>
+              <p className="truncate text-sm font-semibold text-white">
+                {user?.name || "Admin"}
+              </p>
 
-            <p className="text-xs capitalize text-slate-400">
-              {user?.role || "Administrator"}
-            </p>
+              <p className="text-xs capitalize text-slate-400">
+                {user?.role || "Administrator"}
+              </p>
 
-          </div>
+            </div>
+          )}
 
         </div>
 
@@ -73,9 +130,11 @@ function Sidebar() {
       {/* ================= Navigation ================= */}
       <nav className="flex-1 overflow-y-auto px-3 py-5">
 
-        <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
-          Main Menu
-        </p>
+        {!collapsed && (
+          <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+            Main Menu
+          </p>
+        )}
 
         <div className="space-y-1">
 
@@ -86,36 +145,57 @@ function Sidebar() {
               <NavLink
                 key={item.path}
                 to={item.path}
+                title={collapsed ? item.name : undefined}
                 className={({ isActive }) =>
-                  `group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
-                      : "text-slate-400 hover:bg-slate-900 hover:text-white"
-                  }`
+                  `
+                    group flex items-center rounded-xl
+                    text-sm font-medium
+                    transition-all duration-200
+                    ${
+                      collapsed
+                        ? "justify-center px-2 py-3"
+                        : "gap-3 px-3 py-2.5"
+                    }
+                    ${
+                      isActive
+                        ? "bg-blue-600 text-white shadow-md shadow-blue-600/20"
+                        : "text-slate-400 hover:bg-slate-900 hover:text-white"
+                    }
+                  `
                 }
               >
                 {({ isActive }) => (
                   <>
+
                     {/* Icon */}
                     <div
-                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition ${
-                        isActive
-                          ? "bg-white/15 text-white"
-                          : "text-slate-500 group-hover:text-blue-400"
-                      }`}
+                      className={`
+                        flex h-8 w-8 shrink-0
+                        items-center justify-center
+                        rounded-lg
+                        transition
+                        ${
+                          isActive
+                            ? "bg-white/15 text-white"
+                            : "text-slate-500 group-hover:text-blue-400"
+                        }
+                      `}
                     >
                       <Icon size={18} strokeWidth={2} />
                     </div>
 
                     {/* Name */}
-                    <span className="truncate">
-                      {item.name}
-                    </span>
+                    {!collapsed && (
+                      <span className="truncate">
+                        {item.name}
+                      </span>
+                    )}
 
-                    {/* Active indicator */}
-                    {isActive && (
+                    {/* Active Indicator */}
+                    {!collapsed && isActive && (
                       <span className="ml-auto h-2 w-2 rounded-full bg-white" />
                     )}
+
                   </>
                 )}
               </NavLink>
@@ -127,21 +207,23 @@ function Sidebar() {
       </nav>
 
       {/* ================= Footer ================= */}
-      <div className="border-t border-slate-800 p-4">
+      {!collapsed && (
+        <div className="border-t border-slate-800 p-4">
 
-        <div className="rounded-xl bg-slate-900 px-3 py-3">
+          <div className="rounded-xl bg-slate-900 px-3 py-3">
 
-          <p className="text-xs font-medium text-slate-300">
-            eMediShop
-          </p>
+            <p className="text-xs font-medium text-slate-300">
+              eMediShop
+            </p>
 
-          <p className="mt-1 text-[11px] text-slate-500">
-            Medical Shop Management System
-          </p>
+            <p className="mt-1 text-[11px] text-slate-500">
+              Medical Shop Management System
+            </p>
+
+          </div>
 
         </div>
-
-      </div>
+      )}
 
     </aside>
   );

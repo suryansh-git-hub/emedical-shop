@@ -1,21 +1,32 @@
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
+
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 
 function DashboardLayout() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed((prev) => !prev);
+  };
+
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-900">
 
       {/* ================= Sidebar ================= */}
-      <Sidebar />
+      <Sidebar collapsed={sidebarCollapsed} />
 
       {/* ================= Main Area ================= */}
       <div className="flex min-w-0 flex-1 flex-col">
 
-        {/* Navbar */}
-        <Navbar />
+        {/* ================= Navbar ================= */}
+        <Navbar
+          onToggleSidebar={toggleSidebar}
+          sidebarCollapsed={sidebarCollapsed}
+        />
 
-        {/* Page Content */}
+        {/* ================= Page Content ================= */}
         <main className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-[1800px] p-4 sm:p-5 lg:p-6">
             <Outlet />
