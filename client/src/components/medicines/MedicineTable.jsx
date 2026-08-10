@@ -1,6 +1,9 @@
 import { Pencil, Trash2 } from "lucide-react";
 
-const IMAGE_URL = import.meta.env.VITE_BASE_URL;
+const IMAGE_URL = import.meta.env.VITE_BASE_URL.replace(
+  /\/api\/?$/,
+  ""
+);
 
 function MedicineTable({
   medicines,
