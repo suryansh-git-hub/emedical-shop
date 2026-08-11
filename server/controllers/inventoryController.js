@@ -74,7 +74,7 @@ export const getInventoryByMedicine =
   };
 
 // =======================================
-// Get Low Stock Medicines
+// Get Low Stock
 // =======================================
 
 export const getLowStockMedicines =
@@ -108,7 +108,7 @@ export const getLowStockMedicines =
   };
 
 // =======================================
-// Get Out Of Stock Medicines
+// Get Out Of Stock
 // =======================================
 
 export const getOutOfStockMedicines =
@@ -142,7 +142,7 @@ export const getOutOfStockMedicines =
   };
 
 // =======================================
-// Get Near Expiry Medicines
+// Get Near Expiry
 // =======================================
 
 export const getNearExpiryMedicines =
@@ -176,7 +176,7 @@ export const getNearExpiryMedicines =
   };
 
 // =======================================
-// Get Expired Medicines
+// Get Expired
 // =======================================
 
 export const getExpiredMedicines =

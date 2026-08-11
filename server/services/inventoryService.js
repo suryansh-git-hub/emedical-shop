@@ -7,6 +7,7 @@ import { MESSAGES } from "../constants/messages.js";
 
 // =======================================
 // Common Inventory Query
+// Search + Filter + Pagination
 // =======================================
 
 const getInventoryWithPagination = async ({
@@ -21,10 +22,14 @@ const getInventoryWithPagination = async ({
   const skip = (page - 1) * limit;
 
   // =======================================
-  // Medicine Search
+  // Medicine Query
   // =======================================
 
-  let medicineIds = null;
+  const medicineQuery = {};
+
+  // =======================================
+  // Search
+  // =======================================
 
   if (search.trim()) {
     const searchRegex = new RegExp(
@@ -32,46 +37,80 @@ const getInventoryWithPagination = async ({
       "i"
     );
 
-    const medicines = await Medicine.find({
-      $or: [
-        {
-          medicineName: searchRegex,
-        },
-        {
-          genericName: searchRegex,
-        },
-        {
-          company: searchRegex,
-        },
-        {
-          category: searchRegex,
-        },
-        {
-          batchNumber: searchRegex,
-        },
-      ],
-    }).select("_id");
-
-    medicineIds = medicines.map(
-      (medicine) => medicine._id
-    );
+    medicineQuery.$or = [
+      {
+        medicineName: searchRegex,
+      },
+      {
+        genericName: searchRegex,
+      },
+      {
+        company: searchRegex,
+      },
+      {
+        category: searchRegex,
+      },
+      {
+        batchNumber: searchRegex,
+      },
+    ];
   }
+
+  // =======================================
+  // Near Expiry
+  // =======================================
+
+  if (filter === "near-expiry") {
+    const today = new Date();
+
+    const next30Days = new Date();
+
+    next30Days.setDate(
+      today.getDate() + 30
+    );
+
+    medicineQuery.expiryDate = {
+      $gte: today,
+      $lte: next30Days,
+    };
+  }
+
+  // =======================================
+  // Expired
+  // =======================================
+
+  if (filter === "expired") {
+    const today = new Date();
+
+    medicineQuery.expiryDate = {
+      $lt: today,
+    };
+  }
+
+  // =======================================
+  // Find Matching Medicines
+  // =======================================
+
+  const medicines = await Medicine.find(
+    medicineQuery
+  ).select("_id");
+
+  const medicineIds = medicines.map(
+    (medicine) => medicine._id
+  );
 
   // =======================================
   // Inventory Query
   // =======================================
 
-  const inventoryQuery = {};
-
-  // Search
-  if (medicineIds !== null) {
-    inventoryQuery.medicine = {
+  const inventoryQuery = {
+    medicine: {
       $in: medicineIds,
-    };
-  }
+    },
+  };
 
   // =======================================
-  // Filters
+  // Low Stock
   // =======================================
 
   if (filter === "low-stock") {
@@ -81,64 +120,16 @@ const getInventoryWithPagination = async ({
     };
   }
 
+  // =======================================
+  // Out Of Stock
+  // =======================================
+
   if (filter === "out-of-stock") {
     inventoryQuery.currentStock = 0;
   }
 
   // =======================================
-  // Near Expiry / Expired
-  // =======================================
-
-  if (
-    filter === "near-expiry" ||
-    filter === "expired"
-  ) {
-    const today = new Date();
-
-    if (filter === "near-expiry") {
-      const next30Days = new Date();
-
-      next30Days.setDate(
-        today.getDate() + 30
-      );
-
-      const medicines = await Medicine.find({
-        expiryDate: {
-          $gte: today,
-          $lte: next30Days,
-        },
-      }).select("_id");
-
-      const expiryMedicineIds =
-        medicines.map(
-          (medicine) => medicine._id
-        );
-
-      inventoryQuery.medicine = {
-        $in: expiryMedicineIds,
-      };
-    }
-
-    if (filter === "expired") {
-      const medicines = await Medicine.find({
-        expiryDate: {
-          $lt: today,
-        },
-      }).select("_id");
-
-      const expiredMedicineIds =
-        medicines.map(
-          (medicine) => medicine._id
-        );
-
-      inventoryQuery.medicine = {
-        $in: expiredMedicineIds,
-      };
-    }
-  }
-
-  // =======================================
-  // Count
+  // Total Records
   // =======================================
 
   const totalItems =
@@ -147,26 +138,27 @@ const getInventoryWithPagination = async ({
     );
 
   // =======================================
-  // Fetch Paginated Data
+  // Paginated Inventory
   // =======================================
 
   const inventory =
-    await Inventory.find(inventoryQuery)
+    await Inventory.find(
+      inventoryQuery
+    )
       .populate(
         "medicine",
-        `
-          medicineName
-          genericName
-          company
-          category
-          batchNumber
-          expiryDate
-        `
+        "medicineName genericName company category batchNumber expiryDate"
       )
-      .sort({ createdAt: -1 })
+      .sort({
+        createdAt: -1,
+      })
       .skip(skip)
       .limit(limit)
       .lean();
+
+  // =======================================
+  // Pagination Information
+  // =======================================
 
   const totalPages =
     Math.ceil(totalItems / limit) || 1;
@@ -198,7 +190,8 @@ export const getAllInventoryService = async ({
     });
 
   return {
-    message: MESSAGES.INVENTORY_FETCHED,
+    message:
+      MESSAGES.INVENTORY_FETCHED,
     ...result,
   };
 };
@@ -215,14 +208,7 @@ export const getInventoryByMedicineService =
       })
         .populate(
           "medicine",
-          `
-            medicineName
-            genericName
-            company
-            category
-            batchNumber
-            expiryDate
-          `
+          "medicineName genericName company category batchNumber expiryDate"
         )
         .lean();
 
@@ -373,8 +359,12 @@ export const getStockMovementHistoryService =
             .map((item) => ({
               date:
                 purchase.purchaseDate,
+
               type: "PURCHASE",
-              quantity: item.quantity,
+
+              quantity:
+                item.quantity,
+
               invoiceNumber:
                 purchase.invoiceNumber,
             }))
@@ -391,8 +381,12 @@ export const getStockMovementHistoryService =
             )
             .map((item) => ({
               date: sale.saleDate,
+
               type: "SALE",
-              quantity: item.quantity,
+
+              quantity:
+                item.quantity,
+
               invoiceNumber:
                 sale.invoiceNumber,
             }))
@@ -410,6 +404,7 @@ export const getStockMovementHistoryService =
     return {
       message:
         MESSAGES.STOCK_HISTORY_FETCHED,
+
       history,
     };
   };

@@ -17,7 +17,7 @@ import { ROLES } from "../constants/roles.js";
 const router = express.Router();
 
 // =======================================
-// Get All Inventory
+// All Inventory
 // =======================================
 
 router.get(
