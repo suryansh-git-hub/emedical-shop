@@ -11,10 +11,45 @@ const IMAGE_URL = import.meta.env.VITE_BASE_URL.replace(
 );
 
 // ==========================================
+// Get proper image URL
+// ==========================================
+
+const getImageUrl = (image) => {
+  if (!image) return null;
+
+  // If backend already returns a complete URL
+  if (
+    image.startsWith("http://") ||
+    image.startsWith("https://")
+  ) {
+    return image;
+  }
+
+  // Remove leading slash
+  let imageName = image.replace(/^\/+/, "");
+
+  // Avoid /uploads/uploads/filename
+  imageName = imageName.replace(
+    /^uploads\/+/i,
+    ""
+  );
+
+  return `${IMAGE_URL}/uploads/${imageName}`;
+};
+
+// ==========================================
 // Get expiry status
 // ==========================================
 
 const getExpiryStatus = (expiryDate) => {
+  if (!expiryDate) {
+    return {
+      label: "Unknown",
+      className: "bg-slate-100 text-slate-500",
+      dotClass: "bg-slate-400",
+    };
+  }
+
   const today = new Date();
   const expiry = new Date(expiryDate);
 
@@ -121,7 +156,6 @@ function MedicineTable({
       ========================================== */}
 
       <thead className="bg-slate-50">
-
         <tr className="border-b border-slate-200">
 
           <th className="px-4 py-4 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -175,7 +209,6 @@ function MedicineTable({
           )}
 
         </tr>
-
       </thead>
 
       {/* ==========================================
@@ -185,9 +218,12 @@ function MedicineTable({
       <tbody>
 
         {medicines.map((medicine) => {
-
           const expiryStatus = getExpiryStatus(
             medicine.expiryDate
+          );
+
+          const imageUrl = getImageUrl(
+            medicine.medicineImage
           );
 
           return (
@@ -209,33 +245,69 @@ function MedicineTable({
 
                 <div className="flex items-center gap-3">
 
-                  {medicine.medicineImage ? (
-                    <img
-                      src={`${IMAGE_URL}/uploads/${medicine.medicineImage}`}
-                      alt={medicine.medicineName}
-                      className="
+                  {/* Image */}
+
+                  <div className="h-12 w-12 shrink-0">
+
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={medicine.medicineName}
+                        className="
+                          h-12
+                          w-12
+                          rounded-xl
+                          border
+                          border-slate-200
+                          bg-white
+                          object-cover
+                        "
+                        onError={(e) => {
+                          e.currentTarget.style.display =
+                            "none";
+
+                          const fallback =
+                            e.currentTarget
+                              .nextElementSibling;
+
+                          if (fallback) {
+                            fallback.classList.remove(
+                              "hidden"
+                            );
+                            fallback.classList.add(
+                              "flex"
+                            );
+                          }
+                        }}
+                      />
+                    ) : null}
+
+                    {/* Fallback */}
+
+                    <div
+                      className={`
                         h-12
                         w-12
-                        shrink-0
+                        items-center
+                        justify-center
                         rounded-xl
-                        border
-                        border-slate-200
-                        bg-white
-                        object-cover
-                      "
-                      onError={(e) => {
-                        e.currentTarget.style.display =
-                          "none";
-                      }}
-                    />
-                  ) : (
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50">
+                        bg-blue-50
+                        ${
+                          imageUrl
+                            ? "hidden"
+                            : "flex"
+                        }
+                      `}
+                    >
                       <Package
                         size={20}
                         className="text-blue-500"
                       />
                     </div>
-                  )}
+
+                  </div>
+
+                  {/* Medicine name */}
 
                   <div className="min-w-0">
 
@@ -253,29 +325,21 @@ function MedicineTable({
 
               </td>
 
-              {/* ==================================
-                  Generic
-              ================================== */}
+              {/* Generic */}
 
               <td className="px-4 py-4 text-sm text-slate-600">
                 {medicine.genericName || "—"}
               </td>
 
-              {/* ==================================
-                  Company
-              ================================== */}
+              {/* Company */}
 
               <td className="px-4 py-4">
-
                 <span className="text-sm font-medium text-slate-700">
                   {medicine.company || "—"}
                 </span>
-
               </td>
 
-              {/* ==================================
-                  Category
-              ================================== */}
+              {/* Category */}
 
               <td className="px-4 py-4">
 
@@ -285,9 +349,7 @@ function MedicineTable({
 
               </td>
 
-              {/* ==================================
-                  Batch
-              ================================== */}
+              {/* Batch */}
 
               <td className="px-4 py-4">
 
@@ -297,9 +359,7 @@ function MedicineTable({
 
               </td>
 
-              {/* ==================================
-                  Stock
-              ================================== */}
+              {/* Stock */}
 
               <td className="px-4 py-4 text-center">
 
@@ -338,17 +398,13 @@ function MedicineTable({
 
               </td>
 
-              {/* ==================================
-                  Unit
-              ================================== */}
+              {/* Unit */}
 
               <td className="px-4 py-4 text-center text-sm text-slate-600">
                 {medicine.unit || "—"}
               </td>
 
-              {/* ==================================
-                  Purchase Price
-              ================================== */}
+              {/* Purchase */}
 
               <td className="px-4 py-4 text-center">
 
@@ -361,9 +417,7 @@ function MedicineTable({
 
               </td>
 
-              {/* ==================================
-                  Selling Price
-              ================================== */}
+              {/* Selling */}
 
               <td className="px-4 py-4 text-center">
 
@@ -376,9 +430,7 @@ function MedicineTable({
 
               </td>
 
-              {/* ==================================
-                  GST
-              ================================== */}
+              {/* GST */}
 
               <td className="px-4 py-4 text-center">
 
@@ -388,9 +440,7 @@ function MedicineTable({
 
               </td>
 
-              {/* ==================================
-                  Expiry
-              ================================== */}
+              {/* Expiry */}
 
               <td className="px-4 py-4">
 
@@ -425,9 +475,13 @@ function MedicineTable({
 
                     <CalendarClock size={12} />
 
-                    {new Date(
-                      medicine.expiryDate
-                    ).toLocaleDateString("en-IN")}
+                    {medicine.expiryDate
+                      ? new Date(
+                          medicine.expiryDate
+                        ).toLocaleDateString(
+                          "en-IN"
+                        )
+                      : "—"}
 
                   </div>
 
@@ -435,9 +489,7 @@ function MedicineTable({
 
               </td>
 
-              {/* ==================================
-                  Actions
-              ================================== */}
+              {/* Actions */}
 
               {isAdmin && (
                 <td className="px-4 py-4">
