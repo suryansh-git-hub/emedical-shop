@@ -5,7 +5,8 @@ import {
   getInventoryByMedicine,
   getLowStockMedicines,
   getOutOfStockMedicines,
-  getNearExpiryMedicines,getExpiredMedicines,
+  getNearExpiryMedicines,
+  getExpiredMedicines,
   getStockMovementHistory,
 } from "../controllers/inventoryController.js";
 
@@ -18,42 +19,62 @@ const router = express.Router();
 // =======================================
 // Get All Inventory
 // =======================================
+
 router.get(
   "/",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getAllInventory
 );
 
 // =======================================
-// Get Low Stock Medicines
+// Low Stock
 // =======================================
+
 router.get(
   "/low-stock",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getLowStockMedicines
 );
 
 // =======================================
-// Get Out Of Stock Medicines
+// Out Of Stock
 // =======================================
+
 router.get(
   "/out-of-stock",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getOutOfStockMedicines
 );
 
 // =======================================
-// Get Near Expiry Medicines
+// Near Expiry
 // =======================================
+
 router.get(
   "/near-expiry",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getNearExpiryMedicines
 );
+
+// =======================================
+// Expired
+// =======================================
 
 router.get(
   "/expired",
@@ -66,22 +87,30 @@ router.get(
 );
 
 // =======================================
-// Stock Movement History
+// Stock History
 // =======================================
+
 router.get(
   "/stock-history/:medicineId",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getStockMovementHistory
 );
 
 // =======================================
-// Get Inventory By Medicine
+// Inventory By Medicine
 // =======================================
+
 router.get(
   "/:medicineId",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getInventoryByMedicine
 );
 

@@ -1,103 +1,284 @@
-import { useEffect, useState, } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Loader } from "lucide-react";
+
+import {
+  Loader,
+  Search,
+  RotateCcw,
+  PackageSearch,
+  ChevronLeft,
+  ChevronRight,
+  X,
+} from "lucide-react";
+
 import InventoryTable from "../../components/inventory/InventoryTable";
 import InventoryFilter from "../../components/inventory/InventoryFilter";
 import InventoryModal from "../../components/inventory/InventoryModal";
 import StockHistoryTable from "../../components/inventory/StockHistoryTable";
-
 
 import {
   getInventory,
   getLowStockMedicines,
   getOutOfStockMedicines,
   getNearExpiryMedicines,
-  getStockHistory,getExpiredMedicines
+  getStockHistory,
+  getExpiredMedicines,
 } from "../../services/inventoryService";
 
 const Inventory = () => {
-  const [loading, setLoading] = useState(true);
-
-  const [inventory, setInventory] = useState([]);
-
-  const [selectedFilter, setSelectedFilter] = useState("all");
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [stockHistory, setStockHistory] = useState([]);
   const navigate = useNavigate();
 
-  // ==========================
+  // ==========================================
+  // Loading
+  // ==========================================
+
+  const [loading, setLoading] =
+    useState(true);
+
+  // ==========================================
+  // Inventory
+  // ==========================================
+
+  const [inventory, setInventory] =
+    useState([]);
+
+  // ==========================================
+  // Filter
+  // ==========================================
+
+  const [selectedFilter, setSelectedFilter] =
+    useState("all");
+
+  // ==========================================
+  // Search
+  // ==========================================
+
+  const [search, setSearch] =
+    useState("");
+
+  const [debouncedSearch, setDebouncedSearch] =
+    useState("");
+
+  const [searching, setSearching] =
+    useState(false);
+
+  // ==========================================
+  // Pagination
+  // ==========================================
+
+  const [page, setPage] =
+    useState(1);
+
+  const [totalPages, setTotalPages] =
+    useState(1);
+
+  const [totalItems, setTotalItems] =
+    useState(0);
+
+  const limit = 10;
+
+  // ==========================================
+  // Stock History
+  // ==========================================
+
+  const [isModalOpen, setIsModalOpen] =
+    useState(false);
+
+  const [stockHistory, setStockHistory] =
+    useState([]);
+
+  // ==========================================
+  // DEBOUNCING
+  // ==========================================
+
+  useEffect(() => {
+    setSearching(true);
+
+    const timer = setTimeout(() => {
+      setDebouncedSearch(
+        search.trim()
+      );
+
+      setPage(1);
+
+      setSearching(false);
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [search]);
+
+  // ==========================================
   // Load Inventory
-  // ==========================
+  // ==========================================
 
   const loadInventory = async () => {
     try {
       setLoading(true);
 
+      const params = {
+        search: debouncedSearch,
+        page,
+        limit,
+      };
+
       let response;
 
       switch (selectedFilter) {
         case "low-stock":
-          response = await getLowStockMedicines();
+          response =
+            await getLowStockMedicines(
+              params
+            );
           break;
 
         case "out-of-stock":
-          response = await getOutOfStockMedicines();
+          response =
+            await getOutOfStockMedicines(
+              params
+            );
           break;
 
         case "near-expiry":
-          response = await getNearExpiryMedicines();
+          response =
+            await getNearExpiryMedicines(
+              params
+            );
           break;
 
         case "expired":
-  response =
-    await getExpiredMedicines();
-  break;
+          response =
+            await getExpiredMedicines(
+              params
+            );
+          break;
 
         default:
-          response = await getInventory();
+          response =
+            await getInventory(params);
       }
 
-      setInventory(response.inventory || []);
+      const data =
+        response.inventory || [];
+
+      setInventory(data);
+
+      setTotalItems(
+        Number(response.totalItems) || 0
+      );
+
+      setTotalPages(
+        Math.max(
+          Number(response.totalPages) || 1,
+          1
+        )
+      );
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
           "Failed to load inventory."
       );
+
+      setInventory([]);
+      setTotalItems(0);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleIncreaseStock = (medicine) => {
-  navigate("/purchases", {
-    state: {
-      medicine,
-    },
-  });
-};
+  // ==========================================
+  // Fetch whenever required
+  // ==========================================
 
-const handleReduceStock = (medicine) => {
-  navigate("/sales", {
-    state: {
-      medicine,
-    },
-  });
-};
+  useEffect(() => {
+    loadInventory();
+  }, [
+    selectedFilter,
+    debouncedSearch,
+    page,
+  ]);
 
+  // ==========================================
+  // Filter
+  // ==========================================
 
+  const handleFilterChange = (
+    value
+  ) => {
+    setSelectedFilter(value);
+    setPage(1);
+  };
 
-  // ==========================
-  // View Stock History
-  // ==========================
+  // ==========================================
+  // Clear Search
+  // ==========================================
 
-  const handleViewHistory = async (medicineId) => {
+  const handleClearSearch = () => {
+    setSearch("");
+    setDebouncedSearch("");
+    setPage(1);
+  };
+
+  // ==========================================
+  // Reset Everything
+  // ==========================================
+
+  const handleReset = () => {
+    setSearch("");
+    setDebouncedSearch("");
+
+    setSelectedFilter("all");
+
+    setPage(1);
+  };
+
+  // ==========================================
+  // Increase Stock
+  // ==========================================
+
+  const handleIncreaseStock = (
+    medicine
+  ) => {
+    navigate("/purchases", {
+      state: {
+        medicine,
+      },
+    });
+  };
+
+  // ==========================================
+  // Reduce Stock
+  // ==========================================
+
+  const handleReduceStock = (
+    medicine
+  ) => {
+    navigate("/sales", {
+      state: {
+        medicine,
+      },
+    });
+  };
+
+  // ==========================================
+  // History
+  // ==========================================
+
+  const handleViewHistory = async (
+    medicineId
+  ) => {
     try {
-      const response = await getStockHistory(medicineId);
+      const response =
+        await getStockHistory(
+          medicineId
+        );
 
-      setStockHistory(response.history || []);
+      setStockHistory(
+        response.history || []
+      );
 
       setIsModalOpen(true);
     } catch (error) {
@@ -108,59 +289,462 @@ const handleReduceStock = (medicine) => {
     }
   };
 
-  useEffect(() => {
-    loadInventory();
-  }, [selectedFilter]);
+  // ==========================================
+  // Pagination
+  // ==========================================
 
-  if (loading) {
-    return <Loader />;
-  }
+  const handlePrevious = () => {
+    if (page > 1) {
+      setPage(
+        (previousPage) =>
+          previousPage - 1
+      );
+    }
+  };
 
-  console.log({
-  handleIncreaseStock,
-  handleReduceStock,
-  handleViewHistory,
-});
+  const handleNext = () => {
+    if (page < totalPages) {
+      setPage(
+        (previousPage) =>
+          previousPage + 1
+      );
+    }
+  };
 
-  return (
-    <div className="space-y-6">
-      {/* Header */}
+  // ==========================================
+  // Loading
+  // ==========================================
 
-      <div>
-        <h1 className="text-2xl font-bold">
-          Inventory Management
-        </h1>
+  if (
+    loading &&
+    inventory.length === 0
+  ) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
+          <Loader
+            size={26}
+            className="animate-spin text-blue-600"
+          />
+        </div>
 
-        <p className="text-gray-500">
-          Monitor stock levels and inventory movement.
+        <p className="mt-4 font-semibold text-slate-700">
+          Loading inventory...
+        </p>
+
+        <p className="mt-1 text-sm text-slate-400">
+          Fetching your stock information.
         </p>
       </div>
+    );
+  }
 
-      {/* Filter */}
+  return (
+    <div className="mx-auto max-w-[1600px] space-y-6 pb-10">
 
-      <InventoryFilter
-        selectedFilter={selectedFilter}
-        setSelectedFilter={setSelectedFilter}
-      />
+      {/* ==========================================
+          HEADER
+      ========================================== */}
 
-      {/* Inventory Table */}
+      <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
 
-      <InventoryTable
-        inventory={inventory}   onIncreaseStock={handleIncreaseStock}
-    onReduceStock={handleReduceStock}
-        onViewHistory={handleViewHistory}
-      />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
-      {/* Stock History Modal */}
+          <div className="flex items-center gap-4">
+
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 shadow-lg shadow-blue-100">
+              <PackageSearch
+                size={27}
+                className="text-white"
+              />
+            </div>
+
+            <div>
+
+              <span className="text-sm font-semibold text-blue-600">
+                Stock Management
+              </span>
+
+              <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                Inventory
+              </h1>
+
+              <p className="mt-1 text-sm text-slate-500">
+                Monitor stock levels, expiry dates
+                and inventory movement.
+              </p>
+
+            </div>
+
+          </div>
+
+          <button
+            type="button"
+            onClick={handleReset}
+            className="
+              flex
+              items-center
+              justify-center
+              gap-2
+              rounded-xl
+              border
+              border-slate-200
+              bg-white
+              px-4
+              py-2.5
+              text-sm
+              font-semibold
+              text-slate-600
+              transition
+              hover:border-blue-200
+              hover:bg-blue-50
+              hover:text-blue-600
+            "
+          >
+            <RotateCcw size={16} />
+            Reset
+          </button>
+
+        </div>
+
+      </div>
+
+      {/* ==========================================
+          SEARCH + FILTER
+      ========================================== */}
+
+      <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+
+        <div className="mb-5">
+
+          <h2 className="font-semibold text-slate-900">
+            Find Inventory
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Search medicines or filter inventory
+            by stock status.
+          </p>
+
+        </div>
+
+        <div className="flex flex-col gap-4 lg:flex-row">
+
+          {/* Search */}
+
+          <div className="relative flex-1">
+
+            <Search
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+            />
+
+            <input
+              type="text"
+              value={search}
+              onChange={(e) =>
+                setSearch(
+                  e.target.value
+                )
+              }
+              placeholder="Search medicine, generic name, company, category or batch..."
+              className="
+                w-full
+                rounded-xl
+                border
+                border-slate-200
+                bg-slate-50
+                py-3.5
+                pl-11
+                pr-11
+                text-sm
+                text-slate-700
+                outline-none
+                transition
+                placeholder:text-slate-400
+                focus:border-blue-500
+                focus:bg-white
+                focus:ring-4
+                focus:ring-blue-100
+              "
+            />
+
+            {search && (
+              <button
+                type="button"
+                onClick={
+                  handleClearSearch
+                }
+                className="
+                  absolute
+                  right-3
+                  top-1/2
+                  flex
+                  h-7
+                  w-7
+                  -translate-y-1/2
+                  items-center
+                  justify-center
+                  rounded-lg
+                  text-slate-400
+                  hover:bg-slate-200
+                  hover:text-slate-700
+                "
+              >
+                <X size={15} />
+              </button>
+            )}
+
+          </div>
+
+          {/* Filter */}
+
+          <div className="lg:w-[450px]">
+
+            <InventoryFilter
+              selectedFilter={
+                selectedFilter
+              }
+              setSelectedFilter={
+                handleFilterChange
+              }
+            />
+
+          </div>
+
+        </div>
+
+        {/* Searching */}
+
+        {searching && (
+          <div className="mt-3 flex items-center gap-2 text-xs font-medium text-blue-600">
+
+            <Loader
+              size={13}
+              className="animate-spin"
+            />
+
+            Searching...
+
+          </div>
+        )}
+
+        {/* Active Search */}
+
+        {!searching &&
+          debouncedSearch && (
+            <div className="mt-4 rounded-xl bg-blue-50 px-4 py-3 text-sm text-blue-700">
+
+              Search results for{" "}
+
+              <span className="font-bold">
+                "{debouncedSearch}"
+              </span>
+
+            </div>
+          )}
+
+      </div>
+
+      {/* ==========================================
+          INVENTORY
+      ========================================== */}
+
+      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+
+        {/* Header */}
+
+        <div className="border-b border-slate-200 px-5 py-5 sm:px-6">
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+
+              <h2 className="font-semibold text-slate-900">
+                Inventory Records
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-500">
+
+                {totalItems > 0
+                  ? `${totalItems} record${
+                      totalItems !== 1
+                        ? "s"
+                        : ""
+                    } found`
+                  : "No inventory records found"}
+
+              </p>
+
+            </div>
+
+            {totalItems > 0 && (
+              <span className="w-fit rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600">
+                Page {page} of{" "}
+                {totalPages}
+              </span>
+            )}
+
+          </div>
+
+        </div>
+
+        {/* Table */}
+
+        <div className="overflow-x-auto">
+
+          <InventoryTable
+            inventory={inventory}
+            onIncreaseStock={
+              handleIncreaseStock
+            }
+            onReduceStock={
+              handleReduceStock
+            }
+            onViewHistory={
+              handleViewHistory
+            }
+          />
+
+        </div>
+
+        {/* ==========================================
+            PAGINATION
+        ========================================== */}
+
+        {totalItems > 0 && (
+          <div className="border-t border-slate-200 px-5 py-4 sm:px-6">
+
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+              <p className="text-sm text-slate-500">
+
+                Showing{" "}
+
+                <span className="font-semibold text-slate-700">
+                  {(page - 1) *
+                    limit +
+                    1}
+                </span>
+
+                {" "}to{" "}
+
+                <span className="font-semibold text-slate-700">
+                  {Math.min(
+                    page * limit,
+                    totalItems
+                  )}
+                </span>
+
+                {" "}of{" "}
+
+                <span className="font-semibold text-slate-700">
+                  {totalItems}
+                </span>
+
+              </p>
+
+              <div className="flex items-center gap-2">
+
+                <button
+                  type="button"
+                  disabled={
+                    page === 1 ||
+                    loading
+                  }
+                  onClick={
+                    handlePrevious
+                  }
+                  className="
+                    flex
+                    items-center
+                    gap-1
+                    rounded-xl
+                    border
+                    border-slate-200
+                    px-3.5
+                    py-2
+                    text-sm
+                    font-medium
+                    text-slate-600
+                    transition
+                    hover:border-blue-200
+                    hover:bg-blue-50
+                    hover:text-blue-600
+                    disabled:cursor-not-allowed
+                    disabled:opacity-40
+                  "
+                >
+                  <ChevronLeft
+                    size={16}
+                  />
+                  Previous
+                </button>
+
+                <div className="flex h-9 min-w-9 items-center justify-center rounded-xl bg-blue-600 px-3 text-sm font-bold text-white">
+                  {page}
+                </div>
+
+                <button
+                  type="button"
+                  disabled={
+                    page >=
+                      totalPages ||
+                    loading
+                  }
+                  onClick={
+                    handleNext
+                  }
+                  className="
+                    flex
+                    items-center
+                    gap-1
+                    rounded-xl
+                    border
+                    border-slate-200
+                    px-3.5
+                    py-2
+                    text-sm
+                    font-medium
+                    text-slate-600
+                    transition
+                    hover:border-blue-200
+                    hover:bg-blue-50
+                    hover:text-blue-600
+                    disabled:cursor-not-allowed
+                    disabled:opacity-40
+                  "
+                >
+                  Next
+                  <ChevronRight
+                    size={16}
+                  />
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+      </div>
+
+      {/* ==========================================
+          STOCK HISTORY
+      ========================================== */}
 
       <InventoryModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() =>
+          setIsModalOpen(false)
+        }
       >
         <StockHistoryTable
           history={stockHistory}
         />
       </InventoryModal>
+
     </div>
   );
 };

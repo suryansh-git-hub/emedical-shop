@@ -13,20 +13,24 @@ import {
 const BillSummary = ({
   items = [],
   customer,
+
+  // Reward points
+  redeemRewardPoints,
+  setRedeemRewardPoints,
+
+  // Payment
   paymentMethod,
   setPaymentMethod,
   cashReceived,
   setCashReceived,
+
+  // Actions
   onGenerateBill,
   onClearBill,
   saving,
-
-  // Reward points
-  useRewardPoints,
-  setUseRewardPoints,
 }) => {
   // ==========================================
-  // Calculations
+  // BILL CALCULATIONS
   // ==========================================
 
   const subtotal = items.reduce(
@@ -47,30 +51,55 @@ const BillSummary = ({
     0
   );
 
-  // Available customer reward points
+  // ==========================================
+  // REWARD POINTS
+  // ==========================================
+
   const availablePoints = Number(
     customer?.rewardPoints || 0
   );
 
-  // Only redeem points when toggle is ON
-  const rewardDiscount = useRewardPoints
-    ? Math.min(
-        availablePoints,
-        Math.floor(subtotal + gstAmount)
-      )
+  /*
+   * Maximum points that can be redeemed.
+   *
+   * Points cannot exceed the current bill amount.
+   */
+  const maximumRewardDiscount = Math.min(
+    availablePoints,
+    Math.floor(subtotal + gstAmount)
+  );
+
+  /*
+   * Reward discount is applied ONLY when
+   * the customer chooses to redeem points.
+   */
+  const rewardDiscount = redeemRewardPoints
+    ? maximumRewardDiscount
     : 0;
+
+  // ==========================================
+  // GRAND TOTAL
+  // ==========================================
 
   const grandTotal = Math.max(
     0,
-    subtotal + gstAmount - rewardDiscount
+    subtotal +
+      gstAmount -
+      rewardDiscount
   );
 
-  // Reward points earned from this purchase
+  // ==========================================
+  // REWARD POINTS EARNED
+  // ==========================================
+
   const rewardEarned = Math.floor(
     grandTotal / 100
   );
 
-  // Cash change
+  // ==========================================
+  // CASH CHANGE
+  // ==========================================
+
   const cashAmount = Number(
     cashReceived || 0
   );
@@ -82,14 +111,17 @@ const BillSummary = ({
       : 0;
 
   // ==========================================
-  // Format Currency
+  // FORMAT CURRENCY
   // ==========================================
 
   const formatCurrency = (value) =>
-    `₹${Number(value).toLocaleString("en-IN", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`;
+    `₹${Number(value).toLocaleString(
+      "en-IN",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    )}`;
 
   return (
     <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_10px_40px_rgba(15,23,42,0.06)]">
@@ -229,6 +261,7 @@ const BillSummary = ({
         <div className="flex items-center justify-between rounded-2xl border border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 px-5 py-5">
 
           <div>
+
             <p className="text-sm font-semibold text-blue-700">
               Grand Total
             </p>
@@ -236,6 +269,7 @@ const BillSummary = ({
             <p className="mt-1 text-3xl font-extrabold tracking-tight text-blue-700 sm:text-4xl">
               {formatCurrency(grandTotal)}
             </p>
+
           </div>
 
           <div className="hidden h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm sm:flex">
@@ -289,12 +323,12 @@ const BillSummary = ({
             type="button"
             disabled={availablePoints === 0}
             onClick={() =>
-              setUseRewardPoints(
-                !useRewardPoints
+              setRedeemRewardPoints(
+                !redeemRewardPoints
               )
             }
             className={`relative h-7 w-14 shrink-0 rounded-full transition ${
-              useRewardPoints
+              redeemRewardPoints
                 ? "bg-amber-500"
                 : "bg-slate-300"
             } ${
@@ -303,11 +337,14 @@ const BillSummary = ({
                 : "cursor-pointer"
             }`}
             aria-label="Toggle reward points"
+            aria-pressed={
+              redeemRewardPoints
+            }
           >
 
             <span
               className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow-sm transition ${
-                useRewardPoints
+                redeemRewardPoints
                   ? "left-8"
                   : "left-1"
               }`}
@@ -340,7 +377,7 @@ const BillSummary = ({
                     className="fill-amber-400 text-amber-400"
                   />
 
-                  {useRewardPoints
+                  {redeemRewardPoints
                     ? rewardDiscount
                     : 0}
 
@@ -378,7 +415,7 @@ const BillSummary = ({
 
               <div
                 className={`flex items-center gap-2 text-sm font-medium ${
-                  useRewardPoints
+                  redeemRewardPoints
                     ? "text-green-600"
                     : "text-slate-500"
                 }`}
@@ -386,7 +423,7 @@ const BillSummary = ({
 
                 <CheckCircle2 size={16} />
 
-                {useRewardPoints
+                {redeemRewardPoints
                   ? "Reward points will be redeemed."
                   : "Reward points will not be redeemed."}
 

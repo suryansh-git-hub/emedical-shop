@@ -5,22 +5,39 @@ import {
   getOutOfStockMedicinesService,
   getNearExpiryMedicinesService,
   getStockMovementHistoryService,
-  getExpiredMedicinesService
+  getExpiredMedicinesService,
 } from "../services/inventoryService.js";
 
 // =======================================
 // Get All Inventory
 // =======================================
-export const getAllInventory = async (req, res) => {
+
+export const getAllInventory = async (
+  req,
+  res
+) => {
   try {
-    const result = await getAllInventoryService();
+    const {
+      search = "",
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    const result =
+      await getAllInventoryService({
+        search,
+        page,
+        limit,
+      });
 
     res.status(200).json({
       success: true,
       ...result,
     });
   } catch (error) {
-    res.status(error.statusCode || 500).json({
+    res.status(
+      error.statusCode || 500
+    ).json({
       success: false,
       message: error.message,
     });
@@ -30,118 +47,193 @@ export const getAllInventory = async (req, res) => {
 // =======================================
 // Get Inventory By Medicine
 // =======================================
-export const getInventoryByMedicine = async (req, res) => {
-  try {
-    const { medicineId } = req.params;
 
-    const result = await getInventoryByMedicineService(medicineId);
+export const getInventoryByMedicine =
+  async (req, res) => {
+    try {
+      const { medicineId } =
+        req.params;
 
-    res.status(200).json({
-      success: true,
-      ...result,
-    });
-  } catch (error) {
-    res.status(error.statusCode || 404).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+      const result =
+        await getInventoryByMedicineService(
+          medicineId
+        );
+
+      res.status(200).json({
+        success: true,
+        ...result,
+      });
+    } catch (error) {
+      res.status(
+        error.statusCode || 404
+      ).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
 
 // =======================================
 // Get Low Stock Medicines
 // =======================================
-export const getLowStockMedicines = async (req, res) => {
-  try {
-    const result = await getLowStockMedicinesService();
 
-    res.status(200).json({
-      success: true,
-      ...result,
-    });
-  } catch (error) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+export const getLowStockMedicines =
+  async (req, res) => {
+    try {
+      const {
+        search = "",
+        page = 1,
+        limit = 10,
+      } = req.query;
+
+      const result =
+        await getLowStockMedicinesService({
+          search,
+          page,
+          limit,
+        });
+
+      res.status(200).json({
+        success: true,
+        ...result,
+      });
+    } catch (error) {
+      res.status(
+        error.statusCode || 500
+      ).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
 
 // =======================================
 // Get Out Of Stock Medicines
 // =======================================
-export const getOutOfStockMedicines = async (req, res) => {
-  try {
-    const result = await getOutOfStockMedicinesService();
 
-    res.status(200).json({
-      success: true,
-      ...result,
-    });
-  } catch (error) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+export const getOutOfStockMedicines =
+  async (req, res) => {
+    try {
+      const {
+        search = "",
+        page = 1,
+        limit = 10,
+      } = req.query;
+
+      const result =
+        await getOutOfStockMedicinesService({
+          search,
+          page,
+          limit,
+        });
+
+      res.status(200).json({
+        success: true,
+        ...result,
+      });
+    } catch (error) {
+      res.status(
+        error.statusCode || 500
+      ).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
 
 // =======================================
 // Get Near Expiry Medicines
 // =======================================
-export const getNearExpiryMedicines = async (req, res) => {
-  try {
-    const result = await getNearExpiryMedicinesService();
 
-    res.status(200).json({
-      success: true,
-      ...result,
-    });
-  } catch (error) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+export const getNearExpiryMedicines =
+  async (req, res) => {
+    try {
+      const {
+        search = "",
+        page = 1,
+        limit = 10,
+      } = req.query;
+
+      const result =
+        await getNearExpiryMedicinesService({
+          search,
+          page,
+          limit,
+        });
+
+      res.status(200).json({
+        success: true,
+        ...result,
+      });
+    } catch (error) {
+      res.status(
+        error.statusCode || 500
+      ).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
 
 // =======================================
-// Get Stock Movement History
+// Get Expired Medicines
 // =======================================
-export const getStockMovementHistory = async (req, res) => {
-  try {
-    const { medicineId } = req.params;
 
-    const result = await getStockMovementHistoryService(medicineId);
+export const getExpiredMedicines =
+  async (req, res) => {
+    try {
+      const {
+        search = "",
+        page = 1,
+        limit = 10,
+      } = req.query;
 
-    res.status(200).json({
-      success: true,
-      ...result,
-    });
-  } catch (error) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+      const result =
+        await getExpiredMedicinesService({
+          search,
+          page,
+          limit,
+        });
 
-export const getExpiredMedicines = async (
-  req,
-  res
-) => {
-  try {
-    const result =
-      await getExpiredMedicinesService();
+      res.status(200).json({
+        success: true,
+        ...result,
+      });
+    } catch (error) {
+      res.status(
+        error.statusCode || 500
+      ).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
 
-    res.status(200).json({
-      success: true,
-      ...result,
-    });
-  } catch (error) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+// =======================================
+// Stock Movement History
+// =======================================
+
+export const getStockMovementHistory =
+  async (req, res) => {
+    try {
+      const { medicineId } =
+        req.params;
+
+      const result =
+        await getStockMovementHistoryService(
+          medicineId
+        );
+
+      res.status(200).json({
+        success: true,
+        ...result,
+      });
+    } catch (error) {
+      res.status(
+        error.statusCode || 500
+      ).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };

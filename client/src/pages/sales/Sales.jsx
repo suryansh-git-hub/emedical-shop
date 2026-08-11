@@ -41,14 +41,21 @@ const Sales = () => {
   // Search
   // ==========================================
 
-  const [customerSearch, setCustomerSearch] = useState("");
-  const [medicineSearch, setMedicineSearch] = useState("");
-
-  const [debouncedCustomerSearch, setDebouncedCustomerSearch] =
+  const [customerSearch, setCustomerSearch] =
     useState("");
 
-  const [debouncedMedicineSearch, setDebouncedMedicineSearch] =
+  const [medicineSearch, setMedicineSearch] =
     useState("");
+
+  const [
+    debouncedCustomerSearch,
+    setDebouncedCustomerSearch,
+  ] = useState("");
+
+  const [
+    debouncedMedicineSearch,
+    setDebouncedMedicineSearch,
+  ] = useState("");
 
   // ==========================================
   // Billing Data
@@ -63,8 +70,11 @@ const Sales = () => {
   // Reward Points
   // ==========================================
 
-  const [redeemRewardPoints, setRedeemRewardPoints] =
-    useState(false);
+  // Reward points are NOT redeemed by default.
+  const [
+    redeemRewardPoints,
+    setRedeemRewardPoints,
+  ] = useState(false);
 
   // ==========================================
   // Payment
@@ -220,8 +230,8 @@ const Sales = () => {
   const handleCustomerSelect = (customer) => {
     setSelectedCustomer(customer);
 
-    // Every new customer starts with reward
-    // redemption disabled.
+    // Every newly selected customer starts
+    // with reward redemption disabled.
     setRedeemRewardPoints(false);
   };
 
@@ -233,6 +243,10 @@ const Sales = () => {
     const existing = billItems.find(
       (item) => item._id === medicine._id
     );
+
+    // ========================================
+    // Already Added
+    // ========================================
 
     if (existing) {
       if (
@@ -251,7 +265,8 @@ const Sales = () => {
           item._id === medicine._id
             ? {
                 ...item,
-                quantity: item.quantity + 1,
+                quantity:
+                  item.quantity + 1,
               }
             : item
         )
@@ -260,6 +275,10 @@ const Sales = () => {
       return;
     }
 
+    // ========================================
+    // Out Of Stock
+    // ========================================
+
     if (Number(medicine.stock) <= 0) {
       toast.error(
         "This medicine is out of stock."
@@ -267,6 +286,10 @@ const Sales = () => {
 
       return;
     }
+
+    // ========================================
+    // Add New Medicine
+    // ========================================
 
     setBillItems((prev) => [
       ...prev,
@@ -314,6 +337,7 @@ const Sales = () => {
 
     setCashReceived("");
 
+    // Reset reward redemption
     setRedeemRewardPoints(false);
 
     setCustomerSearch("");
@@ -351,16 +375,23 @@ const Sales = () => {
   // Reward Points
   // ==========================================
 
-  const availableRewardPoints =
-    Number(
-      selectedCustomer?.rewardPoints || 0
-    );
+  const availableRewardPoints = Number(
+    selectedCustomer?.rewardPoints || 0
+  );
 
+  /*
+   * Reward points are treated as a flat
+   * discount and cannot exceed the bill total.
+   */
   const maximumRewardDiscount = Math.min(
     availableRewardPoints,
     subtotal + gstAmount
   );
 
+  /*
+   * Only apply reward discount if the user
+   * explicitly chooses to redeem points.
+   */
   const rewardDiscount = redeemRewardPoints
     ? maximumRewardDiscount
     : 0;
@@ -381,21 +412,30 @@ const Sales = () => {
   // ==========================================
 
   const handleGenerateBill = async () => {
-    // Customer
+    // ========================================
+    // Customer Validation
+    // ========================================
+
     if (!selectedCustomer) {
       return toast.error(
         "Please select a customer."
       );
     }
 
-    // Medicines
+    // ========================================
+    // Medicine Validation
+    // ========================================
+
     if (billItems.length === 0) {
       return toast.error(
         "Please add at least one medicine."
       );
     }
 
-    // Reward validation
+    // ========================================
+    // Reward Validation
+    // ========================================
+
     if (
       redeemRewardPoints &&
       availableRewardPoints <= 0
@@ -405,7 +445,10 @@ const Sales = () => {
       );
     }
 
-    // Cash validation
+    // ========================================
+    // Cash Validation
+    // ========================================
+
     if (
       paymentMethod === "Cash" &&
       Number(cashReceived) < grandTotal
@@ -417,6 +460,10 @@ const Sales = () => {
 
     try {
       setSaving(true);
+
+      // ========================================
+      // Payload
+      // ========================================
 
       const payload = {
         customer:
@@ -435,25 +482,30 @@ const Sales = () => {
               Number(item.sellingPrice),
 
             gst:
-              Number(item.gst),
+              Number(item.gst || 0),
           })
         ),
 
-        // ==================================
+        // ======================================
         // Discount
-        // ==================================
+        // ======================================
 
         discountType: "flat",
 
+        /*
+         * If reward redemption is OFF:
+         * rewardDiscount = 0
+         *
+         * If reward redemption is ON:
+         * rewardDiscount = points being redeemed
+         */
         discount: rewardDiscount,
 
-        // If user doesn't want to redeem,
-        // this will be 0.
         redeemPoints: rewardDiscount,
 
-        // ==================================
+        // ======================================
         // Payment
-        // ==================================
+        // ======================================
 
         paymentMethod,
 
@@ -467,6 +519,16 @@ const Sales = () => {
         notes: "",
       };
 
+      console.log(
+        "========== BILL =========="
+      );
+
+      console.log(payload);
+
+      // ========================================
+      // Create Sale
+      // ========================================
+
       const response =
         await addSale(payload);
 
@@ -475,7 +537,15 @@ const Sales = () => {
           "Bill generated successfully."
       );
 
+      // ========================================
+      // Reset Billing Screen
+      // ========================================
+
       clearBill();
+
+      // ========================================
+      // Open Invoice
+      // ========================================
 
       if (response.sale?._id) {
         navigate(
@@ -517,12 +587,16 @@ const Sales = () => {
     );
   }
 
+  // ==========================================
+  // UI
+  // ==========================================
+
   return (
     <div className="mx-auto max-w-[1500px] space-y-6 pb-10">
 
-      {/* ==========================================
+      {/* ======================================
           PAGE HEADER
-      ========================================== */}
+      ====================================== */}
 
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
 
@@ -538,6 +612,7 @@ const Sales = () => {
             </div>
 
             <div>
+
               <p className="text-sm font-semibold text-blue-600">
                 Point of Sale
               </p>
@@ -547,9 +622,10 @@ const Sales = () => {
               </h1>
 
               <p className="mt-1 text-sm text-slate-500">
-                Create a customer invoice quickly and
-                securely.
+                Create a customer invoice quickly
+                and securely.
               </p>
+
             </div>
 
           </div>
@@ -557,7 +633,27 @@ const Sales = () => {
           <button
             type="button"
             onClick={clearBill}
-            className="flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"
+            disabled={saving}
+            className="
+              flex
+              items-center
+              justify-center
+              gap-2
+              rounded-xl
+              border
+              border-slate-200
+              px-4
+              py-2.5
+              text-sm
+              font-semibold
+              text-slate-600
+              transition
+              hover:border-red-200
+              hover:bg-red-50
+              hover:text-red-600
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+            "
           >
             <RotateCcw size={16} />
             Reset Bill
@@ -567,9 +663,9 @@ const Sales = () => {
 
       </div>
 
-      {/* ==========================================
+      {/* ======================================
           CUSTOMER + MEDICINE SEARCH
-      ========================================== */}
+      ====================================== */}
 
       <div className="grid gap-6 lg:grid-cols-2">
 
@@ -587,6 +683,7 @@ const Sales = () => {
             </div>
 
             <div>
+
               <h2 className="font-semibold text-slate-900">
                 Customer
               </h2>
@@ -594,6 +691,7 @@ const Sales = () => {
               <p className="text-xs text-slate-500">
                 Select the customer for this invoice.
               </p>
+
             </div>
 
           </div>
@@ -607,6 +705,15 @@ const Sales = () => {
             search={customerSearch}
             setSearch={setCustomerSearch}
           />
+
+          {/* Debounce indicator */}
+
+          {customerSearch !==
+            debouncedCustomerSearch && (
+            <p className="mt-2 text-xs text-slate-400">
+              Searching customers...
+            </p>
+          )}
 
         </div>
 
@@ -624,6 +731,7 @@ const Sales = () => {
             </div>
 
             <div>
+
               <h2 className="font-semibold text-slate-900">
                 Add Medicines
               </h2>
@@ -631,6 +739,7 @@ const Sales = () => {
               <p className="text-xs text-slate-500">
                 Search by name, generic or batch number.
               </p>
+
             </div>
 
           </div>
@@ -644,13 +753,22 @@ const Sales = () => {
             setSearch={setMedicineSearch}
           />
 
+          {/* Debounce indicator */}
+
+          {medicineSearch !==
+            debouncedMedicineSearch && (
+            <p className="mt-2 text-xs text-slate-400">
+              Searching medicines...
+            </p>
+          )}
+
         </div>
 
       </div>
 
-      {/* ==========================================
+      {/* ======================================
           SELECTED MEDICINES
-      ========================================== */}
+      ====================================== */}
 
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
@@ -659,6 +777,7 @@ const Sales = () => {
           <div className="flex items-center justify-between">
 
             <div>
+
               <h2 className="font-semibold text-slate-900">
                 Current Bill
               </h2>
@@ -670,6 +789,7 @@ const Sales = () => {
                   : "medicines"}{" "}
                 added
               </p>
+
             </div>
 
             {billItems.length > 0 && (
@@ -691,45 +811,30 @@ const Sales = () => {
         </div>
 
         <div className="overflow-x-auto">
+
           <BillItemsTable
             items={billItems}
             setItems={setBillItems}
           />
+
         </div>
 
       </div>
 
-      {/* ==========================================
+        {/* ======================================
           BILL SUMMARY
-      ========================================== */}
+      ====================================== */}
 
       <BillSummary
         items={billItems}
         customer={selectedCustomer}
-
-        // Reward
-        redeemRewardPoints={
-          redeemRewardPoints
-        }
-        setRedeemRewardPoints={
-          setRedeemRewardPoints
-        }
-
-        // Payment
+        redeemRewardPoints={redeemRewardPoints}
+        setRedeemRewardPoints={setRedeemRewardPoints}
         paymentMethod={paymentMethod}
-        setPaymentMethod={
-          setPaymentMethod
-        }
-
+        setPaymentMethod={setPaymentMethod}
         cashReceived={cashReceived}
-        setCashReceived={
-          setCashReceived
-        }
-
-        // Actions
-        onGenerateBill={
-          handleGenerateBill
-        }
+        setCashReceived={setCashReceived}
+        onGenerateBill={handleGenerateBill}
         onClearBill={clearBill}
         saving={saving}
       />
