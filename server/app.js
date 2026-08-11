@@ -18,14 +18,12 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.CLIENT_URL,
+  "https://emedical-shop-6w89.vercel.app",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests without an origin
-      // such as Postman
       if (!origin) {
         return callback(null, true);
       }
@@ -35,20 +33,36 @@ app.use(
       }
 
       return callback(
-        new Error("Not allowed by CORS")
+        new Error(`CORS blocked origin: ${origin}`)
       );
     },
+
     credentials: true,
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+    ],
   })
 );
 
 app.use(express.json());
 app.use(cookieParser());
 
-// Serve uploaded images
 app.use(
   "/uploads",
-  express.static(path.join(process.cwd(), "uploads"))
+  express.static(
+    path.join(process.cwd(), "uploads")
+  )
 );
 
 app.use("/api/auth", authRoute);
