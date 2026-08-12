@@ -7,9 +7,16 @@ import {
 // ==========================
 // Create Purchase
 // ==========================
-export const createPurchase = async (req, res) => {
+export const createPurchase = async (
+  req,
+  res
+) => {
   try {
-    const result = await createPurchaseService(req.body, req.user.id);
+    const result =
+      await createPurchaseService(
+        req.body,
+        req.user.id
+      );
 
     res.status(201).json({
       success: true,
@@ -25,10 +32,28 @@ export const createPurchase = async (req, res) => {
 
 // ==========================
 // Get All Purchases
+// Supports:
+// - Search by invoice number
+// - Search by supplier name
+// - Pagination
 // ==========================
-export const getAllPurchases = async (req, res) => {
+export const getAllPurchases = async (
+  req,
+  res
+) => {
   try {
-    const result = await getAllPurchasesService();
+    const {
+      search = "",
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    const result =
+      await getAllPurchasesService(
+        search,
+        page,
+        limit
+      );
 
     res.status(200).json({
       success: true,
@@ -45,11 +70,15 @@ export const getAllPurchases = async (req, res) => {
 // ==========================
 // Get Purchase By ID
 // ==========================
-export const getPurchaseById = async (req, res) => {
+export const getPurchaseById = async (
+  req,
+  res
+) => {
   try {
     const { id } = req.params;
 
-    const result = await getPurchaseByIdService(id);
+    const result =
+      await getPurchaseByIdService(id);
 
     res.status(200).json({
       success: true,

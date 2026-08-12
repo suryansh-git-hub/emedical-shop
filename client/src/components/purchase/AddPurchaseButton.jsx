@@ -1,13 +1,17 @@
-import { Plus } from "lucide-react";
+import { Plus, ShoppingCart } from "lucide-react";
 
 const AddPurchaseButton = ({ onClick }) => {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-medium text-white transition hover:bg-blue-700"
+      className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 hover:shadow-md"
     >
-      <Plus size={20} />
-      Add Purchase
+      <ShoppingCart size={18} />
+
+      <span>Add Purchase</span>
+
+      <Plus size={16} />
     </button>
   );
 };

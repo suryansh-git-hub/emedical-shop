@@ -112,11 +112,34 @@ const getInventoryWithPagination = async ({
   // =======================================
   // Low Stock
   // =======================================
+  // Low stock means:
+  //
+  // currentStock > 0
+  // AND
+  // currentStock <= reorderLevel
+  //
+  // Example:
+  // Stock = 15
+  // Reorder Level = 20
+  // => LOW STOCK
+  // =======================================
 
   if (filter === "low-stock") {
-    inventoryQuery.currentStock = {
-      $gt: 0,
-      $lte: 10,
+    inventoryQuery.$expr = {
+      $and: [
+        {
+          $gt: [
+            "$currentStock",
+            0,
+          ],
+        },
+        {
+          $lte: [
+            "$currentStock",
+            "$reorderLevel",
+          ],
+        },
+      ],
     };
   }
 
@@ -347,6 +370,10 @@ export const getStockMovementHistoryService =
           medicineId,
       }).lean();
 
+    // =======================================
+    // Purchase History
+    // =======================================
+
     const purchaseHistory =
       purchases.flatMap(
         (purchase) =>
@@ -370,6 +397,10 @@ export const getStockMovementHistoryService =
             }))
       );
 
+    // =======================================
+    // Sale History
+    // =======================================
+
     const saleHistory =
       sales.flatMap(
         (sale) =>
@@ -380,7 +411,8 @@ export const getStockMovementHistoryService =
                 medicineId
             )
             .map((item) => ({
-              date: sale.saleDate,
+              date:
+                sale.saleDate,
 
               type: "SALE",
 
@@ -391,6 +423,10 @@ export const getStockMovementHistoryService =
                 sale.invoiceNumber,
             }))
       );
+
+    // =======================================
+    // Combine + Sort
+    // =======================================
 
     const history = [
       ...purchaseHistory,

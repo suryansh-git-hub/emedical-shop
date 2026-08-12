@@ -1,120 +1,221 @@
-//import { Eye } from "lucide-react";
+import { ShoppingCart, Package } from "lucide-react";
 
-const PurchaseTable = ({
-  purchases,
-  //onView,
-}) => {
-  if (purchases.length === 0) {
-    return (
-      <div className="rounded-xl bg-white p-10 text-center shadow">
-        <h2 className="text-xl font-semibold text-gray-700">
-          No Purchases Found
-        </h2>
-
-        <p className="mt-2 text-gray-500">
-          Create your first purchase to get started.
-        </p>
-      </div>
-    );
-  }
-
+const PurchaseTable = ({ purchases }) => {
   return (
-    <div className="overflow-hidden rounded-xl bg-white shadow">
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+      {/* ==========================================
+          Table Header
+      ========================================== */}
+
+      <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4 sm:px-6">
+
+        <div>
+          <h2 className="text-sm font-semibold text-slate-800">
+            Purchase Records
+          </h2>
+
+          <p className="mt-0.5 text-xs text-slate-500">
+            {purchases.length} purchase
+            {purchases.length !== 1 ? "s" : ""} found
+          </p>
+        </div>
+
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+          <ShoppingCart size={17} />
+        </div>
+
+      </div>
+
+      {/* ==========================================
+          Responsive Table
+      ========================================== */}
 
       <div className="overflow-x-auto">
 
-        <table className="min-w-full">
+        <table className="min-w-[1050px] w-full">
 
-          <thead className="bg-gray-100">
+          {/* ==========================================
+              Table Head
+          ========================================== */}
+
+          <thead className="bg-slate-50">
 
             <tr>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
-                Invoice Number
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 sm:px-6">
+                Invoice
               </th>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Supplier
               </th>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Purchase Date
               </th>
 
-              <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
+              <th className="px-5 py-3.5 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Medicines
               </th>
 
-              <th className="px-6 py-4 text-right text-sm font-semibold text-gray-700">
+              <th className="px-5 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Total Amount
               </th>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">
+              <th className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Created By
               </th>
-
-              {/* <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">
-                Action
-              </th> */}
 
             </tr>
 
           </thead>
 
-          <tbody>
+          {/* ==========================================
+              Table Body
+          ========================================== */}
+
+          <tbody className="divide-y divide-slate-100">
 
             {purchases.map((purchase) => (
 
               <tr
                 key={purchase._id}
-                className="border-t hover:bg-gray-50"
+                className="group transition-colors hover:bg-slate-50/70"
               >
 
-                <td className="px-6 py-4 font-medium">
-                  {purchase.invoiceNumber}
-                </td>
+                {/* ==========================================
+                    Invoice
+                ========================================== */}
 
-                <td className="px-6 py-4">
-                  {purchase.supplier?.supplierName}
-                </td>
+                <td className="px-5 py-4 sm:px-6">
 
-                <td className="px-6 py-4">
-                  {new Date(
-                    purchase.purchaseDate
-                  ).toLocaleDateString()}
-                </td>
+                  <div className="flex items-center gap-3">
 
-                <td className="px-6 py-4 text-center">
-                  {purchase.medicines?.length}
-                </td>
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                      <ShoppingCart size={16} />
+                    </div>
 
-                <td className="px-6 py-4 text-right font-semibold">
-                  ₹
-                  {purchase.totalAmount?.toLocaleString()}
-                </td>
+                    <div className="min-w-0">
 
-                <td className="px-6 py-4">
-                  {purchase.createdBy?.name}
-                </td>
+                      <p className="font-semibold text-slate-800">
+                        {purchase.invoiceNumber}
+                      </p>
 
-                {/* <td className="px-6 py-4">
+                      <p className="mt-0.5 text-xs text-slate-400">
+                        Purchase Invoice
+                      </p>
 
-                  <div className="flex justify-center">
-
-                    <button
-                      onClick={() =>
-                        onView &&
-                        onView(purchase)
-                      }
-                      className="rounded-lg bg-blue-100 p-2 text-blue-600 transition hover:bg-blue-200"
-                      title="View Purchase"
-                    >
-                      <Eye size={18} />
-                    </button>
+                    </div>
 
                   </div>
 
-                </td> */}
+                </td>
+
+                {/* ==========================================
+                    Supplier
+                ========================================== */}
+
+                <td className="px-5 py-4">
+
+                  <div>
+
+                    <p className="font-medium text-slate-800">
+                      {purchase.supplier?.supplierName || "—"}
+                    </p>
+
+                    {purchase.supplier?.contactNumber && (
+                      <p className="mt-0.5 text-xs text-slate-400">
+                        {purchase.supplier.contactNumber}
+                      </p>
+                    )}
+
+                  </div>
+
+                </td>
+
+                {/* ==========================================
+                    Purchase Date
+                ========================================== */}
+
+                <td className="px-5 py-4">
+
+                  <p className="text-sm font-medium text-slate-700">
+                    {purchase.purchaseDate
+                      ? new Date(
+                          purchase.purchaseDate
+                        ).toLocaleDateString()
+                      : "—"}
+                  </p>
+
+                </td>
+
+                {/* ==========================================
+                    Medicines
+                ========================================== */}
+
+                <td className="px-5 py-4 text-center">
+
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+
+                    <Package size={13} />
+
+                    {purchase.medicines?.length || 0}
+
+                  </span>
+
+                </td>
+
+                {/* ==========================================
+                    Total Amount
+                ========================================== */}
+
+                <td className="px-5 py-4 text-right">
+
+                  <span className="font-bold text-slate-800">
+
+                    ₹
+                    {(purchase.totalAmount || 0).toLocaleString(
+                      "en-IN"
+                    )}
+
+                  </span>
+
+                </td>
+
+                {/* ==========================================
+                    Created By
+                ========================================== */}
+
+                <td className="px-5 py-4">
+
+                  <div className="flex items-center gap-2.5">
+
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-600">
+
+                      {purchase.createdBy?.name
+                        ?.charAt(0)
+                        ?.toUpperCase() || "U"}
+
+                    </div>
+
+                    <div className="min-w-0">
+
+                      <p className="truncate text-sm font-medium text-slate-700">
+                        {purchase.createdBy?.name || "Unknown"}
+                      </p>
+
+                      {purchase.createdBy?.role && (
+                        <p className="text-xs capitalize text-slate-400">
+                          {purchase.createdBy.role}
+                        </p>
+                      )}
+
+                    </div>
+
+                  </div>
+
+                </td>
 
               </tr>
 

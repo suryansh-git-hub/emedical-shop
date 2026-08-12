@@ -16,14 +16,24 @@ import reportRoute from "./routes/reportRoute.js";
 
 const app = express();
 
+// =======================================
+// Allowed Frontend Origins
+// =======================================
+
 const allowedOrigins = [
   "http://localhost:5173",
   "https://emedical-shop-6w89.vercel.app",
 ];
 
+// =======================================
+// CORS
+// =======================================
+
 app.use(
   cors({
     origin: function (origin, callback) {
+      // Allow requests without an origin
+      // Example: Postman
       if (!origin) {
         return callback(null, true);
       }
@@ -55,25 +65,57 @@ app.use(
   })
 );
 
+// =======================================
+// Body Parsers
+// =======================================
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 app.use(cookieParser());
 
-app.use(
-  "/uploads",
-  express.static(
-    path.join(process.cwd(), "uploads")
-  )
+// =======================================
+// Static Uploads
+// =======================================
+
+// Absolute path to uploads folder
+const uploadPath = path.join(
+  process.cwd(),
+  "uploads"
 );
 
+// Make uploaded images publicly accessible
+app.use(
+  "/uploads",
+  express.static(uploadPath)
+);
+
+// =======================================
+// API Routes
+// =======================================
+
 app.use("/api/auth", authRoute);
+
 app.use("/api/users", userRoute);
+
 app.use("/api/medicines", medicineRoute);
+
 app.use("/api/suppliers", supplierRoute);
+
 app.use("/api/customers", customerRoute);
+
 app.use("/api/purchases", purchaseRoute);
+
 app.use("/api/inventory", inventoryRoute);
+
 app.use("/api/sales", saleRoute);
+
 app.use("/api/dashboard", dashboardRoute);
+
 app.use("/api/reports", reportRoute);
+
+// =======================================
+// Export
+// =======================================
 
 export default app;

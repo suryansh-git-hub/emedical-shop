@@ -1,4 +1,12 @@
-import { History } from "lucide-react";
+import {
+  History,
+  Package,
+  Plus,
+  Minus,
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 
 const InventoryTable = ({
   inventory,
@@ -6,19 +14,34 @@ const InventoryTable = ({
   onReduceStock,
   onViewHistory,
 }) => {
+  // ==========================================
+  // Empty State
+  // ==========================================
+
   if (!inventory || inventory.length === 0) {
     return (
-      <div className="rounded-xl bg-white p-10 text-center shadow">
-        <h2 className="text-2xl font-semibold text-gray-700">
-          No Inventory Found
-        </h2>
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+            <Package size={30} />
+          </div>
 
-        <p className="mt-2 text-gray-500">
-          No medicines available for the selected filter.
-        </p>
+          <h2 className="text-xl font-bold text-slate-800">
+            No Inventory Found
+          </h2>
+
+          <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
+            No medicines are available for the selected filter.
+            Try changing the filter or add medicine stock.
+          </p>
+        </div>
       </div>
     );
   }
+
+  // ==========================================
+  // Stock Status
+  // ==========================================
 
   const getStockStatus = (item) => {
     const expiryDate = item.medicine?.expiryDate
@@ -30,29 +53,41 @@ const InventoryTable = ({
     if (expiryDate && expiryDate < today) {
       return {
         label: "Expired",
-        className: "bg-red-100 text-red-700",
+        className:
+          "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200",
+        icon: XCircle,
       };
     }
 
     if (item.currentStock === 0) {
       return {
-        label: "Out Of Stock",
-        className: "bg-red-100 text-red-700",
+        label: "Out of Stock",
+        className:
+          "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200",
+        icon: XCircle,
       };
     }
 
     if (item.currentStock <= item.reorderLevel) {
       return {
         label: "Low Stock",
-        className: "bg-yellow-100 text-yellow-700",
+        className:
+          "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200",
+        icon: AlertTriangle,
       };
     }
 
     return {
       label: "In Stock",
-      className: "bg-green-100 text-green-700",
+      className:
+        "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200",
+      icon: CheckCircle2,
     };
   };
+
+  // ==========================================
+  // Date Formatter
+  // ==========================================
 
   const formatDate = (date) => {
     if (!date) return "-";
@@ -64,176 +99,481 @@ const InventoryTable = ({
     });
   };
 
+  // ==========================================
+  // Stock Color
+  // ==========================================
+
+  const getStockColor = (item) => {
+    if (item.currentStock === 0) {
+      return "text-red-600";
+    }
+
+    if (item.currentStock <= item.reorderLevel) {
+      return "text-amber-600";
+    }
+
+    return "text-emerald-600";
+  };
+
+  // ==========================================
+  // Stock Progress
+  // ==========================================
+
+  const getStockPercentage = (item) => {
+    const reorderLevel = Number(item.reorderLevel) || 1;
+    const currentStock = Number(item.currentStock) || 0;
+
+    return Math.min(
+      (currentStock / (reorderLevel * 2)) * 100,
+      100
+    );
+  };
+
+  // ==========================================
+  // Table
+  // ==========================================
+
   return (
-    <div className="overflow-hidden rounded-xl bg-white shadow">
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+      {/* ==========================================
+          TABLE HEADER
+      ========================================== */}
+
+      <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+
+        <div className="flex items-center gap-3">
+
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+            <Package size={19} />
+          </div>
+
+          <div>
+            <h2 className="text-base font-bold text-slate-800">
+              Inventory Records
+            </h2>
+
+            <p className="mt-0.5 text-xs text-slate-500">
+              Manage medicine stock and inventory levels
+            </p>
+          </div>
+
+        </div>
+
+        {/* Record Count */}
+
+        <div className="inline-flex w-fit items-center rounded-full bg-slate-50 px-3.5 py-2 text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-200">
+          {inventory.length}{" "}
+          {inventory.length === 1
+            ? "record"
+            : "records"}{" "}
+          shown
+        </div>
+
+      </div>
+
+      {/* ==========================================
+          RESPONSIVE TABLE
+      ========================================== */}
+
       <div className="overflow-x-auto">
-        <table className="min-w-full">
-          <thead className="bg-gray-100">
+
+        <table className="min-w-[1250px] w-full">
+
+          {/* ==========================================
+              TABLE HEAD
+          ========================================== */}
+
+          <thead className="bg-slate-50">
+
             <tr>
-              <th className="px-4 py-4 text-center text-sm font-semibold">
+
+              <th className="w-12 px-4 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 #
               </th>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold">
+              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 Medicine
               </th>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold">
+              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 Generic
               </th>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold">
+              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 Company
               </th>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold">
+              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 Category
               </th>
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 Stock
               </th>
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 Reorder
               </th>
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 Stock Level
               </th>
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 Expiry
               </th>
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 Status
               </th>
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
                 Actions
               </th>
+
             </tr>
+
           </thead>
 
-          <tbody>
+          {/* ==========================================
+              TABLE BODY
+          ========================================== */}
+
+          <tbody className="divide-y divide-slate-100">
+
             {inventory.map((item, index) => {
+
               const status = getStockStatus(item);
 
-              const stockPercentage = Math.min(
-                (item.currentStock / (item.reorderLevel * 2 || 1)) * 100,
-                100
-              );
+              const StatusIcon = status.icon;
+
+              const stockPercentage =
+                getStockPercentage(item);
 
               return (
                 <tr
                   key={item._id}
-                  className="border-t transition hover:bg-gray-50"
+                  className="group transition-colors duration-150 hover:bg-slate-50/70"
                 >
-                  <td className="px-4 py-4 text-center font-medium">
-                    {index + 1}
+
+                  {/* ==================================
+                      #
+                  ================================== */}
+
+                  <td className="px-4 py-5 text-center">
+
+                    <span className="text-xs font-semibold text-slate-400">
+                      {index + 1}
+                    </span>
+
                   </td>
 
-                  <td className="px-6 py-4 font-semibold text-gray-800">
-                    {item.medicine?.medicineName || "-"}
+                  {/* ==================================
+                      MEDICINE
+                  ================================== */}
+
+                  <td className="px-5 py-5">
+
+                    <div className="flex items-center gap-3">
+
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                        <Package size={17} />
+                      </div>
+
+                      <div className="min-w-0">
+
+                        <p className="truncate text-sm font-bold text-slate-800">
+                          {item.medicine?.medicineName ||
+                            "-"}
+                        </p>
+
+                        <p className="mt-0.5 text-xs text-slate-400">
+                          Medicine
+                        </p>
+
+                      </div>
+
+                    </div>
+
                   </td>
 
-                  <td className="px-6 py-4">
-                    {item.medicine?.genericName || "-"}
+                  {/* ==================================
+                      GENERIC
+                  ================================== */}
+
+                  <td className="px-5 py-5">
+
+                    <span className="text-sm text-slate-600">
+                      {item.medicine?.genericName ||
+                        "-"}
+                    </span>
+
                   </td>
 
-                  <td className="px-6 py-4">
-                    {item.medicine?.company || "-"}
+                  {/* ==================================
+                      COMPANY
+                  ================================== */}
+
+                  <td className="px-5 py-5">
+
+                    <span className="text-sm font-medium text-slate-700">
+                      {item.medicine?.company ||
+                        "-"}
+                    </span>
+
                   </td>
 
-                  <td className="px-6 py-4">
-                    {item.medicine?.category || "-"}
+                  {/* ==================================
+                      CATEGORY
+                  ================================== */}
+
+                  <td className="px-5 py-5">
+
+                    <span className="inline-flex rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                      {item.medicine?.category ||
+                        "-"}
+                    </span>
+
                   </td>
 
-                  <td
-                    className={`px-6 py-4 text-center font-bold ${
-                      item.currentStock === 0
-                        ? "text-red-600"
-                        : item.currentStock <= item.reorderLevel
-                        ? "text-yellow-600"
-                        : "text-green-600"
-                    }`}
-                  >
-                    {item.currentStock}
+                  {/* ==================================
+                      STOCK
+                  ================================== */}
+
+                  <td className="px-5 py-5 text-center">
+
+                    <span
+                      className={`text-base font-bold ${getStockColor(
+                        item
+                      )}`}
+                    >
+                      {item.currentStock}
+                    </span>
+
                   </td>
 
-                  <td className="px-6 py-4 text-center">
-                    {item.reorderLevel}
+                  {/* ==================================
+                      REORDER LEVEL
+                  ================================== */}
+
+                  <td className="px-5 py-5 text-center">
+
+                    <span className="text-sm font-medium text-slate-600">
+                      {item.reorderLevel}
+                    </span>
+
                   </td>
 
-                  <td className="px-6 py-4">
+                  {/* ==================================
+                      STOCK LEVEL
+                  ================================== */}
+
+                  <td className="px-5 py-5">
+
                     <div className="mx-auto w-28">
-                      <div className="h-2 rounded-full bg-gray-200">
+
+                      <div className="mb-1.5 flex items-center justify-between">
+
+                        <span className="text-[10px] font-medium text-slate-400">
+                          Level
+                        </span>
+
+                        <span
+                          className={`text-[10px] font-bold ${getStockColor(
+                            item
+                          )}`}
+                        >
+                          {Math.round(
+                            stockPercentage
+                          )}
+                          %
+                        </span>
+
+                      </div>
+
+                      <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+
                         <div
-                          className={`h-2 rounded-full ${
-                            item.currentStock === 0
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            item.currentStock ===
+                            0
                               ? "bg-red-500"
-                              : item.currentStock <= item.reorderLevel
-                              ? "bg-yellow-500"
-                              : "bg-green-500"
+                              : item.currentStock <=
+                                item.reorderLevel
+                              ? "bg-amber-500"
+                              : "bg-emerald-500"
                           }`}
                           style={{
                             width: `${stockPercentage}%`,
                           }}
                         />
+
                       </div>
+
                     </div>
+
                   </td>
 
-                  <td className="px-6 py-4 text-center">
-                    {formatDate(item.medicine?.expiryDate)}
-                  </td>
+                  {/* ==================================
+                      EXPIRY
+                  ================================== */}
 
-                  <td className="px-6 py-4 text-center">
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${status.className}`}
-                    >
-                      {status.label}
+                  <td className="px-5 py-5 text-center">
+
+                    <span className="text-sm font-medium text-slate-600">
+                      {formatDate(
+                        item.medicine?.expiryDate
+                      )}
                     </span>
+
                   </td>
 
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-center gap-2">
-                      <button
-                        onClick={() =>
-                          onIncreaseStock(item.medicine)
-                        }
-                        className="rounded-lg bg-green-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-green-700"
-                      >
-                        + Stock
-                      </button>
+                  {/* ==================================
+                      STATUS
+                  ================================== */}
+
+                  <td className="px-5 py-5 text-center">
+
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-bold ${status.className}`}
+                    >
+
+                      <StatusIcon size={13} />
+
+                      {status.label}
+
+                    </span>
+
+                  </td>
+
+                  {/* ==================================
+                      ACTIONS
+                  ================================== */}
+
+                  <td className="px-5 py-5">
+
+                    <div className="flex items-center justify-center gap-1.5">
+
+                      {/* Increase */}
 
                       <button
+                        type="button"
                         onClick={() =>
-                          onReduceStock(item.medicine)
+                          onIncreaseStock(
+                            item.medicine
+                          )
                         }
-                        className="rounded-lg bg-orange-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-orange-700"
+                        className="
+                          inline-flex
+                          h-9
+                          items-center
+                          gap-1.5
+                          rounded-lg
+                          bg-emerald-600
+                          px-3
+                          text-xs
+                          font-semibold
+                          text-white
+                          shadow-sm
+                          transition
+                          hover:bg-emerald-700
+                          hover:shadow
+                          active:scale-95
+                        "
+                        title="Increase stock"
                       >
-                        - Stock
+                        <Plus size={14} />
+
+                        <span>
+                          Stock
+                        </span>
                       </button>
 
+                      {/* Reduce */}
+
                       <button
+                        type="button"
                         onClick={() =>
-                          onViewHistory(item.medicine?._id)
+                          onReduceStock(
+                            item.medicine
+                          )
                         }
-                        className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-blue-700"
+                        className="
+                          inline-flex
+                          h-9
+                          items-center
+                          gap-1.5
+                          rounded-lg
+                          bg-orange-500
+                          px-3
+                          text-xs
+                          font-semibold
+                          text-white
+                          shadow-sm
+                          transition
+                          hover:bg-orange-600
+                          hover:shadow
+                          active:scale-95
+                        "
+                        title="Reduce stock"
                       >
-                        <History size={15} />
-                        History
+                        <Minus size={14} />
+
+                        <span>
+                          Stock
+                        </span>
                       </button>
+
+                      {/* History */}
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onViewHistory(
+                            item.medicine?._id
+                          )
+                        }
+                        className="
+                          inline-flex
+                          h-9
+                          items-center
+                          gap-1.5
+                          rounded-lg
+                          bg-blue-600
+                          px-3
+                          text-xs
+                          font-semibold
+                          text-white
+                          shadow-sm
+                          transition
+                          hover:bg-blue-700
+                          hover:shadow
+                          active:scale-95
+                        "
+                        title="View stock history"
+                      >
+                        <History size={14} />
+
+                        <span>
+                          History
+                        </span>
+                      </button>
+
                     </div>
+
                   </td>
+
                 </tr>
               );
             })}
+
           </tbody>
+
         </table>
+
       </div>
+
     </div>
   );
 };

@@ -24,10 +24,21 @@ export const createSupplier = async (req, res) => {
 
 // ==========================
 // Get All Suppliers
+// Search + Pagination
 // ==========================
 export const getAllSuppliers = async (req, res) => {
   try {
-    const result = await getAllSuppliersService();
+    const {
+      search = "",
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    const result = await getAllSuppliersService({
+      search,
+      page,
+      limit,
+    });
 
     return res.status(200).json(result);
   } catch (error) {
@@ -42,7 +53,9 @@ export const getAllSuppliers = async (req, res) => {
 // ==========================
 export const getSupplierById = async (req, res) => {
   try {
-    const result = await getSupplierByIdService(req.params.id);
+    const result = await getSupplierByIdService(
+      req.params.id
+    );
 
     return res.status(200).json(result);
   } catch (error) {
@@ -75,7 +88,9 @@ export const updateSupplier = async (req, res) => {
 // ==========================
 export const deleteSupplier = async (req, res) => {
   try {
-    const result = await deleteSupplierService(req.params.id);
+    const result = await deleteSupplierService(
+      req.params.id
+    );
 
     return res.status(200).json(result);
   } catch (error) {
@@ -92,7 +107,9 @@ export const getSupplierPurchaseHistory = async (
   req,
   res
 ) => {
-  console.log("========== SUPPLIER HISTORY ==========");
+  console.log(
+    "========== SUPPLIER HISTORY =========="
+  );
   console.log("Supplier ID:", req.params.id);
 
   try {

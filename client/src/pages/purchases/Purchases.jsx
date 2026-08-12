@@ -1,11 +1,23 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Loader } from "lucide-react";
+
+import {
+  Loader,
+  Search,
+  X,
+  RotateCcw,
+  ShoppingCart,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+} from "lucide-react";
+
 import AddPurchaseButton from "../../components/purchase/AddPurchaseButton";
 import PurchaseForm from "../../components/purchase/PurchaseForm";
 import PurchaseModal from "../../components/purchase/PurchaseModal";
 import PurchaseTable from "../../components/purchase/PurchaseTable";
+
 import {
   getPurchases,
   getSuppliers,
@@ -13,10 +25,15 @@ import {
   addPurchase,
 } from "../../services/purchaseService";
 
+// ==========================================
+// Initial Form Data
+// ==========================================
+
 const initialFormData = {
   supplier: "",
   invoiceNumber: "",
   purchaseDate: new Date().toISOString().split("T")[0],
+
   medicines: [
     {
       medicine: "",
@@ -26,43 +43,146 @@ const initialFormData = {
   ],
 };
 
+// ==========================================
+// Purchases Component
+// ==========================================
+
 const Purchases = () => {
+  // ==========================================
+  // Purchase Data
+  // ==========================================
+
   const [loading, setLoading] = useState(true);
+
   const [purchases, setPurchases] = useState([]);
+
   const [suppliers, setSuppliers] = useState([]);
+
   const [medicines, setMedicines] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState(initialFormData);
+
+  // ==========================================
+  // Search
+  // ==========================================
+
+  const [search, setSearch] = useState("");
+
+  const [debouncedSearch, setDebouncedSearch] =
+    useState("");
+
+  // ==========================================
+  // Pagination
+  // ==========================================
+
+  const [page, setPage] = useState(1);
+
+  const [totalPages, setTotalPages] =
+    useState(1);
+
+  const [totalPurchases, setTotalPurchases] =
+    useState(0);
+
+  const limit = 10;
+
+  // ==========================================
+  // Purchase Modal
+  // ==========================================
+
+  const [isModalOpen, setIsModalOpen] =
+    useState(false);
+
+  const [formData, setFormData] =
+    useState(initialFormData);
+
+  // ==========================================
+  // React Router
+  // ==========================================
 
   const location = useLocation();
+
   const navigate = useNavigate();
 
-  const selectedMedicine = location.state?.medicine || null;
+  const selectedMedicine =
+    location.state?.medicine || null;
 
-  // =============================
+  // ==========================================
+  // Search Debouncing
+  // ==========================================
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const trimmedSearch = search.trim();
+
+      setDebouncedSearch(trimmedSearch);
+
+      // New search always starts from page 1
+      setPage(1);
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [search]);
+
+  // ==========================================
   // Fetch Purchases
-  // =============================
+  // ==========================================
 
-  const fetchPurchases = async () => {
+  const fetchPurchases = async (
+    searchValue = "",
+    pageValue = 1
+  ) => {
     try {
-      const response = await getPurchases();
-      setPurchases(response.purchases || []);
+      setLoading(true);
+
+      const response = await getPurchases(
+        searchValue,
+        pageValue,
+        limit
+      );
+
+      const purchaseList =
+        response.purchases || [];
+
+      setPurchases(purchaseList);
+
+      // Backend should return totalPurchases
+      setTotalPurchases(
+        Number(response.totalPurchases) || 0
+      );
+
+      setTotalPages(
+        Math.max(
+          Number(response.totalPages) || 1,
+          1
+        )
+      );
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
           "Failed to fetch purchases."
       );
+
+      setPurchases([]);
+
+      setTotalPurchases(0);
+
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // =============================
+  // ==========================================
   // Fetch Suppliers
-  // =============================
+  // ==========================================
 
   const fetchSuppliers = async () => {
     try {
       const response = await getSuppliers();
-      setSuppliers(response.suppliers || []);
+
+      setSuppliers(
+        response.suppliers || []
+      );
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
@@ -71,14 +191,17 @@ const Purchases = () => {
     }
   };
 
-  // =============================
+  // ==========================================
   // Fetch Medicines
-  // =============================
+  // ==========================================
 
   const fetchMedicines = async () => {
     try {
       const response = await getMedicines();
-      setMedicines(response.medicines || []);
+
+      setMedicines(
+        response.medicines || []
+      );
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
@@ -87,84 +210,160 @@ const Purchases = () => {
     }
   };
 
-  // =============================
+  // ==========================================
   // Initial Load
-  // =============================
+  // ==========================================
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-
-        await Promise.all([
-          fetchPurchases(),
-          fetchSuppliers(),
-          fetchMedicines(),
-        ]);
-      } finally {
-        setLoading(false);
-      }
+    const loadDropdownData = async () => {
+      await Promise.all([
+        fetchSuppliers(),
+        fetchMedicines(),
+      ]);
     };
 
-    loadData();
+    loadDropdownData();
   }, []);
 
-  // =============================
-  // Open Purchase from Inventory
-  // =============================
+  // ==========================================
+  // Fetch Purchases
+  // Search / Pagination
+  // ==========================================
 
   useEffect(() => {
-    if (selectedMedicine) {
-      setFormData({
-        ...initialFormData,
-        medicines: [
-          {
-            medicine: selectedMedicine._id,
-            quantity: 1,
-            purchasePrice: "",
-          },
-        ],
-      });
+    fetchPurchases(
+      debouncedSearch,
+      page
+    );
+  }, [debouncedSearch, page]);
 
-      setIsModalOpen(true);
+  // ==========================================
+  // Keep Page Valid
+  // ==========================================
 
-      navigate(location.pathname, {
-        replace: true,
-        state: null,
-      });
+  useEffect(() => {
+    if (
+      page > totalPages &&
+      totalPages > 0
+    ) {
+      setPage(totalPages);
     }
+  }, [page, totalPages]);
+
+  // ==========================================
+  // Clear Search
+  // ==========================================
+
+  const handleClearSearch = () => {
+    setSearch("");
+    setDebouncedSearch("");
+    setPage(1);
+  };
+
+  // ==========================================
+  // Reset Search
+  // ==========================================
+
+  const handleReset = () => {
+    setSearch("");
+    setDebouncedSearch("");
+    setPage(1);
+  };
+
+  // ==========================================
+  // Open Add Purchase Modal
+  // ==========================================
+
+  const handleAddPurchase = () => {
+    setFormData({
+      ...initialFormData,
+
+      medicines: [
+        {
+          medicine: "",
+          quantity: 1,
+          purchasePrice: "",
+        },
+      ],
+    });
+
+    setIsModalOpen(true);
+  };
+
+  // ==========================================
+  // Open Purchase From Inventory
+  // ==========================================
+
+  useEffect(() => {
+    if (!selectedMedicine) return;
+
+    setFormData({
+      ...initialFormData,
+
+      medicines: [
+        {
+          medicine: selectedMedicine._id,
+          quantity: 1,
+          purchasePrice: "",
+        },
+      ],
+    });
+
+    setIsModalOpen(true);
+
+    navigate(location.pathname, {
+      replace: true,
+      state: null,
+    });
   }, [
     selectedMedicine,
     navigate,
     location.pathname,
   ]);
 
-  // =============================
-  // Open Modal
-  // =============================
+  // ==========================================
+  // Close Purchase Modal
+  // ==========================================
 
-  const handleAddPurchase = () => {
-    setFormData(initialFormData);
-    setIsModalOpen(true);
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+
+    setFormData({
+      ...initialFormData,
+
+      medicines: [
+        {
+          medicine: "",
+          quantity: 1,
+          purchasePrice: "",
+        },
+      ],
+    });
   };
 
-  // =============================
+  // ==========================================
   // Save Purchase
-  // =============================
+  // ==========================================
 
   const handleSavePurchase = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await addPurchase(formData);
+      const response =
+        await addPurchase(formData);
 
-      toast.success(response.message);
+      toast.success(
+        response.message ||
+          "Purchase created successfully."
+      );
 
-      setIsModalOpen(false);
+      handleCloseModal();
 
-      setFormData(initialFormData);
-
-      fetchPurchases();
+      // Refresh current page
+      await fetchPurchases(
+        debouncedSearch,
+        page
+      );
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
@@ -173,55 +372,504 @@ const Purchases = () => {
     }
   };
 
-  if (loading) {
-    return <Loader />;
-  }
+  // ==========================================
+  // Previous Page
+  // ==========================================
 
-  return (
-    <div className="space-y-6">
+  const handlePrevious = () => {
+    if (
+      page > 1 &&
+      !loading
+    ) {
+      setPage(
+        (previousPage) =>
+          previousPage - 1
+      );
+    }
+  };
 
-      {/* Header */}
+  // ==========================================
+  // Next Page
+  // ==========================================
 
-      <div className="flex items-center justify-between">
+  const handleNext = () => {
+    if (
+      page < totalPages &&
+      !loading
+    ) {
+      setPage(
+        (previousPage) =>
+          previousPage + 1
+      );
+    }
+  };
 
-        <div>
-          <h1 className="text-2xl font-bold">
-            Purchase Management
-          </h1>
+  // ==========================================
+  // Showing Range
+  // ==========================================
 
-          <p className="text-gray-500">
-            Manage medicine purchases
-          </p>
+  const firstPurchase =
+    totalPurchases === 0
+      ? 0
+      : (page - 1) * limit + 1;
+
+  const lastPurchase =
+    totalPurchases === 0
+      ? 0
+      : Math.min(
+          page * limit,
+          totalPurchases
+        );
+
+  // ==========================================
+  // Initial Loading
+  // ==========================================
+
+  if (
+    loading &&
+    purchases.length === 0
+  ) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center">
+
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
+          <Loader
+            size={26}
+            className="animate-spin text-blue-600"
+          />
         </div>
 
-        <AddPurchaseButton
-          onClick={handleAddPurchase}
-        />
+        <p className="mt-4 font-semibold text-slate-700">
+          Loading purchases...
+        </p>
+
+        <p className="mt-1 text-sm text-slate-400">
+          Fetching purchase information.
+        </p>
 
       </div>
+    );
+  }
 
-      {/* Purchase Table */}
+  // ==========================================
+  // UI
+  // ==========================================
 
-      <PurchaseTable purchases={purchases} />
+  return (
+    <div className="min-h-full bg-[#f5f7fb]">
 
-      {/* Purchase Modal */}
+      <div className="mx-auto max-w-[1500px] space-y-6">
 
-      <PurchaseModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setFormData(initialFormData);
-        }}
-      >
-        <PurchaseForm
-          formData={formData}
-          setFormData={setFormData}
-          suppliers={suppliers}
-          medicines={medicines}
-          onSubmit={handleSavePurchase}
-          selectedMedicine={selectedMedicine}
+        {/* ==========================================
+            HEADER
+        ========================================== */}
+
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+
+            {/* Title */}
+
+            <div className="flex items-center gap-4">
+
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-600 shadow-lg shadow-blue-100">
+
+                <ShoppingCart
+                  size={27}
+                  className="text-white"
+                />
+
+              </div>
+
+              <div>
+
+                <span className="text-sm font-semibold text-blue-600">
+                  Purchase Management
+                </span>
+
+                <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                  Purchases
+                </h1>
+
+                <p className="mt-1 text-sm text-slate-500">
+                  Manage medicine purchases,
+                  suppliers and inventory stock.
+                </p>
+
+              </div>
+
+            </div>
+
+            {/* Add Purchase */}
+
+            <AddPurchaseButton
+              onClick={
+                handleAddPurchase
+              }
+            />
+
+          </div>
+
+        </div>
+
+        {/* ==========================================
+            SEARCH
+        ========================================== */}
+
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+
+          <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+
+              <h2 className="font-semibold text-slate-900">
+                Find Purchases
+              </h2>
+
+              <p className="mt-1 text-sm text-slate-500">
+                Search by invoice number or
+                supplier name.
+              </p>
+
+            </div>
+
+            <button
+              type="button"
+              onClick={handleReset}
+              className="
+                inline-flex
+                w-fit
+                items-center
+                gap-2
+                rounded-xl
+                border
+                border-slate-200
+                px-3.5
+                py-2
+                text-sm
+                font-medium
+                text-slate-600
+                transition
+                hover:border-blue-200
+                hover:bg-blue-50
+                hover:text-blue-600
+              "
+            >
+              <RotateCcw size={15} />
+              Reset
+            </button>
+
+          </div>
+
+          {/* Search Input */}
+
+          <div className="relative">
+
+            <Search
+              size={18}
+              className="
+                pointer-events-none
+                absolute
+                left-4
+                top-1/2
+                -translate-y-1/2
+                text-slate-400
+              "
+            />
+
+            <input
+              type="text"
+              value={search}
+              onChange={(e) =>
+                setSearch(
+                  e.target.value
+                )
+              }
+              placeholder="Search by invoice number or supplier name..."
+              className="
+                w-full
+                rounded-xl
+                border
+                border-slate-200
+                bg-slate-50
+                py-3.5
+                pl-11
+                pr-11
+                text-sm
+                text-slate-700
+                outline-none
+                transition
+                placeholder:text-slate-400
+                focus:border-blue-500
+                focus:bg-white
+                focus:ring-4
+                focus:ring-blue-100
+              "
+            />
+
+            {/* Clear */}
+
+            {search && (
+              <button
+                type="button"
+                onClick={
+                  handleClearSearch
+                }
+                className="
+                  absolute
+                  right-3
+                  top-1/2
+                  flex
+                  h-8
+                  w-8
+                  -translate-y-1/2
+                  items-center
+                  justify-center
+                  rounded-lg
+                  text-slate-400
+                  transition
+                  hover:bg-slate-200
+                  hover:text-slate-700
+                "
+                title="Clear search"
+              >
+                <X size={16} />
+              </button>
+            )}
+
+          </div>
+
+          {/* Debounce Indicator */}
+
+          {search !== debouncedSearch && (
+            <div className="mt-3 flex items-center gap-2 text-xs font-medium text-blue-600">
+
+              <Loader
+                size={13}
+                className="animate-spin"
+              />
+
+              Searching...
+
+            </div>
+          )}
+
+          {/* Active Search */}
+
+          {debouncedSearch && (
+            <div className="mt-4 flex items-center gap-2 rounded-xl bg-blue-50 px-4 py-3 text-sm text-blue-700">
+
+              <Search size={15} />
+
+              <span>
+                Showing results for{" "}
+                <span className="font-bold">
+                  "{debouncedSearch}"
+                </span>
+              </span>
+
+            </div>
+          )}
+
+        </div>
+
+        {/* ==========================================
+            PURCHASE TABLE
+        ========================================== */}
+
+        <PurchaseTable
+          purchases={purchases}
         />
-      </PurchaseModal>
+
+        {/* ==========================================
+            TABLE LOADING
+        ========================================== */}
+
+        {loading &&
+          purchases.length > 0 && (
+            <div className="flex items-center justify-center gap-2 py-2 text-sm font-medium text-blue-600">
+
+              <Loader
+                size={16}
+                className="animate-spin"
+              />
+
+              Updating purchases...
+
+            </div>
+          )}
+
+        {/* ==========================================
+            PAGINATION
+        ========================================== */}
+
+        {totalPurchases > 0 && (
+          <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+              {/* Result Information */}
+
+              <div className="flex items-center gap-3">
+
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+
+                  <FileText size={17} />
+
+                </div>
+
+                <p className="text-sm text-slate-500">
+
+                  Showing{" "}
+
+                  <span className="font-semibold text-slate-800">
+                    {firstPurchase}
+                  </span>
+
+                  {" "}to{" "}
+
+                  <span className="font-semibold text-slate-800">
+                    {lastPurchase}
+                  </span>
+
+                  {" "}of{" "}
+
+                  <span className="font-semibold text-slate-800">
+                    {totalPurchases}
+                  </span>
+
+                  {" "}purchases
+
+                </p>
+
+              </div>
+
+              {/* Pagination Controls */}
+
+              <div className="flex items-center gap-2">
+
+                {/* Previous */}
+
+                <button
+                  type="button"
+                  onClick={
+                    handlePrevious
+                  }
+                  disabled={
+                    page === 1 ||
+                    loading
+                  }
+                  className="
+                    inline-flex
+                    items-center
+                    gap-1
+                    rounded-xl
+                    border
+                    border-slate-200
+                    px-3.5
+                    py-2
+                    text-sm
+                    font-medium
+                    text-slate-600
+                    transition
+                    hover:border-blue-200
+                    hover:bg-blue-50
+                    hover:text-blue-600
+                    disabled:cursor-not-allowed
+                    disabled:opacity-40
+                  "
+                >
+
+                  <ChevronLeft
+                    size={16}
+                  />
+
+                  Previous
+
+                </button>
+
+                {/* Current Page */}
+
+                <div className="flex h-9 min-w-9 items-center justify-center rounded-xl bg-blue-600 px-3 text-sm font-bold text-white shadow-sm">
+                  {page}
+                </div>
+
+                <span className="px-1 text-sm text-slate-400">
+                  of {totalPages}
+                </span>
+
+                {/* Next */}
+
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  disabled={
+                    page >= totalPages ||
+                    loading
+                  }
+                  className="
+                    inline-flex
+                    items-center
+                    gap-1
+                    rounded-xl
+                    border
+                    border-slate-200
+                    px-3.5
+                    py-2
+                    text-sm
+                    font-medium
+                    text-slate-600
+                    transition
+                    hover:border-blue-200
+                    hover:bg-blue-50
+                    hover:text-blue-600
+                    disabled:cursor-not-allowed
+                    disabled:opacity-40
+                  "
+                >
+
+                  Next
+
+                  <ChevronRight
+                    size={16}
+                  />
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+        {/* ==========================================
+            PURCHASE MODAL
+        ========================================== */}
+
+        <PurchaseModal
+          isOpen={isModalOpen}
+          onClose={
+            handleCloseModal
+          }
+        >
+
+          <PurchaseForm
+            formData={formData}
+            setFormData={setFormData}
+            suppliers={suppliers}
+            medicines={medicines}
+            onSubmit={
+              handleSavePurchase
+            }
+            selectedMedicine={
+              selectedMedicine
+            }
+          />
+
+        </PurchaseModal>
+
+      </div>
 
     </div>
   );
