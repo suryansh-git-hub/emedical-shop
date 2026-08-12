@@ -1,4 +1,9 @@
-import { Pencil, UserCheck, UserX } from "lucide-react";
+import {
+  Pencil,
+  UserCheck,
+  UserX,
+  Users,
+} from "lucide-react";
 
 function UserTable({
   users,
@@ -6,22 +11,52 @@ function UserTable({
   onEdit,
   onStatus,
 }) {
+  // ==========================================
+  // Loading
+  // ==========================================
+
   if (loading) {
     return (
-      <div className="rounded-xl border bg-white p-8 text-center shadow-sm">
-        Loading users...
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex min-h-[300px] flex-col items-center justify-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50">
+            <Users
+              size={22}
+              className="animate-pulse text-blue-600"
+            />
+          </div>
+
+          <p className="mt-4 text-sm font-semibold text-slate-700">
+            Loading users...
+          </p>
+
+          <p className="mt-1 text-xs text-slate-400">
+            Fetching system users.
+          </p>
+        </div>
       </div>
     );
   }
 
-  if (users.length === 0) {
+  // ==========================================
+  // Empty State
+  // ==========================================
+
+  if (!users || users.length === 0) {
     return (
-      <div className="rounded-xl border bg-white p-10 text-center shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-700">
+      <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100">
+          <Users
+            size={25}
+            className="text-slate-400"
+          />
+        </div>
+
+        <h2 className="mt-4 text-lg font-bold text-slate-800">
           No Users Found
         </h2>
 
-        <p className="mt-2 text-gray-500">
+        <p className="mt-1 text-sm text-slate-500">
           No users match your search.
         </p>
       </div>
@@ -29,123 +64,266 @@ function UserTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+      {/* ==========================================
+          TABLE HEADER
+      ========================================== */}
+
+      <div className="border-b border-slate-200 px-5 py-4">
+        <div className="flex items-center justify-between">
+
+          <div>
+            <h2 className="text-base font-bold text-slate-900">
+              System Users
+            </h2>
+
+            <p className="mt-0.5 text-xs text-slate-500">
+              {users.length} user
+              {users.length !== 1 ? "s" : ""} found
+            </p>
+          </div>
+
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50">
+            <Users
+              size={17}
+              className="text-blue-600"
+            />
+          </div>
+
+        </div>
+      </div>
+
+      {/* ==========================================
+          TABLE
+      ========================================== */}
+
       <div className="overflow-x-auto">
-        <table className="min-w-full">
-          <thead className="bg-gray-100">
+
+        <table className="min-w-[900px] w-full">
+
+          {/* ==========================
+              HEAD
+          ========================== */}
+
+          <thead className="bg-slate-50">
+
             <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold">
+
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wide text-slate-500">
                 Name
               </th>
 
-              <th className="px-6 py-4 text-left text-sm font-semibold">
+              <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wide text-slate-500">
                 Email
               </th>
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
+              <th className="px-6 py-4 text-center text-xs font-bold uppercase tracking-wide text-slate-500">
                 Role
               </th>
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
+              <th className="px-6 py-4 text-center text-xs font-bold uppercase tracking-wide text-slate-500">
                 Status
               </th>
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
+              <th className="px-6 py-4 text-center text-xs font-bold uppercase tracking-wide text-slate-500">
                 Created
               </th>
 
-              <th className="px-6 py-4 text-center text-sm font-semibold">
+              <th className="px-6 py-4 text-center text-xs font-bold uppercase tracking-wide text-slate-500">
                 Actions
               </th>
+
             </tr>
+
           </thead>
 
-          <tbody>
+          {/* ==========================
+              BODY
+          ========================== */}
+
+          <tbody className="divide-y divide-slate-200">
+
             {users.map((user) => (
+
               <tr
                 key={user._id}
-                className="border-t hover:bg-gray-50"
+                className="group transition hover:bg-slate-50/80"
               >
-                {/* Name */}
 
-                <td className="px-6 py-4 font-medium">
-                  {user.name}
-                </td>
-
-                {/* Email */}
+                {/* ==========================
+                    NAME
+                ========================== */}
 
                 <td className="px-6 py-4">
-                  {user.email}
+
+                  <div className="flex items-center gap-3">
+
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-sm font-bold text-blue-600">
+                      {user.name
+                        ?.charAt(0)
+                        ?.toUpperCase() || "U"}
+                    </div>
+
+                    <div className="min-w-0">
+
+                      <p className="truncate font-semibold text-slate-800">
+                        {user.name || "-"}
+                      </p>
+
+                    </div>
+
+                  </div>
+
                 </td>
 
-                {/* Role */}
+                {/* ==========================
+                    EMAIL
+                ========================== */}
+
+                <td className="px-6 py-4">
+
+                  <p className="truncate text-sm text-slate-600">
+                    {user.email || "-"}
+                  </p>
+
+                </td>
+
+                {/* ==========================
+                    ROLE
+                ========================== */}
 
                 <td className="px-6 py-4 text-center">
+
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      user.role === "admin"
-                        ? "bg-purple-100 text-purple-700"
-                        : "bg-blue-100 text-blue-700"
-                    }`}
+                    className={`
+                      inline-flex
+                      rounded-full
+                      px-3
+                      py-1.5
+                      text-xs
+                      font-semibold
+                      capitalize
+                      ${
+                        user.role === "admin"
+                          ? "bg-purple-50 text-purple-700 ring-1 ring-purple-100"
+                          : "bg-blue-50 text-blue-700 ring-1 ring-blue-100"
+                      }
+                    `}
                   >
                     {user.role}
                   </span>
+
                 </td>
 
-                {/* Status */}
+                {/* ==========================
+                    STATUS
+                ========================== */}
 
                 <td className="px-6 py-4 text-center">
+
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      user.isActive
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                    }`}
+                    className={`
+                      inline-flex
+                      rounded-full
+                      px-3
+                      py-1.5
+                      text-xs
+                      font-semibold
+                      ${
+                        user.isActive
+                          ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100"
+                          : "bg-red-50 text-red-700 ring-1 ring-red-100"
+                      }
+                    `}
                   >
                     {user.isActive
                       ? "Active"
                       : "Inactive"}
                   </span>
+
                 </td>
 
-                {/* Created */}
+                {/* ==========================
+                    CREATED
+                ========================== */}
 
                 <td className="px-6 py-4 text-center">
-                  {new Date(
-                    user.createdAt
-                  ).toLocaleDateString("en-IN")}
+
+                  <span className="text-sm text-slate-600">
+                    {user.createdAt
+                      ? new Date(
+                          user.createdAt
+                        ).toLocaleDateString(
+                          "en-IN"
+                        )
+                      : "-"}
+                  </span>
+
                 </td>
 
-                {/* Actions */}
+                {/* ==========================
+                    ACTIONS
+                ========================== */}
 
                 <td className="px-6 py-4">
-                  <div className="flex items-center justify-center gap-3">
+
+                  <div className="flex items-center justify-center gap-2">
+
                     {/* Edit */}
 
                     <button
+                      type="button"
                       onClick={() =>
                         onEdit(user)
                       }
-                      className="rounded-lg bg-blue-100 p-2 text-blue-600 transition hover:bg-blue-200"
+                      className="
+                        flex
+                        h-9
+                        w-9
+                        items-center
+                        justify-center
+                        rounded-xl
+                        bg-blue-50
+                        text-blue-600
+                        transition
+                        hover:bg-blue-100
+                        hover:text-blue-700
+                        focus:outline-none
+                        focus:ring-4
+                        focus:ring-blue-100
+                      "
                       title="Edit User"
                     >
-                      <Pencil size={18} />
+                      <Pencil size={16} />
                     </button>
 
                     {/* Activate / Deactivate */}
 
                     <button
+                      type="button"
                       onClick={() =>
                         onStatus(
                           user._id,
                           user.isActive
                         )
                       }
-                      className={`rounded-lg p-2 transition ${
-                        user.isActive
-                          ? "bg-red-100 text-red-600 hover:bg-red-200"
-                          : "bg-green-100 text-green-600 hover:bg-green-200"
-                      }`}
+                      className={`
+                        flex
+                        h-9
+                        w-9
+                        items-center
+                        justify-center
+                        rounded-xl
+                        transition
+                        focus:outline-none
+                        focus:ring-4
+                        ${
+                          user.isActive
+                            ? "bg-red-50 text-red-600 hover:bg-red-100 focus:ring-red-100"
+                            : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100 focus:ring-emerald-100"
+                        }
+                      `}
                       title={
                         user.isActive
                           ? "Deactivate User"
@@ -153,18 +331,26 @@ function UserTable({
                       }
                     >
                       {user.isActive ? (
-                        <UserX size={18} />
+                        <UserX size={16} />
                       ) : (
-                        <UserCheck size={18} />
+                        <UserCheck size={16} />
                       )}
                     </button>
+
                   </div>
+
                 </td>
+
               </tr>
+
             ))}
+
           </tbody>
+
         </table>
+
       </div>
+
     </div>
   );
 }

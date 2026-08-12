@@ -7,27 +7,51 @@ import { MESSAGES } from "../constants/messages.js";
 // =======================================
 
 export const createUserService = async (userData) => {
-  const { name, email, password, role } = userData;
+  const {
+    name,
+    email,
+    password,
+    role,
+  } = userData;
 
   if (!name || !email || !password) {
     const error = new Error(
       "Name, Email and Password are required."
     );
+
     error.statusCode = 400;
+
     throw error;
   }
 
-  const existingUser = await User.findOne({ email });
+  // =======================================
+  // Check Existing User
+  // =======================================
+
+  const existingUser = await User.findOne({
+    email,
+  });
 
   if (existingUser) {
     const error = new Error(
       MESSAGES.USER_ALREADY_EXISTS
     );
+
     error.statusCode = 409;
+
     throw error;
   }
 
-  const hashedPassword = await hashPassword(password);
+  // =======================================
+  // Hash Password
+  // =======================================
+
+  const hashedPassword =
+    await hashPassword(password);
+
+  // =======================================
+  // Create User
+  // =======================================
 
   const user = await User.create({
     name,
@@ -35,6 +59,10 @@ export const createUserService = async (userData) => {
     password: hashedPassword,
     role,
   });
+
+  // =======================================
+  // Remove Password From Response
+  // =======================================
 
   const userResponse = user.toObject();
 
@@ -48,37 +76,101 @@ export const createUserService = async (userData) => {
 
 // =======================================
 // Get All Users
+// Search + Pagination
 // =======================================
 
-export const getAllUsersService = async (
-  search = ""
-) => {
+export const getAllUsersService = async ({
+  search = "",
+  page = 1,
+  limit = 10,
+}) => {
+  // =======================================
+  // Convert Pagination Values
+  // =======================================
+
+  page = Math.max(
+    Number(page) || 1,
+    1
+  );
+
+  limit = Math.max(
+    Number(limit) || 10,
+    1
+  );
+
+  // =======================================
+  // Calculate Skip
+  // =======================================
+
+  const skip = (page - 1) * limit;
+
+  // =======================================
+  // Search Filter
+  // =======================================
+
   const filter = {};
 
-  if (search) {
+  if (search.trim()) {
     filter.$or = [
       {
         name: {
-          $regex: search,
+          $regex: search.trim(),
           $options: "i",
         },
       },
       {
         email: {
-          $regex: search,
+          $regex: search.trim(),
           $options: "i",
         },
       },
     ];
   }
 
+  // =======================================
+  // Count Total Matching Users
+  // =======================================
+
+  const totalUsers =
+    await User.countDocuments(filter);
+
+  // =======================================
+  // Fetch Paginated Users
+  // =======================================
+
   const users = await User.find(filter)
     .select("-password")
-    .sort({ createdAt: -1 });
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit)
+    .lean();
+
+  // =======================================
+  // Calculate Total Pages
+  // =======================================
+
+  const totalPages =
+    Math.ceil(
+      totalUsers / limit
+    ) || 1;
+
+  // =======================================
+  // Return Result
+  // =======================================
 
   return {
-    message: "Users fetched successfully.",
+    message:
+      "Users fetched successfully.",
+
     users,
+
+    totalUsers,
+
+    totalPages,
+
+    currentPage: page,
+
+    limit,
   };
 };
 
@@ -89,9 +181,9 @@ export const getAllUsersService = async (
 export const getUserByIdService = async (
   id
 ) => {
-  const user = await User.findById(id).select(
-    "-password"
-  );
+  const user = await User.findById(id)
+    .select("-password")
+    .lean();
 
   if (!user) {
     const error = new Error(
@@ -104,7 +196,9 @@ export const getUserByIdService = async (
   }
 
   return {
-    message: "User fetched successfully.",
+    message:
+      "User fetched successfully.",
+
     user,
   };
 };
@@ -117,9 +211,18 @@ export const updateUserService = async (
   id,
   userData
 ) => {
-  const { name, email, role } = userData;
+  const {
+    name,
+    email,
+    role,
+  } = userData;
 
-  const user = await User.findById(id);
+  // =======================================
+  // Find User
+  // =======================================
+
+  const user =
+    await User.findById(id);
 
   if (!user) {
     const error = new Error(
@@ -131,10 +234,19 @@ export const updateUserService = async (
     throw error;
   }
 
-  if (email && email !== user.email) {
-    const existingUser = await User.findOne({
-      email,
-    });
+  // =======================================
+  // Check Duplicate Email
+  // =======================================
+
+  if (
+    email &&
+    email !== user.email
+  ) {
+    const existingUser =
+      await User.findOne({
+        email,
+        _id: { $ne: id },
+      });
 
     if (existingUser) {
       const error = new Error(
@@ -147,18 +259,34 @@ export const updateUserService = async (
     }
   }
 
-  user.name = name ?? user.name;
-  user.email = email ?? user.email;
-  user.role = role ?? user.role;
+  // =======================================
+  // Update Fields
+  // =======================================
+
+  user.name =
+    name ?? user.name;
+
+  user.email =
+    email ?? user.email;
+
+  user.role =
+    role ?? user.role;
 
   await user.save();
 
-  const updatedUser = user.toObject();
+  // =======================================
+  // Remove Password
+  // =======================================
+
+  const updatedUser =
+    user.toObject();
 
   delete updatedUser.password;
 
   return {
-    message: "User updated successfully.",
+    message:
+      "User updated successfully.",
+
     user: updatedUser,
   };
 };
@@ -169,7 +297,12 @@ export const updateUserService = async (
 
 export const changeUserStatusService =
   async (id, isActive) => {
-    const user = await User.findById(id);
+    // =======================================
+    // Find User
+    // =======================================
+
+    const user =
+      await User.findById(id);
 
     if (!user) {
       const error = new Error(
@@ -181,18 +314,30 @@ export const changeUserStatusService =
       throw error;
     }
 
+    // =======================================
+    // Update Status
+    // =======================================
+
     user.isActive = isActive;
 
     await user.save();
 
-    const updatedUser = user.toObject();
+    // =======================================
+    // Remove Password
+    // =======================================
+
+    const updatedUser =
+      user.toObject();
 
     delete updatedUser.password;
 
     return {
       message: `User ${
-        isActive ? "activated" : "deactivated"
+        isActive
+          ? "activated"
+          : "deactivated"
       } successfully.`,
+
       user: updatedUser,
     };
   };

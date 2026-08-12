@@ -6,6 +6,10 @@ const CustomerForm = ({
   onSubmit,
   isEditing,
 }) => {
+  // ==========================================
+  // Handle Input Change
+  // ==========================================
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -20,97 +24,222 @@ const CustomerForm = ({
       onSubmit={onSubmit}
       className="space-y-6"
     >
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-
-        {/* Customer Name */}
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">
-            Customer Name
-          </label>
-
-          <input
-            type="text"
-            name="customerName"
-            value={formData.customerName}
-            onChange={handleChange}
-            placeholder="Enter Customer Name"
-            required
-            className="w-full rounded-lg border px-4 py-2 outline-none focus:border-blue-500"
-          />
-        </div>
-
-        {/* Contact Number */}
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">
-            Contact Number
-          </label>
-
-          <input
-            type="tel"
-            name="contactNumber"
-            value={formData.contactNumber}
-            onChange={handleChange}
-            placeholder="Enter Contact Number"
-            required
-            className="w-full rounded-lg border px-4 py-2 outline-none focus:border-blue-500"
-          />
-        </div>
-
-        {/* Email */}
-
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">
-            Email
-          </label>
-
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Enter Email Address"
-            required
-            className="w-full rounded-lg border px-4 py-2 outline-none focus:border-blue-500"
-          />
-        </div>
-
-      </div>
-
-      {/* Address */}
+      {/* ==========================================
+          Customer Information
+      ========================================== */}
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700">
+        <div className="mb-4">
+          <h3 className="text-sm font-semibold text-slate-800">
+            Customer Information
+          </h3>
+
+          <p className="mt-1 text-xs text-slate-500">
+            Enter the customer's basic contact details.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+          {/* Customer Name */}
+
+          <div>
+            <label
+              htmlFor="customerName"
+              className="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Customer Name
+            </label>
+
+            <input
+              id="customerName"
+              type="text"
+              name="customerName"
+              value={formData.customerName}
+              onChange={handleChange}
+              placeholder="Enter customer name"
+              required
+              className="
+                w-full
+                rounded-xl
+                border
+                border-slate-200
+                bg-slate-50
+                px-4
+                py-3
+                text-sm
+                text-slate-700
+                outline-none
+                transition
+                placeholder:text-slate-400
+                focus:border-blue-500
+                focus:bg-white
+                focus:ring-4
+                focus:ring-blue-100
+              "
+            />
+          </div>
+
+          {/* Contact Number */}
+
+          <div>
+            <label
+              htmlFor="contactNumber"
+              className="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Contact Number
+            </label>
+
+            <input
+              id="contactNumber"
+              type="tel"
+              name="contactNumber"
+              value={formData.contactNumber}
+              onChange={handleChange}
+              placeholder="Enter contact number"
+              required
+              className="
+                w-full
+                rounded-xl
+                border
+                border-slate-200
+                bg-slate-50
+                px-4
+                py-3
+                text-sm
+                text-slate-700
+                outline-none
+                transition
+                placeholder:text-slate-400
+                focus:border-blue-500
+                focus:bg-white
+                focus:ring-4
+                focus:ring-blue-100
+              "
+            />
+          </div>
+
+          {/* Email */}
+
+          <div className="md:col-span-2">
+            <label
+              htmlFor="email"
+              className="mb-2 block text-sm font-medium text-slate-700"
+            >
+              Email Address
+            </label>
+
+            <input
+              id="email"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="Enter email address"
+              required
+              className="
+                w-full
+                rounded-xl
+                border
+                border-slate-200
+                bg-slate-50
+                px-4
+                py-3
+                text-sm
+                text-slate-700
+                outline-none
+                transition
+                placeholder:text-slate-400
+                focus:border-blue-500
+                focus:bg-white
+                focus:ring-4
+                focus:ring-blue-100
+              "
+            />
+          </div>
+
+        </div>
+      </div>
+
+      {/* ==========================================
+          Address
+      ========================================== */}
+
+      <div>
+        <label
+          htmlFor="address"
+          className="mb-2 block text-sm font-medium text-slate-700"
+        >
           Address
         </label>
 
         <textarea
+          id="address"
           rows={4}
           name="address"
           value={formData.address}
           onChange={handleChange}
-          placeholder="Enter Customer Address"
+          placeholder="Enter customer address"
           required
-          className="w-full resize-none rounded-lg border px-4 py-2 outline-none focus:border-blue-500"
+          className="
+            w-full
+            resize-none
+            rounded-xl
+            border
+            border-slate-200
+            bg-slate-50
+            px-4
+            py-3
+            text-sm
+            text-slate-700
+            outline-none
+            transition
+            placeholder:text-slate-400
+            focus:border-blue-500
+            focus:bg-white
+            focus:ring-4
+            focus:ring-blue-100
+          "
         />
       </div>
 
-      {/* Submit Button */}
+      {/* ==========================================
+          Submit
+      ========================================== */}
 
-      <div className="flex justify-end">
+      <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
 
         <button
           type="submit"
-          className="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-white transition hover:bg-blue-700"
+          className="
+            inline-flex
+            items-center
+            justify-center
+            gap-2
+            rounded-xl
+            bg-blue-600
+            px-6
+            py-3
+            text-sm
+            font-semibold
+            text-white
+            shadow-sm
+            transition
+            hover:bg-blue-700
+            hover:shadow-md
+            focus:outline-none
+            focus:ring-4
+            focus:ring-blue-100
+          "
         >
-          <Save size={18} />
+          <Save size={17} />
 
-          {isEditing ? "Update Customer" : "Add Customer"}
+          {isEditing
+            ? "Update Customer"
+            : "Add Customer"}
         </button>
 
       </div>
-
     </form>
   );
 };

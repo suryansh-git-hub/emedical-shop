@@ -1,5 +1,12 @@
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import {
+  User,
+  Mail,
+  Lock,
+  Shield,
+  Save,
+} from "lucide-react";
 
 function UserForm({
   onSubmit,
@@ -9,7 +16,10 @@ function UserForm({
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: {
+      errors,
+      isSubmitting,
+    },
   } = useForm({
     defaultValues: {
       name: "",
@@ -19,13 +29,19 @@ function UserForm({
     },
   });
 
+  // ==========================================
+  // Populate Form
+  // ==========================================
+
   useEffect(() => {
     if (defaultValues) {
       reset({
-        name: defaultValues.name,
-        email: defaultValues.email,
+        name: defaultValues.name || "",
+        email: defaultValues.email || "",
         password: "",
-        role: defaultValues.role,
+        role:
+          defaultValues.role ||
+          "pharmacist",
       });
     } else {
       reset({
@@ -37,9 +53,16 @@ function UserForm({
     }
   }, [defaultValues, reset]);
 
+  // ==========================================
+  // Submit
+  // ==========================================
+
   const submitHandler = async (data) => {
-    // Password is not required while editing
-    if (defaultValues && !data.password) {
+    // Password is optional while editing
+    if (
+      defaultValues &&
+      !data.password
+    ) {
       delete data.password;
     }
 
@@ -55,66 +78,188 @@ function UserForm({
       onSubmit={handleSubmit(submitHandler)}
       className="space-y-5"
     >
-      {/* Name */}
+
+      {/* ==========================================
+          NAME
+      ========================================== */}
 
       <div>
-        <label className="mb-2 block text-sm font-medium">
+
+        <label
+          htmlFor="user-name"
+          className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700"
+        >
+          <User
+            size={15}
+            className="text-slate-400"
+          />
+
           Full Name
         </label>
 
         <input
+          id="user-name"
           type="text"
           placeholder="Enter full name"
-          className="w-full rounded-lg border p-3"
+          className={`
+            h-12
+            w-full
+            rounded-xl
+            border
+            bg-slate-50
+            px-4
+            text-sm
+            text-slate-700
+            outline-none
+            transition
+
+            placeholder:text-slate-400
+
+            hover:border-slate-300
+
+            focus:bg-white
+            focus:ring-4
+
+            ${
+              errors.name
+                ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+                : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+            }
+          `}
           {...register("name", {
-            required: "Name is required",
+            required:
+              "Name is required",
           })}
         />
 
         {errors.name && (
-          <p className="mt-1 text-sm text-red-500">
+          <p className="mt-1.5 text-xs font-medium text-red-600">
             {errors.name.message}
           </p>
         )}
+
       </div>
 
-      {/* Email */}
+      {/* ==========================================
+          EMAIL
+      ========================================== */}
 
       <div>
-        <label className="mb-2 block text-sm font-medium">
-          Email
+
+        <label
+          htmlFor="user-email"
+          className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700"
+        >
+          <Mail
+            size={15}
+            className="text-slate-400"
+          />
+
+          Email Address
         </label>
 
         <input
+          id="user-email"
           type="email"
-          placeholder="Enter email"
-          className="w-full rounded-lg border p-3"
+          placeholder="Enter email address"
+          className={`
+            h-12
+            w-full
+            rounded-xl
+            border
+            bg-slate-50
+            px-4
+            text-sm
+            text-slate-700
+            outline-none
+            transition
+
+            placeholder:text-slate-400
+
+            hover:border-slate-300
+
+            focus:bg-white
+            focus:ring-4
+
+            ${
+              errors.email
+                ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+                : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+            }
+          `}
           {...register("email", {
-            required: "Email is required",
+            required:
+              "Email is required",
+
+            pattern: {
+              value:
+                /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message:
+                "Please enter a valid email address",
+            },
           })}
         />
 
         {errors.email && (
-          <p className="mt-1 text-sm text-red-500">
+          <p className="mt-1.5 text-xs font-medium text-red-600">
             {errors.email.message}
           </p>
         )}
+
       </div>
 
-      {/* Password */}
+      {/* ==========================================
+          PASSWORD
+      ========================================== */}
 
       {!defaultValues && (
         <div>
-          <label className="mb-2 block text-sm font-medium">
+
+          <label
+            htmlFor="user-password"
+            className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700"
+          >
+            <Lock
+              size={15}
+              className="text-slate-400"
+            />
+
             Password
           </label>
 
           <input
+            id="user-password"
             type="password"
             placeholder="Enter password"
-            className="w-full rounded-lg border p-3"
+            className={`
+              h-12
+              w-full
+              rounded-xl
+              border
+              bg-slate-50
+              px-4
+              text-sm
+              text-slate-700
+              outline-none
+              transition
+
+              placeholder:text-slate-400
+
+              hover:border-slate-300
+
+              focus:bg-white
+              focus:ring-4
+
+              ${
+                errors.password
+                  ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+                  : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+              }
+            `}
             {...register("password", {
-              required: "Password is required",
+              required:
+                "Password is required",
+
               minLength: {
                 value: 8,
                 message:
@@ -123,25 +268,95 @@ function UserForm({
             })}
           />
 
+          {!errors.password && (
+            <p className="mt-1.5 text-xs text-slate-400">
+              Password must contain at least 8 characters.
+            </p>
+          )}
+
           {errors.password && (
-            <p className="mt-1 text-sm text-red-500">
+            <p className="mt-1.5 text-xs font-medium text-red-600">
               {errors.password.message}
             </p>
           )}
+
         </div>
       )}
 
-      {/* Role */}
+      {/* ==========================================
+          EDIT PASSWORD NOTE
+      ========================================== */}
+
+      {defaultValues && (
+        <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
+
+          <div className="flex gap-3">
+
+            <Lock
+              size={17}
+              className="mt-0.5 shrink-0 text-blue-600"
+            />
+
+            <div>
+              <p className="text-sm font-semibold text-blue-800">
+                Password
+              </p>
+
+              <p className="mt-0.5 text-xs text-blue-600">
+                Leave the password empty if you don't want to change it.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* ==========================================
+          ROLE
+      ========================================== */}
 
       <div>
-        <label className="mb-2 block text-sm font-medium">
-          Role
+
+        <label
+          htmlFor="user-role"
+          className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700"
+        >
+          <Shield
+            size={15}
+            className="text-slate-400"
+          />
+
+          User Role
         </label>
 
         <select
-          className="w-full rounded-lg border p-3"
+          id="user-role"
+          className="
+            h-12
+            w-full
+            rounded-xl
+            border
+            border-slate-200
+            bg-slate-50
+            px-4
+            text-sm
+            font-medium
+            capitalize
+            text-slate-700
+            outline-none
+            transition
+
+            hover:border-slate-300
+
+            focus:border-blue-500
+            focus:bg-white
+            focus:ring-4
+            focus:ring-blue-100
+          "
           {...register("role")}
         >
+
           <option value="admin">
             Admin
           </option>
@@ -149,22 +364,78 @@ function UserForm({
           <option value="pharmacist">
             Pharmacist
           </option>
+
         </select>
+
       </div>
 
-      {/* Submit */}
+      {/* ==========================================
+          ACTION
+      ========================================== */}
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {isSubmitting
-          ? "Saving..."
-          : defaultValues
-          ? "Update User"
-          : "Create User"}
-      </button>
+      <div className="border-t border-slate-200 pt-5">
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="
+            flex
+            h-12
+            w-full
+            items-center
+            justify-center
+            gap-2
+            rounded-xl
+            bg-blue-600
+            px-5
+            text-sm
+            font-semibold
+            text-white
+            shadow-sm
+            transition
+
+            hover:bg-blue-700
+            hover:shadow-md
+
+            focus:outline-none
+            focus:ring-4
+            focus:ring-blue-100
+
+            disabled:cursor-not-allowed
+            disabled:opacity-50
+          "
+        >
+
+          {isSubmitting ? (
+            <>
+              <span
+                className="
+                  h-4
+                  w-4
+                  animate-spin
+                  rounded-full
+                  border-2
+                  border-white/40
+                  border-t-white
+                "
+              />
+
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save size={17} />
+
+              {defaultValues
+                ? "Update User"
+                : "Create User"}
+            </>
+          )}
+
+        </button>
+
+      </div>
+
     </form>
   );
 }

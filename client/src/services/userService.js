@@ -1,42 +1,46 @@
 import api from "./axios";
 
-// ==========================
 // Get All Users
-// ==========================
-
-export const getUsers = async (search = "") => {
+export const getUsers = async (
+  search = "",
+  page = 1,
+  limit = 10
+) => {
   const response = await api.get("/users", {
-    params: { search },
+    params: {
+      search,
+      page,
+      limit,
+    },
   });
 
   return response.data;
 };
 
-// ==========================
 // Get User By ID
-// ==========================
-
 export const getUserById = async (id) => {
-  const response = await api.get(`/users/${id}`);
+  const response = await api.get(
+    `/users/${id}`
+  );
 
   return response.data;
 };
 
-// ==========================
 // Create User
-// ==========================
-
 export const createUser = async (data) => {
-  const response = await api.post("/users", data);
+  const response = await api.post(
+    "/users",
+    data
+  );
 
   return response.data;
 };
 
-// ==========================
 // Update User
-// ==========================
-
-export const updateUser = async (id, data) => {
+export const updateUser = async (
+  id,
+  data
+) => {
   const response = await api.put(
     `/users/${id}`,
     data
@@ -45,17 +49,16 @@ export const updateUser = async (id, data) => {
   return response.data;
 };
 
-// ==========================
 // Activate / Deactivate User
-// ==========================
-
 export const changeUserStatus = async (
   id,
   isActive
 ) => {
   const response = await api.patch(
     `/users/${id}/status`,
-    { isActive }
+    {
+      isActive,
+    }
   );
 
   return response.data;

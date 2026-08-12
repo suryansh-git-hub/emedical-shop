@@ -1,16 +1,34 @@
 @import "tailwindcss";
 
+/* =========================================
+   GLOBAL APPLICATION THEME
+========================================= */
+
 :root {
   --app-bg: #f5f7fb;
+  --card-bg: #ffffff;
+
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+
+  --border: #e2e8f0;
 }
+
+/* =========================================
+   GLOBAL
+========================================= */
 
 html,
 body,
 #root {
   min-height: 100%;
-  margin: 0;
 }
 
 body {
+  margin: 0;
   background-color: var(--app-bg);
+  color: var(--text-primary);
 }
