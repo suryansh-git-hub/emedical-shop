@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
 import ForgotPassword from "../pages/auth/ForgotPassword";
+import ResetPassword from "../pages/auth/ResetPassword";
 
 import Dashboard from "../pages/dashboard/Dashboard";
 import Sales from "../pages/sales/Sales";
@@ -26,60 +27,86 @@ function AppRoutes() {
     <BrowserRouter>
       <Routes>
 
-        {/* ================= Public Routes ================= */}
+        {/* ================================
+            PUBLIC ROUTES
+        ================================= */}
 
-        <Route path="/" element={<Login />} />
+        {/* Login */}
+        <Route
+          path="/"
+          element={<Login />}
+        />
 
+        {/* Signup */}
         <Route
           path="/signup"
           element={<Signup />}
         />
 
+        {/* Forgot Password */}
         <Route
           path="/forgot-password"
           element={<ForgotPassword />}
         />
 
-        {/* ================= Protected Routes ================= */}
+        {/* Reset Password */}
+        <Route
+          path="/reset-password/:token"
+          element={<ResetPassword />}
+        />
+
+
+        {/* ================================
+            PROTECTED ROUTES
+        ================================= */}
 
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
 
-            {/* Admin + Pharmacist */}
+            {/* ============================
+                Admin + Pharmacist
+            ============================ */}
 
+            {/* Dashboard */}
             <Route
               path="/dashboard"
               element={<Dashboard />}
             />
 
+            {/* Customers */}
             <Route
               path="/customers"
               element={<Customers />}
             />
 
+            {/* Inventory */}
             <Route
               path="/inventory"
               element={<Inventory />}
             />
 
+            {/* Sales */}
             <Route
               path="/sales"
               element={<Sales />}
             />
 
-            {/* Invoice Page */}
-
+            {/* Invoice */}
             <Route
               path="/sales/invoice/:id"
               element={<InvoicePage />}
             />
 
+            {/* Medicines */}
             <Route
               path="/medicines"
               element={<Medicines />}
             />
 
-            {/* ================= Admin Only ================= */}
+
+            {/* ============================
+                ADMIN ONLY
+            ============================ */}
 
             <Route
               element={
@@ -88,28 +115,37 @@ function AppRoutes() {
                 />
               }
             >
+
+              {/* Suppliers */}
               <Route
                 path="/suppliers"
                 element={<Suppliers />}
               />
 
+              {/* Purchases */}
               <Route
                 path="/purchases"
                 element={<Purchases />}
               />
 
+              {/* Reports */}
               <Route
                 path="/reports"
                 element={<Reports />}
               />
 
+              {/* Users */}
               <Route
                 path="/users"
                 element={<Users />}
               />
+
             </Route>
 
-            {/* Dashboard 404 */}
+
+            {/* ============================
+                DASHBOARD 404
+            ============================ */}
 
             <Route
               path="*"
@@ -119,7 +155,10 @@ function AppRoutes() {
           </Route>
         </Route>
 
-        {/* Public 404 */}
+
+        {/* ================================
+            PUBLIC 404
+        ================================= */}
 
         <Route
           path="*"
