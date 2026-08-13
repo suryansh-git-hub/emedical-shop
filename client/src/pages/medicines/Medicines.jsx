@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
 import {
   Pill,
   RefreshCw,
@@ -51,7 +52,6 @@ function Medicines() {
 
   const [search, setSearch] = useState("");
 
-  // Search value actually used by API
   const [debouncedSearch, setDebouncedSearch] =
     useState("");
 
@@ -85,7 +85,7 @@ function Medicines() {
     useState(1);
 
   // ==========================================
-  // DEBOUNCING
+  // Debouncing
   // ==========================================
 
   useEffect(() => {
@@ -287,30 +287,65 @@ function Medicines() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
 
         <div>
-
           <div className="mb-2 flex items-center gap-2">
 
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50">
+            <div
+              className="
+                flex h-9 w-9
+                items-center justify-center
+                rounded-xl
+                bg-blue-50
+
+                dark:bg-blue-950/60
+              "
+            >
               <Pill
                 size={19}
-                className="text-blue-600"
+                className="
+                  text-blue-600
+                  dark:text-blue-400
+                "
               />
             </div>
 
-            <span className="text-sm font-semibold text-blue-600">
+            <span
+              className="
+                text-sm font-semibold
+                text-blue-600
+                dark:text-blue-400
+              "
+            >
               Inventory Management
             </span>
 
           </div>
 
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1
+            className="
+              text-2xl font-bold
+              tracking-tight
+              text-slate-900
+              sm:text-3xl
+
+              dark:text-white
+            "
+          >
             Medicines
           </h1>
 
-          <p className="mt-1 text-sm text-slate-500 sm:text-base">
-            Manage medicines, stock, pricing and expiry details.
-          </p>
+          <p
+            className="
+              mt-1
+              text-sm
+              text-slate-500
+              sm:text-base
 
+              dark:text-slate-400
+            "
+          >
+            Manage medicines, stock, pricing and
+            expiry details.
+          </p>
         </div>
 
         {isAdmin && (
@@ -325,19 +360,45 @@ function Medicines() {
           SEARCH & FILTERS
       ========================================== */}
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div
+        className="
+          rounded-2xl
+          border border-slate-200
+          bg-white
+          p-5
+          shadow-sm
+
+          dark:border-slate-700
+          dark:bg-slate-900
+          dark:shadow-none
+        "
+      >
 
         <div className="mb-5 flex items-center justify-between">
 
           <div>
-            <h2 className="text-base font-semibold text-slate-900">
+            <h2
+              className="
+                text-base font-semibold
+                text-slate-900
+                dark:text-white
+              "
+            >
               Find Medicines
             </h2>
 
-            <p className="mt-1 text-sm text-slate-500">
+            <p
+              className="
+                mt-1 text-sm
+                text-slate-500
+                dark:text-slate-400
+              "
+            >
               Search and filter your medicine inventory.
             </p>
           </div>
+
+          {/* Desktop Reset */}
 
           <button
             type="button"
@@ -349,16 +410,27 @@ function Medicines() {
               rounded-lg
               border
               border-slate-200
+              bg-white
               px-3
               py-2
               text-sm
               font-medium
               text-slate-600
               transition
+
               hover:border-blue-200
               hover:bg-blue-50
               hover:text-blue-600
+
               sm:flex
+
+              dark:border-slate-700
+              dark:bg-slate-800
+              dark:text-slate-300
+
+              dark:hover:border-slate-600
+              dark:hover:bg-slate-700
+              dark:hover:text-blue-400
             "
           >
             <RefreshCw size={15} />
@@ -407,6 +479,7 @@ function Medicines() {
               rounded-lg
               border
               border-slate-200
+              bg-white
               px-3
               py-2
               text-sm
@@ -414,7 +487,13 @@ function Medicines() {
               text-slate-600
               transition
               hover:bg-slate-50
+
               sm:hidden
+
+              dark:border-slate-700
+              dark:bg-slate-800
+              dark:text-slate-300
+              dark:hover:bg-slate-700
             "
           >
             <RefreshCw size={15} />
@@ -426,7 +505,17 @@ function Medicines() {
         {/* Debounce indicator */}
 
         {search !== debouncedSearch && (
-          <div className="mt-3 flex items-center gap-2 text-xs text-slate-400">
+          <div
+            className="
+              mt-3
+              flex
+              items-center
+              gap-2
+              text-xs
+              text-slate-400
+              dark:text-slate-500
+            "
+          >
             <RefreshCw
               size={13}
               className="animate-spin"
@@ -442,27 +531,79 @@ function Medicines() {
           MEDICINE INVENTORY
       ========================================== */}
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div
+        className="
+          overflow-hidden
+          rounded-2xl
+          border border-slate-200
+          bg-white
+          shadow-sm
+
+          dark:border-slate-700
+          dark:bg-slate-900
+          dark:shadow-none
+        "
+      >
 
         {/* Table Header */}
 
-        <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+        <div
+          className="
+            flex
+            flex-col
+            gap-3
+            border-b
+            border-slate-200
+            px-5
+            py-5
+
+            sm:flex-row
+            sm:items-center
+            sm:justify-between
+
+            dark:border-slate-700
+          "
+        >
 
           <div className="flex items-center gap-3">
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100">
+            <div
+              className="
+                flex h-10 w-10
+                items-center justify-center
+                rounded-xl
+                bg-slate-100
+
+                dark:bg-slate-800
+              "
+            >
               <PackageSearch
                 size={20}
-                className="text-slate-600"
+                className="
+                  text-slate-600
+                  dark:text-slate-300
+                "
               />
             </div>
 
             <div>
-              <h2 className="font-semibold text-slate-900">
+              <h2
+                className="
+                  font-semibold
+                  text-slate-900
+                  dark:text-white
+                "
+              >
                 Medicine Inventory
               </h2>
 
-              <p className="text-sm text-slate-500">
+              <p
+                className="
+                  text-sm
+                  text-slate-500
+                  dark:text-slate-400
+                "
+              >
                 {loading
                   ? "Loading medicines..."
                   : `${medicines.length} medicines displayed`}
@@ -472,7 +613,21 @@ function Medicines() {
           </div>
 
           {!loading && (
-            <div className="w-fit rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600">
+            <div
+              className="
+                w-fit
+                rounded-full
+                bg-blue-50
+                px-3
+                py-1.5
+                text-xs
+                font-semibold
+                text-blue-600
+
+                dark:bg-blue-950/60
+                dark:text-blue-400
+              "
+            >
               Page {page} of {totalPages}
             </div>
           )}
@@ -496,14 +651,21 @@ function Medicines() {
         {/* Pagination */}
 
         {!loading && medicines.length > 0 && (
-          <div className="border-t border-slate-200 px-5 py-4">
+          <div
+            className="
+              border-t
+              border-slate-200
+              px-5
+              py-4
 
+              dark:border-slate-700
+            "
+          >
             <MedicinePagination
               page={page}
               setPage={setPage}
               totalPages={totalPages}
             />
-
           </div>
         )}
 

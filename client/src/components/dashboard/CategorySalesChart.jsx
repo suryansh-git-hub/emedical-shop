@@ -29,20 +29,58 @@ function CategorySalesChart({ data = [] }) {
   );
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+    <div
+      className="
+        rounded-2xl
+        border border-slate-200
+        bg-white
+        p-6
+        shadow-sm
+        transition-all
+        hover:shadow-md
+
+        dark:border-slate-700
+        dark:bg-slate-900
+        dark:shadow-none
+      "
+    >
       {/* Header */}
       <div className="mb-4">
-        <h2 className="text-lg font-bold text-slate-900">
+        <h2
+          className="
+            text-lg font-bold
+            text-slate-900
+            dark:text-white
+          "
+        >
           Category-wise Sales
         </h2>
 
-        <p className="mt-1 text-sm text-slate-500">
+        <p
+          className="
+            mt-1 text-sm
+            text-slate-500
+            dark:text-slate-400
+          "
+        >
           Sales distribution across medicine categories
         </p>
       </div>
 
       {chartData.length === 0 ? (
-        <div className="flex h-[300px] items-center justify-center rounded-xl bg-slate-50 text-sm text-slate-500">
+        <div
+          className="
+            flex h-[300px]
+            items-center justify-center
+            rounded-xl
+            bg-slate-50
+            text-sm
+            text-slate-500
+
+            dark:bg-slate-800/60
+            dark:text-slate-400
+          "
+        >
           No category sales available.
         </div>
       ) : (
@@ -78,13 +116,13 @@ function CategorySalesChart({ data = [] }) {
               y="42%"
               textAnchor="middle"
               dominantBaseline="middle"
-              className="fill-slate-900"
             >
               <tspan
                 x="50%"
                 dy="-4"
                 fontSize="20"
                 fontWeight="700"
+                fill="#f8fafc"
               >
                 ₹{totalSales.toLocaleString("en-IN")}
               </tspan>
@@ -93,18 +131,27 @@ function CategorySalesChart({ data = [] }) {
                 x="50%"
                 dy="24"
                 fontSize="11"
-                fill="#64748b"
+                fill="#94a3b8"
               >
                 Total Sales
               </tspan>
             </text>
 
+            {/* Tooltip */}
             <Tooltip
               contentStyle={{
                 borderRadius: "12px",
-                border: "1px solid #e2e8f0",
+                border: "1px solid #475569",
+                backgroundColor: "#0f172a",
+                color: "#f8fafc",
                 boxShadow:
-                  "0 10px 25px rgba(15, 23, 42, 0.1)",
+                  "0 10px 25px rgba(0, 0, 0, 0.25)",
+              }}
+              labelStyle={{
+                color: "#cbd5e1",
+              }}
+              itemStyle={{
+                color: "#93c5fd",
               }}
               formatter={(value) => [
                 `₹${Number(value).toLocaleString(
@@ -114,12 +161,14 @@ function CategorySalesChart({ data = [] }) {
               ]}
             />
 
+            {/* Legend */}
             <Legend
               verticalAlign="bottom"
               iconType="circle"
               wrapperStyle={{
                 paddingTop: "15px",
                 fontSize: "12px",
+                color: "#94a3b8",
               }}
             />
           </PieChart>

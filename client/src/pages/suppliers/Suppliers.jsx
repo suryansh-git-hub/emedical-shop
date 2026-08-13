@@ -43,7 +43,6 @@ const Suppliers = () => {
   // ==========================================
 
   const [suppliers, setSuppliers] = useState([]);
-
   const [loading, setLoading] = useState(true);
 
   // ==========================================
@@ -51,7 +50,6 @@ const Suppliers = () => {
   // ==========================================
 
   const [search, setSearch] = useState("");
-
   const [debouncedSearch, setDebouncedSearch] =
     useState("");
 
@@ -67,7 +65,6 @@ const Suppliers = () => {
   const [totalSuppliers, setTotalSuppliers] =
     useState(0);
 
-  // Suppliers per page
   const limit = 10;
 
   // ==========================================
@@ -101,9 +98,6 @@ const Suppliers = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search.trim());
-
-      // Whenever search changes,
-      // start from page 1.
       setPage(1);
     }, 500);
 
@@ -129,33 +123,16 @@ const Suppliers = () => {
         limit
       );
 
-      // ======================================
-      // Set Suppliers
-      // ======================================
-
       const supplierList =
         response.suppliers || [];
 
       setSuppliers(supplierList);
-
-      // ======================================
-      // Set Total Suppliers
-      // ======================================
-      //
-      // Backend normally sends totalSuppliers.
-      // Fallback to returned array length
-      // just in case.
-      //
 
       setTotalSuppliers(
         Number(response.totalSuppliers) ||
           supplierList.length ||
           0
       );
-
-      // ======================================
-      // Set Total Pages
-      // ======================================
 
       setTotalPages(
         Math.max(
@@ -284,11 +261,6 @@ const Suppliers = () => {
           "Supplier deleted successfully."
       );
 
-      // ======================================
-      // If the last supplier on the current
-      // page was deleted, move to previous page
-      // ======================================
-
       if (
         suppliers.length === 1 &&
         page > 1
@@ -325,7 +297,6 @@ const Suppliers = () => {
         );
 
       setHistory(response);
-
       setIsHistoryOpen(true);
     } catch (error) {
       toast.error(
@@ -345,22 +316,12 @@ const Suppliers = () => {
     try {
       let response;
 
-      // ======================================
-      // Update
-      // ======================================
-
       if (editingSupplier) {
         response = await updateSupplier(
           editingSupplier._id,
           formData
         );
-      }
-
-      // ======================================
-      // Create
-      // ======================================
-
-      else {
+      } else {
         response = await addSupplier(
           formData
         );
@@ -373,7 +334,6 @@ const Suppliers = () => {
 
       handleCloseModal();
 
-      // Refresh current page
       await fetchSuppliers(
         debouncedSearch,
         page
@@ -438,20 +398,55 @@ const Suppliers = () => {
     suppliers.length === 0
   ) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center">
+      <div className="
+        flex
+        min-h-[60vh]
+        flex-col
+        items-center
+        justify-center
+        bg-slate-50
 
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
+        dark:bg-slate-950
+      ">
+
+        <div className="
+          flex
+          h-14
+          w-14
+          items-center
+          justify-center
+          rounded-2xl
+          bg-blue-50
+
+          dark:bg-blue-950/40
+        ">
           <Loader
             size={26}
-            className="animate-spin text-blue-600"
+            className="
+              animate-spin
+              text-blue-600
+              dark:text-blue-400
+            "
           />
         </div>
 
-        <p className="mt-4 font-semibold text-slate-700">
+        <p className="
+          mt-4
+          font-semibold
+          text-slate-700
+
+          dark:text-slate-200
+        ">
           Loading suppliers...
         </p>
 
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="
+          mt-1
+          text-sm
+          text-slate-400
+
+          dark:text-slate-500
+        ">
           Fetching supplier information.
         </p>
 
@@ -464,21 +459,65 @@ const Suppliers = () => {
   // ==========================================
 
   return (
-    <div className="min-h-full bg-[#f5f7fb]">
+    <div className="
+      min-h-full
+      bg-[#f5f7fb]
 
-      <div className="mx-auto max-w-[1500px] space-y-6">
+      dark:bg-slate-950
+    ">
+
+      <div className="
+        mx-auto
+        max-w-[1500px]
+        space-y-6
+      ">
 
         {/* ==========================================
             HEADER
         ========================================== */}
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="
+          rounded-3xl
+          border
+          border-slate-200
+          bg-white
+          p-6
+          shadow-sm
 
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          dark:border-slate-800
+          dark:bg-slate-900
+        ">
 
-            <div className="flex items-center gap-4">
+          <div className="
+            flex
+            flex-col
+            gap-5
+            sm:flex-row
+            sm:items-center
+            sm:justify-between
+          ">
 
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-600 shadow-lg shadow-blue-100">
+            <div className="
+              flex
+              items-center
+              gap-4
+            ">
+
+              <div className="
+                flex
+                h-14
+                w-14
+                shrink-0
+                items-center
+                justify-center
+                rounded-2xl
+                bg-blue-600
+                shadow-lg
+                shadow-blue-100
+
+                dark:bg-blue-500
+                dark:shadow-none
+              ">
 
                 <Building2
                   size={27}
@@ -489,15 +528,36 @@ const Suppliers = () => {
 
               <div>
 
-                <span className="text-sm font-semibold text-blue-600">
+                <span className="
+                  text-sm
+                  font-semibold
+                  text-blue-600
+
+                  dark:text-blue-400
+                ">
                   Supplier Management
                 </span>
 
-                <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                <h1 className="
+                  mt-1
+                  text-2xl
+                  font-bold
+                  tracking-tight
+                  text-slate-900
+                  sm:text-3xl
+
+                  dark:text-slate-100
+                ">
                   Suppliers
                 </h1>
 
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="
+                  mt-1
+                  text-sm
+                  text-slate-500
+
+                  dark:text-slate-400
+                ">
                   Manage supplier information,
                   contacts and purchase history.
                 </p>
@@ -507,9 +567,7 @@ const Suppliers = () => {
             </div>
 
             <AddSupplierButton
-              onClick={
-                handleAddSupplier
-              }
+              onClick={handleAddSupplier}
             />
 
           </div>
@@ -520,17 +578,47 @@ const Suppliers = () => {
             SEARCH
         ========================================== */}
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div className="
+          rounded-3xl
+          border
+          border-slate-200
+          bg-white
+          p-5
+          shadow-sm
+          sm:p-6
 
-          <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          dark:border-slate-800
+          dark:bg-slate-900
+        ">
+
+          <div className="
+            mb-5
+            flex
+            flex-col
+            gap-2
+            sm:flex-row
+            sm:items-center
+            sm:justify-between
+          ">
 
             <div>
 
-              <h2 className="font-semibold text-slate-900">
+              <h2 className="
+                font-semibold
+                text-slate-900
+
+                dark:text-slate-100
+              ">
                 Find Suppliers
               </h2>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="
+                mt-1
+                text-sm
+                text-slate-500
+
+                dark:text-slate-400
+              ">
                 Search suppliers by name or
                 contact number.
               </p>
@@ -557,6 +645,12 @@ const Suppliers = () => {
                 hover:border-blue-200
                 hover:bg-blue-50
                 hover:text-blue-600
+
+                dark:border-slate-700
+                dark:text-slate-300
+                dark:hover:border-slate-600
+                dark:hover:bg-slate-800
+                dark:hover:text-blue-400
               "
             >
 
@@ -611,6 +705,14 @@ const Suppliers = () => {
                 focus:bg-white
                 focus:ring-4
                 focus:ring-blue-100
+
+                dark:border-slate-700
+                dark:bg-slate-800
+                dark:text-slate-200
+                dark:placeholder:text-slate-500
+                dark:focus:border-blue-500
+                dark:focus:bg-slate-800
+                dark:focus:ring-blue-950/50
               "
             />
 
@@ -619,9 +721,7 @@ const Suppliers = () => {
             {search && (
               <button
                 type="button"
-                onClick={
-                  handleClearSearch
-                }
+                onClick={handleClearSearch}
                 className="
                   absolute
                   right-3
@@ -637,12 +737,13 @@ const Suppliers = () => {
                   transition
                   hover:bg-slate-200
                   hover:text-slate-700
+
+                  dark:hover:bg-slate-700
+                  dark:hover:text-slate-200
                 "
                 title="Clear search"
               >
-
                 <X size={16} />
-
               </button>
             )}
 
@@ -651,7 +752,17 @@ const Suppliers = () => {
           {/* Searching Indicator */}
 
           {search !== debouncedSearch && (
-            <div className="mt-3 flex items-center gap-2 text-xs font-medium text-blue-600">
+            <div className="
+              mt-3
+              flex
+              items-center
+              gap-2
+              text-xs
+              font-medium
+              text-blue-600
+
+              dark:text-blue-400
+            ">
 
               <Loader
                 size={13}
@@ -666,7 +777,18 @@ const Suppliers = () => {
           {/* Active Search */}
 
           {debouncedSearch && (
-            <div className="mt-4 rounded-xl bg-blue-50 px-4 py-3 text-sm text-blue-700">
+            <div className="
+              mt-4
+              rounded-xl
+              bg-blue-50
+              px-4
+              py-3
+              text-sm
+              text-blue-700
+
+              dark:bg-blue-950/40
+              dark:text-blue-300
+            ">
 
               Showing results for{" "}
 
@@ -686,12 +808,8 @@ const Suppliers = () => {
         <SupplierTable
           suppliers={suppliers}
           onEdit={handleEditSupplier}
-          onDelete={
-            handleDeleteSupplier
-          }
-          onHistory={
-            handleSupplierHistory
-          }
+          onDelete={handleDeleteSupplier}
+          onHistory={handleSupplierHistory}
         />
 
         {/* ==========================================
@@ -700,7 +818,17 @@ const Suppliers = () => {
 
         {loading &&
           suppliers.length > 0 && (
-            <div className="flex items-center justify-center gap-2 text-sm font-medium text-blue-600">
+            <div className="
+              flex
+              items-center
+              justify-center
+              gap-2
+              text-sm
+              font-medium
+              text-blue-600
+
+              dark:text-blue-400
+            ">
 
               <Loader
                 size={16}
@@ -717,29 +845,67 @@ const Suppliers = () => {
         ========================================== */}
 
         {totalSuppliers > 0 && (
-          <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+          <div className="
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            px-5
+            py-4
+            shadow-sm
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            dark:border-slate-800
+            dark:bg-slate-900
+          ">
+
+            <div className="
+              flex
+              flex-col
+              gap-4
+              sm:flex-row
+              sm:items-center
+              sm:justify-between
+            ">
 
               {/* Showing */}
 
-              <p className="text-sm text-slate-500">
+              <p className="
+                text-sm
+                text-slate-500
+
+                dark:text-slate-400
+              ">
 
                 Showing{" "}
 
-                <span className="font-semibold text-slate-800">
+                <span className="
+                  font-semibold
+                  text-slate-800
+
+                  dark:text-slate-200
+                ">
                   {firstSupplier}
                 </span>
 
                 {" "}to{" "}
 
-                <span className="font-semibold text-slate-800">
+                <span className="
+                  font-semibold
+                  text-slate-800
+
+                  dark:text-slate-200
+                ">
                   {lastSupplier}
                 </span>
 
                 {" "}of{" "}
 
-                <span className="font-semibold text-slate-800">
+                <span className="
+                  font-semibold
+                  text-slate-800
+
+                  dark:text-slate-200
+                ">
                   {totalSuppliers}
                 </span>
 
@@ -749,15 +915,17 @@ const Suppliers = () => {
 
               {/* Controls */}
 
-              <div className="flex items-center gap-2">
+              <div className="
+                flex
+                items-center
+                gap-2
+              ">
 
                 {/* Previous */}
 
                 <button
                   type="button"
-                  onClick={
-                    handlePrevious
-                  }
+                  onClick={handlePrevious}
                   disabled={
                     page === 1 ||
                     loading
@@ -780,12 +948,16 @@ const Suppliers = () => {
                     hover:text-blue-600
                     disabled:cursor-not-allowed
                     disabled:opacity-40
+
+                    dark:border-slate-700
+                    dark:text-slate-300
+                    dark:hover:border-slate-600
+                    dark:hover:bg-slate-800
+                    dark:hover:text-blue-400
                   "
                 >
 
-                  <ChevronLeft
-                    size={16}
-                  />
+                  <ChevronLeft size={16} />
 
                   Previous
 
@@ -793,13 +965,33 @@ const Suppliers = () => {
 
                 {/* Current Page */}
 
-                <div className="flex h-9 min-w-9 items-center justify-center rounded-xl bg-blue-600 px-3 text-sm font-bold text-white">
+                <div className="
+                  flex
+                  h-9
+                  min-w-9
+                  items-center
+                  justify-center
+                  rounded-xl
+                  bg-blue-600
+                  px-3
+                  text-sm
+                  font-bold
+                  text-white
+
+                  dark:bg-blue-500
+                ">
                   {page}
                 </div>
 
                 {/* Total Pages */}
 
-                <span className="px-1 text-sm text-slate-400">
+                <span className="
+                  px-1
+                  text-sm
+                  text-slate-400
+
+                  dark:text-slate-500
+                ">
                   of {totalPages}
                 </span>
 
@@ -809,8 +1001,7 @@ const Suppliers = () => {
                   type="button"
                   onClick={handleNext}
                   disabled={
-                    page >=
-                      totalPages ||
+                    page >= totalPages ||
                     loading
                   }
                   className="
@@ -831,14 +1022,18 @@ const Suppliers = () => {
                     hover:text-blue-600
                     disabled:cursor-not-allowed
                     disabled:opacity-40
+
+                    dark:border-slate-700
+                    dark:text-slate-300
+                    dark:hover:border-slate-600
+                    dark:hover:bg-slate-800
+                    dark:hover:text-blue-400
                   "
                 >
 
                   Next
 
-                  <ChevronRight
-                    size={16}
-                  />
+                  <ChevronRight size={16} />
 
                 </button>
 
@@ -855,17 +1050,54 @@ const Suppliers = () => {
 
         {suppliers.length === 0 &&
           !loading && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
+            <div className="
+              rounded-2xl
+              border
+              border-slate-200
+              bg-white
+              p-10
+              text-center
+              shadow-sm
 
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
+              dark:border-slate-800
+              dark:bg-slate-900
+            ">
+
+              <div className="
+                mx-auto
+                flex
+                h-14
+                w-14
+                items-center
+                justify-center
+                rounded-2xl
+                bg-slate-100
+                text-slate-500
+
+                dark:bg-slate-800
+                dark:text-slate-400
+              ">
                 <Building2 size={25} />
               </div>
 
-              <h2 className="mt-4 text-lg font-semibold text-slate-800">
+              <h2 className="
+                mt-4
+                text-lg
+                font-semibold
+                text-slate-800
+
+                dark:text-slate-100
+              ">
                 No Suppliers Found
               </h2>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="
+                mt-1
+                text-sm
+                text-slate-500
+
+                dark:text-slate-400
+              ">
                 {debouncedSearch
                   ? `No suppliers match "${debouncedSearch}".`
                   : "Add your first supplier to get started."}
@@ -882,16 +1114,12 @@ const Suppliers = () => {
           isOpen={isModalOpen}
           onClose={handleCloseModal}
         >
-
           <SupplierForm
             formData={formData}
             setFormData={setFormData}
             onSubmit={handleSaveSupplier}
-            isEditing={
-              editingSupplier
-            }
+            isEditing={editingSupplier}
           />
-
         </SupplierModal>
 
         {/* ==========================================

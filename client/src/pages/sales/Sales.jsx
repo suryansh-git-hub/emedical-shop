@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+
 import {
   Loader,
   Receipt,
@@ -70,7 +71,6 @@ const Sales = () => {
   // Reward Points
   // ==========================================
 
-  // Reward points are NOT redeemed by default.
   const [
     redeemRewardPoints,
     setRedeemRewardPoints,
@@ -230,8 +230,6 @@ const Sales = () => {
   const handleCustomerSelect = (customer) => {
     setSelectedCustomer(customer);
 
-    // Every newly selected customer starts
-    // with reward redemption disabled.
     setRedeemRewardPoints(false);
   };
 
@@ -337,7 +335,6 @@ const Sales = () => {
 
     setCashReceived("");
 
-    // Reset reward redemption
     setRedeemRewardPoints(false);
 
     setCustomerSearch("");
@@ -379,19 +376,11 @@ const Sales = () => {
     selectedCustomer?.rewardPoints || 0
   );
 
-  /*
-   * Reward points are treated as a flat
-   * discount and cannot exceed the bill total.
-   */
   const maximumRewardDiscount = Math.min(
     availableRewardPoints,
     subtotal + gstAmount
   );
 
-  /*
-   * Only apply reward discount if the user
-   * explicitly chooses to redeem points.
-   */
   const rewardDiscount = redeemRewardPoints
     ? maximumRewardDiscount
     : 0;
@@ -461,10 +450,6 @@ const Sales = () => {
     try {
       setSaving(true);
 
-      // ========================================
-      // Payload
-      // ========================================
-
       const payload = {
         customer:
           selectedCustomer._id,
@@ -486,26 +471,11 @@ const Sales = () => {
           })
         ),
 
-        // ======================================
-        // Discount
-        // ======================================
-
         discountType: "flat",
 
-        /*
-         * If reward redemption is OFF:
-         * rewardDiscount = 0
-         *
-         * If reward redemption is ON:
-         * rewardDiscount = points being redeemed
-         */
         discount: rewardDiscount,
 
         redeemPoints: rewardDiscount,
-
-        // ======================================
-        // Payment
-        // ======================================
 
         paymentMethod,
 
@@ -525,10 +495,6 @@ const Sales = () => {
 
       console.log(payload);
 
-      // ========================================
-      // Create Sale
-      // ========================================
-
       const response =
         await addSale(payload);
 
@@ -537,15 +503,7 @@ const Sales = () => {
           "Bill generated successfully."
       );
 
-      // ========================================
-      // Reset Billing Screen
-      // ========================================
-
       clearBill();
-
-      // ========================================
-      // Open Invoice
-      // ========================================
 
       if (response.sale?._id) {
         navigate(
@@ -568,21 +526,56 @@ const Sales = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
+      <div className="
+        flex
+        min-h-[60vh]
+        flex-col
+        items-center
+        justify-center
+        bg-transparent
+      ">
+
+        <div className="
+          flex
+          h-14
+          w-14
+          items-center
+          justify-center
+          rounded-2xl
+          bg-blue-50
+
+          dark:bg-blue-950/50
+        ">
+
           <Loader
-            className="animate-spin text-blue-600"
+            className="
+              animate-spin
+              text-blue-600
+              dark:text-blue-400
+            "
             size={26}
           />
+
         </div>
 
-        <p className="mt-4 font-semibold text-slate-700">
+        <p className="
+          mt-4
+          font-semibold
+          text-slate-700
+          dark:text-slate-300
+        ">
           Loading billing...
         </p>
 
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="
+          mt-1
+          text-sm
+          text-slate-400
+          dark:text-slate-500
+        ">
           Preparing customers and medicines.
         </p>
+
       </div>
     );
   }
@@ -592,36 +585,93 @@ const Sales = () => {
   // ==========================================
 
   return (
-    <div className="mx-auto max-w-[1500px] space-y-6 pb-10">
+    <div className="
+      mx-auto
+      max-w-[1500px]
+      space-y-6
+      pb-10
+    ">
 
       {/* ======================================
           PAGE HEADER
       ====================================== */}
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="
+        rounded-2xl
+        border
+        border-slate-200
+        bg-white
+        p-6
+        shadow-sm
 
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        dark:border-slate-800
+        dark:bg-slate-900
+        dark:shadow-black/20
+      ">
+
+        <div className="
+          flex
+          flex-col
+          gap-4
+          sm:flex-row
+          sm:items-center
+          sm:justify-between
+        ">
+
+          {/* Header Title */}
 
           <div className="flex items-center gap-4">
 
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50">
+            <div className="
+              flex
+              h-12
+              w-12
+              items-center
+              justify-center
+              rounded-xl
+              bg-blue-50
+
+              dark:bg-blue-950/50
+            ">
+
               <Receipt
                 size={24}
-                className="text-blue-600"
+                className="
+                  text-blue-600
+                  dark:text-blue-400
+                "
               />
+
             </div>
 
             <div>
 
-              <p className="text-sm font-semibold text-blue-600">
+              <p className="
+                text-sm
+                font-semibold
+                text-blue-600
+                dark:text-blue-400
+              ">
                 Point of Sale
               </p>
 
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+              <h1 className="
+                text-2xl
+                font-bold
+                tracking-tight
+                text-slate-900
+
+                dark:text-slate-100
+              ">
                 Billing
               </h1>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="
+                mt-1
+                text-sm
+                text-slate-500
+                dark:text-slate-400
+              ">
                 Create a customer invoice quickly
                 and securely.
               </p>
@@ -629,6 +679,8 @@ const Sales = () => {
             </div>
 
           </div>
+
+          {/* Reset */}
 
           <button
             type="button"
@@ -642,21 +694,34 @@ const Sales = () => {
               rounded-xl
               border
               border-slate-200
+              bg-white
               px-4
               py-2.5
               text-sm
               font-semibold
               text-slate-600
               transition
+
               hover:border-red-200
               hover:bg-red-50
               hover:text-red-600
+
+              dark:border-slate-700
+              dark:bg-slate-800
+              dark:text-slate-300
+              dark:hover:border-red-900
+              dark:hover:bg-red-950/40
+              dark:hover:text-red-400
+
               disabled:cursor-not-allowed
               disabled:opacity-50
             "
           >
+
             <RotateCcw size={16} />
+
             Reset Bill
+
           </button>
 
         </div>
@@ -667,28 +732,71 @@ const Sales = () => {
           CUSTOMER + MEDICINE SEARCH
       ====================================== */}
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="
+        grid
+        gap-6
+        lg:grid-cols-2
+      ">
 
         {/* Customer */}
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="
+          rounded-2xl
+          border
+          border-slate-200
+          bg-white
+          p-5
+          shadow-sm
 
-          <div className="mb-4 flex items-center gap-3">
+          dark:border-slate-800
+          dark:bg-slate-900
+          dark:shadow-black/20
+        ">
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+          <div className="
+            mb-4
+            flex
+            items-center
+            gap-3
+          ">
+
+            <div className="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-xl
+              bg-blue-50
+
+              dark:bg-blue-950/50
+            ">
+
               <UserRound
                 size={19}
-                className="text-blue-600"
+                className="
+                  text-blue-600
+                  dark:text-blue-400
+                "
               />
+
             </div>
 
             <div>
 
-              <h2 className="font-semibold text-slate-900">
+              <h2 className="
+                font-semibold
+                text-slate-900
+                dark:text-slate-100
+              ">
                 Customer
               </h2>
 
-              <p className="text-xs text-slate-500">
+              <p className="
+                text-xs
+                text-slate-500
+                dark:text-slate-400
+              ">
                 Select the customer for this invoice.
               </p>
 
@@ -706,11 +814,14 @@ const Sales = () => {
             setSearch={setCustomerSearch}
           />
 
-          {/* Debounce indicator */}
-
           {customerSearch !==
             debouncedCustomerSearch && (
-            <p className="mt-2 text-xs text-slate-400">
+            <p className="
+              mt-2
+              text-xs
+              text-slate-400
+              dark:text-slate-500
+            ">
               Searching customers...
             </p>
           )}
@@ -719,24 +830,63 @@ const Sales = () => {
 
         {/* Medicine */}
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div className="
+          rounded-2xl
+          border
+          border-slate-200
+          bg-white
+          p-5
+          shadow-sm
 
-          <div className="mb-4 flex items-center gap-3">
+          dark:border-slate-800
+          dark:bg-slate-900
+          dark:shadow-black/20
+        ">
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50">
+          <div className="
+            mb-4
+            flex
+            items-center
+            gap-3
+          ">
+
+            <div className="
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+              rounded-xl
+              bg-emerald-50
+
+              dark:bg-emerald-950/50
+            ">
+
               <ShoppingCart
                 size={19}
-                className="text-emerald-600"
+                className="
+                  text-emerald-600
+                  dark:text-emerald-400
+                "
               />
+
             </div>
 
             <div>
 
-              <h2 className="font-semibold text-slate-900">
+              <h2 className="
+                font-semibold
+                text-slate-900
+                dark:text-slate-100
+              ">
                 Add Medicines
               </h2>
 
-              <p className="text-xs text-slate-500">
+              <p className="
+                text-xs
+                text-slate-500
+                dark:text-slate-400
+              ">
                 Search by name, generic or batch number.
               </p>
 
@@ -753,11 +903,14 @@ const Sales = () => {
             setSearch={setMedicineSearch}
           />
 
-          {/* Debounce indicator */}
-
           {medicineSearch !==
             debouncedMedicineSearch && (
-            <p className="mt-2 text-xs text-slate-400">
+            <p className="
+              mt-2
+              text-xs
+              text-slate-400
+              dark:text-slate-500
+            ">
               Searching medicines...
             </p>
           )}
@@ -770,19 +923,50 @@ const Sales = () => {
           SELECTED MEDICINES
       ====================================== */}
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="
+        overflow-hidden
+        rounded-2xl
+        border
+        border-slate-200
+        bg-white
+        shadow-sm
 
-        <div className="border-b border-slate-200 px-5 py-4">
+        dark:border-slate-800
+        dark:bg-slate-900
+        dark:shadow-black/20
+      ">
 
-          <div className="flex items-center justify-between">
+        <div className="
+          border-b
+          border-slate-200
+          px-5
+          py-4
+
+          dark:border-slate-800
+        ">
+
+          <div className="
+            flex
+            items-center
+            justify-between
+          ">
 
             <div>
 
-              <h2 className="font-semibold text-slate-900">
+              <h2 className="
+                font-semibold
+                text-slate-900
+                dark:text-slate-100
+              ">
                 Current Bill
               </h2>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="
+                mt-1
+                text-sm
+                text-slate-500
+                dark:text-slate-400
+              ">
                 {billItems.length}{" "}
                 {billItems.length === 1
                   ? "medicine"
@@ -793,7 +977,18 @@ const Sales = () => {
             </div>
 
             {billItems.length > 0 && (
-              <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600">
+              <span className="
+                rounded-full
+                bg-blue-50
+                px-3
+                py-1
+                text-xs
+                font-semibold
+                text-blue-600
+
+                dark:bg-blue-950/50
+                dark:text-blue-400
+              ">
                 {billItems.reduce(
                   (sum, item) =>
                     sum +
@@ -821,20 +1016,26 @@ const Sales = () => {
 
       </div>
 
-        {/* ======================================
+      {/* ======================================
           BILL SUMMARY
       ====================================== */}
 
       <BillSummary
         items={billItems}
         customer={selectedCustomer}
-        redeemRewardPoints={redeemRewardPoints}
-        setRedeemRewardPoints={setRedeemRewardPoints}
+        redeemRewardPoints={
+          redeemRewardPoints
+        }
+        setRedeemRewardPoints={
+          setRedeemRewardPoints
+        }
         paymentMethod={paymentMethod}
         setPaymentMethod={setPaymentMethod}
         cashReceived={cashReceived}
         setCashReceived={setCashReceived}
-        onGenerateBill={handleGenerateBill}
+        onGenerateBill={
+          handleGenerateBill
+        }
         onClearBill={clearBill}
         saving={saving}
       />

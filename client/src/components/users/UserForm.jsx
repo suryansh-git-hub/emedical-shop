@@ -87,11 +87,20 @@ function UserForm({
 
         <label
           htmlFor="user-name"
-          className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700"
+          className="
+            mb-2
+            flex
+            items-center
+            gap-2
+            text-sm
+            font-semibold
+            text-slate-700
+            dark:text-slate-200
+          "
         >
           <User
             size={15}
-            className="text-slate-400"
+            className="text-slate-400 dark:text-slate-500"
           />
 
           Full Name
@@ -120,10 +129,16 @@ function UserForm({
             focus:bg-white
             focus:ring-4
 
+            dark:bg-slate-800
+            dark:text-slate-200
+            dark:placeholder:text-slate-500
+            dark:hover:border-slate-600
+            dark:focus:bg-slate-800
+
             ${
               errors.name
-                ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+                ? "border-red-400 focus:border-red-500 focus:ring-red-100 dark:border-red-500 dark:focus:ring-red-950"
+                : "border-slate-200 focus:border-blue-500 focus:ring-blue-100 dark:border-slate-700 dark:focus:border-blue-500 dark:focus:ring-blue-950"
             }
           `}
           {...register("name", {
@@ -133,7 +148,7 @@ function UserForm({
         />
 
         {errors.name && (
-          <p className="mt-1.5 text-xs font-medium text-red-600">
+          <p className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-400">
             {errors.name.message}
           </p>
         )}
@@ -148,11 +163,20 @@ function UserForm({
 
         <label
           htmlFor="user-email"
-          className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700"
+          className="
+            mb-2
+            flex
+            items-center
+            gap-2
+            text-sm
+            font-semibold
+            text-slate-700
+            dark:text-slate-200
+          "
         >
           <Mail
             size={15}
-            className="text-slate-400"
+            className="text-slate-400 dark:text-slate-500"
           />
 
           Email Address
@@ -181,10 +205,16 @@ function UserForm({
             focus:bg-white
             focus:ring-4
 
+            dark:bg-slate-800
+            dark:text-slate-200
+            dark:placeholder:text-slate-500
+            dark:hover:border-slate-600
+            dark:focus:bg-slate-800
+
             ${
               errors.email
-                ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+                ? "border-red-400 focus:border-red-500 focus:ring-red-100 dark:border-red-500 dark:focus:ring-red-950"
+                : "border-slate-200 focus:border-blue-500 focus:ring-blue-100 dark:border-slate-700 dark:focus:border-blue-500 dark:focus:ring-blue-950"
             }
           `}
           {...register("email", {
@@ -201,7 +231,7 @@ function UserForm({
         />
 
         {errors.email && (
-          <p className="mt-1.5 text-xs font-medium text-red-600">
+          <p className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-400">
             {errors.email.message}
           </p>
         )}
@@ -217,11 +247,20 @@ function UserForm({
 
           <label
             htmlFor="user-password"
-            className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700"
+            className="
+              mb-2
+              flex
+              items-center
+              gap-2
+              text-sm
+              font-semibold
+              text-slate-700
+              dark:text-slate-200
+            "
           >
             <Lock
               size={15}
-              className="text-slate-400"
+              className="text-slate-400 dark:text-slate-500"
             />
 
             Password
@@ -250,10 +289,16 @@ function UserForm({
               focus:bg-white
               focus:ring-4
 
+              dark:bg-slate-800
+              dark:text-slate-200
+              dark:placeholder:text-slate-500
+              dark:hover:border-slate-600
+              dark:focus:bg-slate-800
+
               ${
                 errors.password
-                  ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                  : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+                  ? "border-red-400 focus:border-red-500 focus:ring-red-100 dark:border-red-500 dark:focus:ring-red-950"
+                  : "border-slate-200 focus:border-blue-500 focus:ring-blue-100 dark:border-slate-700 dark:focus:border-blue-500 dark:focus:ring-blue-950"
               }
             `}
             {...register("password", {
@@ -269,13 +314,13 @@ function UserForm({
           />
 
           {!errors.password && (
-            <p className="mt-1.5 text-xs text-slate-400">
+            <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
               Password must contain at least 8 characters.
             </p>
           )}
 
           {errors.password && (
-            <p className="mt-1.5 text-xs font-medium text-red-600">
+            <p className="mt-1.5 text-xs font-medium text-red-600 dark:text-red-400">
               {errors.password.message}
             </p>
           )}
@@ -288,23 +333,40 @@ function UserForm({
       ========================================== */}
 
       {defaultValues && (
-        <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
+        <div className="
+          rounded-xl
+          border
+          border-blue-100
+          bg-blue-50
+          px-4
+          py-3
+
+          dark:border-blue-900
+          dark:bg-blue-950/40
+        ">
 
           <div className="flex gap-3">
 
             <Lock
               size={17}
-              className="mt-0.5 shrink-0 text-blue-600"
+              className="
+                mt-0.5
+                shrink-0
+                text-blue-600
+                dark:text-blue-400
+              "
             />
 
             <div>
-              <p className="text-sm font-semibold text-blue-800">
+
+              <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">
                 Password
               </p>
 
-              <p className="mt-0.5 text-xs text-blue-600">
+              <p className="mt-0.5 text-xs text-blue-600 dark:text-blue-400">
                 Leave the password empty if you don't want to change it.
               </p>
+
             </div>
 
           </div>
@@ -320,11 +382,20 @@ function UserForm({
 
         <label
           htmlFor="user-role"
-          className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700"
+          className="
+            mb-2
+            flex
+            items-center
+            gap-2
+            text-sm
+            font-semibold
+            text-slate-700
+            dark:text-slate-200
+          "
         >
           <Shield
             size={15}
-            className="text-slate-400"
+            className="text-slate-400 dark:text-slate-500"
           />
 
           User Role
@@ -353,15 +424,29 @@ function UserForm({
             focus:bg-white
             focus:ring-4
             focus:ring-blue-100
+
+            dark:border-slate-700
+            dark:bg-slate-800
+            dark:text-slate-200
+            dark:hover:border-slate-600
+            dark:focus:border-blue-500
+            dark:focus:bg-slate-800
+            dark:focus:ring-blue-950
           "
           {...register("role")}
         >
 
-          <option value="admin">
+          <option
+            value="admin"
+            className="bg-white text-slate-800 dark:bg-slate-800 dark:text-slate-200"
+          >
             Admin
           </option>
 
-          <option value="pharmacist">
+          <option
+            value="pharmacist"
+            className="bg-white text-slate-800 dark:bg-slate-800 dark:text-slate-200"
+          >
             Pharmacist
           </option>
 
@@ -373,7 +458,7 @@ function UserForm({
           ACTION
       ========================================== */}
 
-      <div className="border-t border-slate-200 pt-5">
+      <div className="border-t border-slate-200 pt-5 dark:border-slate-800">
 
         <button
           type="submit"
@@ -400,6 +485,8 @@ function UserForm({
             focus:outline-none
             focus:ring-4
             focus:ring-blue-100
+
+            dark:focus:ring-blue-950
 
             disabled:cursor-not-allowed
             disabled:opacity-50

@@ -41,9 +41,20 @@ const ReportGenerator = ({
   };
 
   return (
-    <div className="rounded-xl bg-white p-6 shadow">
+    <div
+      className="
+        rounded-2xl
+        border border-slate-200
+        bg-white
+        p-6
+        shadow-sm
+        dark:border-slate-800
+        dark:bg-slate-900
+        dark:shadow-black/20
+      "
+    >
 
-      <h2 className="mb-5 text-xl font-semibold">
+      <h2 className="mb-5 text-xl font-bold text-slate-900 dark:text-white">
         Report Generator
       </h2>
 
@@ -53,7 +64,7 @@ const ReportGenerator = ({
 
         <div className="flex-1">
 
-          <label className="mb-2 block text-sm font-medium">
+          <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-300">
             Report Type
           </label>
 
@@ -62,7 +73,26 @@ const ReportGenerator = ({
             onChange={(e) =>
               setReportType(e.target.value)
             }
-            className="w-full rounded-lg border p-3"
+            className="
+              w-full
+              rounded-xl
+              border
+              border-slate-200
+              bg-white
+              p-3
+              text-sm
+              text-slate-700
+              outline-none
+              transition
+              focus:border-blue-500
+              focus:ring-4
+              focus:ring-blue-100
+              dark:border-slate-700
+              dark:bg-slate-800
+              dark:text-slate-200
+              dark:focus:border-blue-500
+              dark:focus:ring-blue-500/10
+            "
           >
             <option value="today">
               Today's Sales
@@ -79,7 +109,6 @@ const ReportGenerator = ({
             <option value="yearly">
               Yearly Sales
             </option>
-
           </select>
 
         </div>
@@ -89,7 +118,21 @@ const ReportGenerator = ({
         <button
           onClick={handleGenerate}
           disabled={loading}
-          className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+          className="
+            rounded-xl
+            bg-blue-600
+            px-6
+            py-3
+            font-semibold
+            text-white
+            shadow-sm
+            transition
+            hover:bg-blue-700
+            hover:shadow-md
+            disabled:cursor-not-allowed
+            disabled:bg-slate-400
+            dark:disabled:bg-slate-700
+          "
         >
           {loading
             ? "Generating..."
@@ -107,7 +150,24 @@ const ReportGenerator = ({
                 !showExport
               )
             }
-            className="flex items-center gap-2 rounded-lg bg-green-600 px-6 py-3 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-400"
+            className="
+              flex
+              items-center
+              gap-2
+              rounded-xl
+              bg-green-600
+              px-6
+              py-3
+              font-semibold
+              text-white
+              shadow-sm
+              transition
+              hover:bg-green-700
+              hover:shadow-md
+              disabled:cursor-not-allowed
+              disabled:bg-slate-400
+              dark:disabled:bg-slate-700
+            "
           >
             Export
 
@@ -116,16 +176,48 @@ const ReportGenerator = ({
 
           {showExport && hasReport && (
 
-            <div className="absolute right-0 z-20 mt-2 w-52 overflow-hidden rounded-lg border bg-white shadow-lg">
+            <div
+              className="
+                absolute
+                right-0
+                z-20
+                mt-2
+                w-52
+                overflow-hidden
+                rounded-xl
+                border
+                border-slate-200
+                bg-white
+                shadow-xl
+                dark:border-slate-700
+                dark:bg-slate-800
+                dark:shadow-black/40
+              "
+            >
 
               <button
                 onClick={
                   handleExportExcel
                 }
-                className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-gray-100"
+                className="
+                  flex
+                  w-full
+                  items-center
+                  gap-3
+                  px-4
+                  py-3
+                  text-left
+                  text-sm
+                  text-slate-700
+                  transition
+                  hover:bg-slate-100
+                  dark:text-slate-200
+                  dark:hover:bg-slate-700
+                "
               >
                 <FileSpreadsheet
                   size={18}
+                  className="text-green-600"
                 />
 
                 Export Excel
@@ -135,17 +227,31 @@ const ReportGenerator = ({
                 onClick={
                   handleExportPDF
                 }
-                className="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-gray-100"
+                className="
+                  flex
+                  w-full
+                  items-center
+                  gap-3
+                  px-4
+                  py-3
+                  text-left
+                  text-sm
+                  text-slate-700
+                  transition
+                  hover:bg-slate-100
+                  dark:text-slate-200
+                  dark:hover:bg-slate-700
+                "
               >
                 <FileText
                   size={18}
+                  className="text-red-500"
                 />
 
                 Export PDF
               </button>
 
             </div>
-
           )}
 
         </div>

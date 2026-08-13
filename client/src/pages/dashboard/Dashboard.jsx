@@ -68,21 +68,52 @@ function Dashboard() {
 
   if (loading || !dashboard) {
     return (
-      <div className="flex min-h-[70vh] items-center justify-center">
+      <div
+        className="
+          flex min-h-[70vh]
+          items-center justify-center
+          bg-[#f5f7fb]
+          dark:bg-slate-950
+        "
+      >
         <div className="flex flex-col items-center">
 
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-50">
+          <div
+            className="
+              mb-4 flex h-12 w-12
+              items-center justify-center
+              rounded-full
+              bg-blue-50
+              dark:bg-blue-950
+            "
+          >
             <RefreshCw
               size={24}
-              className="animate-spin text-blue-600"
+              className="
+                animate-spin
+                text-blue-600
+                dark:text-blue-400
+              "
             />
           </div>
 
-          <p className="text-sm font-medium text-slate-600">
+          <p
+            className="
+              text-sm font-medium
+              text-slate-600
+              dark:text-slate-300
+            "
+          >
             Loading dashboard...
           </p>
 
-          <p className="mt-1 text-xs text-slate-400">
+          <p
+            className="
+              mt-1 text-xs
+              text-slate-400
+              dark:text-slate-500
+            "
+          >
             Fetching the latest shop information
           </p>
 
@@ -92,24 +123,55 @@ function Dashboard() {
   }
 
   return (
-    <div className="space-y-6 pb-8">
+    <div
+      className="
+        min-h-full
+        space-y-6
+        pb-8
+        transition-colors
+        dark:text-slate-100
+      "
+    >
 
       {/* =====================================================
           Page Heading
       ===================================================== */}
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div
+        className="
+          flex flex-col gap-4
+          sm:flex-row
+          sm:items-end
+          sm:justify-between
+        "
+      >
 
         <div>
 
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1
+            className="
+              text-2xl font-bold
+              tracking-tight
+              text-slate-900
+              sm:text-3xl
+              dark:text-white
+            "
+          >
             Dashboard
           </h1>
 
-          <p className="mt-1 text-sm text-slate-500 sm:text-base">
+          {/* <p
+            className="
+              mt-1 text-sm
+              text-slate-500
+              sm:text-base
+              dark:text-slate-400
+            "
+          >
             Welcome back, {user?.name || "Admin"}. Here's what's
             happening in your medical shop.
-          </p>
+          </p> */}
+
         </div>
 
         {/* Refresh */}
@@ -134,19 +196,33 @@ function Dashboard() {
             text-slate-700
             shadow-sm
             transition
+
             hover:border-blue-200
             hover:bg-blue-50
             hover:text-blue-600
+
             disabled:cursor-not-allowed
             disabled:opacity-60
+
+            dark:border-slate-700
+            dark:bg-slate-900
+            dark:text-slate-300
+
+            dark:hover:border-blue-700
+            dark:hover:bg-slate-800
+            dark:hover:text-blue-400
           "
         >
           <RefreshCw
             size={16}
-            className={refreshing ? "animate-spin" : ""}
+            className={
+              refreshing ? "animate-spin" : ""
+            }
           />
 
-          {refreshing ? "Refreshing..." : "Refresh"}
+          {refreshing
+            ? "Refreshing..."
+            : "Refresh"}
         </button>
 
       </div>
@@ -164,13 +240,27 @@ function Dashboard() {
       <section>
 
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-slate-900">
+
+          <h2
+            className="
+              text-lg font-semibold
+              text-slate-900
+              dark:text-white
+            "
+          >
             Business Overview
           </h2>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p
+            className="
+              mt-1 text-sm
+              text-slate-500
+              dark:text-slate-400
+            "
+          >
             A quick look at your medical shop's current status.
           </p>
+
         </div>
 
         <div
@@ -251,7 +341,9 @@ function Dashboard() {
 
           <StatCard
             title="Expired Medicines"
-            value={dashboard.expiredMedicines?.length || 0}
+            value={
+              dashboard.expiredMedicines?.length || 0
+            }
             icon={
               <TriangleAlert
                 size={24}
@@ -275,14 +367,29 @@ function Dashboard() {
           Inventory Alerts + Recent Sales
       ===================================================== */}
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+      <section
+        className="
+          grid
+          grid-cols-1
+          gap-6
+          xl:grid-cols-2
+        "
+      >
 
-        <LowStockTable
-          medicines={dashboard.lowStockMedicines || []}
+   
+
+           <CategorySalesChart
+          data={
+            dashboard.categorySales || []
+          }
         />
 
-        <RecentSales
-          sales={dashboard.recentSales || []}
+      
+
+         <TopSellingMedicines
+          medicines={
+            dashboard.topSellingMedicines || []
+          }
         />
 
       </section>
@@ -293,7 +400,9 @@ function Dashboard() {
 
       <section>
         <SalesOverview
-          data={dashboard.monthlySales || []}
+          data={
+            dashboard.monthlySales || []
+          }
         />
       </section>
 
@@ -301,15 +410,26 @@ function Dashboard() {
           Sales Analysis
       ===================================================== */}
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-
-        <CategorySalesChart
-          data={dashboard.categorySales || []}
+      <section
+        className="
+          grid
+          grid-cols-1
+          gap-6
+          xl:grid-cols-2
+        "
+      >
+     <LowStockTable
+          medicines={
+            dashboard.lowStockMedicines || []
+          }
         />
+     
 
         {isAdmin && (
           <RecentPurchases
-            purchases={dashboard.recentPurchases || []}
+            purchases={
+              dashboard.recentPurchases || []
+            }
           />
         )}
 
@@ -319,13 +439,21 @@ function Dashboard() {
           Products Performance
       ===================================================== */}
 
-      <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-
-        <TopSellingMedicines
-          medicines={
-            dashboard.topSellingMedicines || []
+      <section
+        className="
+          grid
+          grid-cols-1
+          gap-6
+          xl:grid-cols-2
+        "
+      >
+  
+    <RecentSales
+          sales={
+            dashboard.recentSales || []
           }
         />
+       
 
         <ExpiringMedicines
           medicines={

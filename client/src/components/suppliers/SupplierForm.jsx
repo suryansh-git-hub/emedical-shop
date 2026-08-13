@@ -22,11 +22,43 @@ const SupplierForm = ({
     }));
   };
 
-  const inputClass =
-    "w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 pl-11 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100";
+  const inputClass = `
+    w-full
+    rounded-xl
+    border
+    border-slate-200
+    bg-slate-50
+    px-4
+    py-3
+    pl-11
+    text-sm
+    text-slate-700
+    outline-none
+    transition
+    placeholder:text-slate-400
+    focus:border-blue-500
+    focus:bg-white
+    focus:ring-4
+    focus:ring-blue-100
 
-  const labelClass =
-    "mb-2 block text-sm font-semibold text-slate-700";
+    dark:border-slate-700
+    dark:bg-slate-800
+    dark:text-slate-200
+    dark:placeholder:text-slate-500
+    dark:focus:border-blue-500
+    dark:focus:bg-slate-800
+    dark:focus:ring-blue-950/50
+  `;
+
+  const labelClass = `
+    mb-2
+    block
+    text-sm
+    font-semibold
+    text-slate-700
+
+    dark:text-slate-300
+  `;
 
   return (
     <form onSubmit={onSubmit} className="space-y-6">
@@ -35,29 +67,65 @@ const SupplierForm = ({
           FORM INTRO
       ========================================== */}
 
-      <div className="rounded-2xl bg-blue-50 p-4">
+      <div
+        className="
+          rounded-2xl
+          bg-blue-50
+          p-4
 
+          dark:bg-blue-950/40
+        "
+      >
         <div className="flex items-start gap-3">
 
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white">
+          <div
+            className="
+              flex
+              h-10
+              w-10
+              shrink-0
+              items-center
+              justify-center
+              rounded-xl
+              bg-blue-600
+              text-white
+            "
+          >
             <Building2 size={19} />
           </div>
 
           <div>
-            <h3 className="font-semibold text-slate-800">
+
+            <h3
+              className="
+                font-semibold
+                text-slate-800
+
+                dark:text-slate-100
+              "
+            >
               {isEditing
                 ? "Update Supplier Details"
                 : "Add New Supplier"}
             </h3>
 
-            <p className="mt-1 text-xs leading-5 text-slate-500">
+            <p
+              className="
+                mt-1
+                text-xs
+                leading-5
+                text-slate-500
+
+                dark:text-slate-400
+              "
+            >
               Enter the supplier's contact and business
               information below.
             </p>
+
           </div>
 
         </div>
-
       </div>
 
       {/* ==========================================
@@ -66,7 +134,18 @@ const SupplierForm = ({
 
       <div>
 
-        <h3 className="mb-4 text-sm font-bold uppercase tracking-wide text-slate-500">
+        <h3
+          className="
+            mb-4
+            text-sm
+            font-bold
+            uppercase
+            tracking-wide
+            text-slate-500
+
+            dark:text-slate-400
+          "
+        >
           Supplier Information
         </h3>
 
@@ -87,7 +166,13 @@ const SupplierForm = ({
 
               <Building2
                 size={17}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                className="
+                  absolute
+                  left-4
+                  top-1/2
+                  -translate-y-1/2
+                  text-slate-400
+                "
               />
 
               <input
@@ -120,7 +205,13 @@ const SupplierForm = ({
 
               <Phone
                 size={17}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                className="
+                  absolute
+                  left-4
+                  top-1/2
+                  -translate-y-1/2
+                  text-slate-400
+                "
               />
 
               <input
@@ -153,7 +244,13 @@ const SupplierForm = ({
 
               <Mail
                 size={17}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                className="
+                  absolute
+                  left-4
+                  top-1/2
+                  -translate-y-1/2
+                  text-slate-400
+                "
               />
 
               <input
@@ -186,7 +283,13 @@ const SupplierForm = ({
 
               <FileText
                 size={17}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                className="
+                  absolute
+                  left-4
+                  top-1/2
+                  -translate-y-1/2
+                  text-slate-400
+                "
               />
 
               <input
@@ -225,7 +328,12 @@ const SupplierForm = ({
 
           <MapPin
             size={17}
-            className="absolute left-4 top-4 text-slate-400"
+            className="
+              absolute
+              left-4
+              top-4
+              text-slate-400
+            "
           />
 
           <textarea
@@ -255,6 +363,14 @@ const SupplierForm = ({
               focus:bg-white
               focus:ring-4
               focus:ring-blue-100
+
+              dark:border-slate-700
+              dark:bg-slate-800
+              dark:text-slate-200
+              dark:placeholder:text-slate-500
+              dark:focus:border-blue-500
+              dark:focus:bg-slate-800
+              dark:focus:ring-blue-950/50
             "
           />
 
@@ -266,14 +382,27 @@ const SupplierForm = ({
           ACTIONS
       ========================================== */}
 
-      <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
+      <div
+        className="
+          flex
+          flex-col-reverse
+          gap-3
+          border-t
+          border-slate-100
+          pt-5
+          sm:flex-row
+          sm:justify-end
+
+          dark:border-slate-800
+        "
+      >
+
+        {/* Cancel */}
 
         <button
           type="button"
           onClick={() => {
             // Modal close is handled by parent.
-            // This button intentionally does nothing
-            // unless a cancel handler is passed.
           }}
           className="
             hidden
@@ -289,10 +418,17 @@ const SupplierForm = ({
             transition
             hover:bg-slate-50
             sm:block
+
+            dark:border-slate-700
+            dark:bg-slate-800
+            dark:text-slate-300
+            dark:hover:bg-slate-700
           "
         >
           Cancel
         </button>
+
+        {/* Submit */}
 
         <button
           type="submit"
@@ -315,6 +451,10 @@ const SupplierForm = ({
             focus:outline-none
             focus:ring-4
             focus:ring-blue-100
+
+            dark:bg-blue-500
+            dark:hover:bg-blue-600
+            dark:focus:ring-blue-950
           "
         >
           <Save size={17} />

@@ -21,34 +21,113 @@ function MedicineFilters({
     setPage(1);
   };
 
+  const inputClasses = `
+    w-full
+    rounded-lg
+    border
+    border-slate-200
+    bg-white
+    px-3
+    py-2.5
+    text-sm
+    text-slate-700
+    outline-none
+    transition
+
+    focus:border-blue-400
+    focus:ring-4
+    focus:ring-blue-50
+
+    dark:border-slate-700
+    dark:bg-slate-800
+    dark:text-slate-100
+
+    dark:focus:border-blue-500
+    dark:focus:ring-blue-950
+  `;
+
+  const labelClasses = `
+    mb-1.5
+    block
+    text-xs
+    font-semibold
+    text-slate-600
+    dark:text-slate-400
+  `;
+
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+    <div
+      className="
+        rounded-xl
+        border
+        border-slate-200
+        bg-slate-50
+        p-4
+
+        dark:border-slate-700
+        dark:bg-slate-800/70
+      "
+    >
       {/* Filter Header */}
+
       <div className="mb-4 flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white">
+
+        <div
+          className="
+            flex
+            h-8
+            w-8
+            items-center
+            justify-center
+            rounded-lg
+            bg-white
+
+            dark:bg-slate-700
+          "
+        >
           <Filter
             size={16}
-            className="text-slate-600"
+            className="
+              text-slate-600
+              dark:text-slate-300
+            "
           />
         </div>
 
         <div>
-          <h3 className="text-sm font-semibold text-slate-800">
+          <h3
+            className="
+              text-sm
+              font-semibold
+              text-slate-800
+
+              dark:text-slate-100
+            "
+          >
             Filters & Sorting
           </h3>
 
-          <p className="text-xs text-slate-500">
+          <p
+            className="
+              text-xs
+              text-slate-500
+              dark:text-slate-400
+            "
+          >
             Refine your medicine inventory
           </p>
         </div>
+
       </div>
 
       {/* Filters */}
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
 
         {/* Category */}
+
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-slate-600">
+          <label className={labelClasses}>
             Category
           </label>
 
@@ -60,60 +139,26 @@ function MedicineFilters({
                 e.target.value
               )
             }
-            className="
-              w-full
-              rounded-lg
-              border
-              border-slate-200
-              bg-white
-              px-3
-              py-2.5
-              text-sm
-              text-slate-700
-              outline-none
-              transition
-              focus:border-blue-400
-              focus:ring-4
-              focus:ring-blue-50
-            "
+            className={inputClasses}
           >
             <option value="">
               All Categories
             </option>
 
-            <option value="Tablet">
-              Tablet
-            </option>
-
-            <option value="Capsule">
-              Capsule
-            </option>
-
-            <option value="Syrup">
-              Syrup
-            </option>
-
-            <option value="Injection">
-              Injection
-            </option>
-
-            <option value="Ointment">
-              Ointment
-            </option>
-
-            <option value="Drops">
-              Drops
-            </option>
-
-            <option value="Powder">
-              Powder
-            </option>
+            <option value="Tablet">Tablet</option>
+            <option value="Capsule">Capsule</option>
+            <option value="Syrup">Syrup</option>
+            <option value="Injection">Injection</option>
+            <option value="Ointment">Ointment</option>
+            <option value="Drops">Drops</option>
+            <option value="Powder">Powder</option>
           </select>
         </div>
 
         {/* Company */}
+
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-slate-600">
+          <label className={labelClasses}>
             Company
           </label>
 
@@ -127,29 +172,18 @@ function MedicineFilters({
               )
             }
             placeholder="Search company..."
-            className="
-              w-full
-              rounded-lg
-              border
-              border-slate-200
-              bg-white
-              px-3
-              py-2.5
-              text-sm
-              text-slate-700
+            className={`
+              ${inputClasses}
               placeholder:text-slate-400
-              outline-none
-              transition
-              focus:border-blue-400
-              focus:ring-4
-              focus:ring-blue-50
-            "
+              dark:placeholder:text-slate-500
+            `}
           />
         </div>
 
         {/* Expiry */}
+
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-slate-600">
+          <label className={labelClasses}>
             Expiry Status
           </label>
 
@@ -161,44 +195,29 @@ function MedicineFilters({
                 e.target.value
               )
             }
-            className="
-              w-full
-              rounded-lg
-              border
-              border-slate-200
-              bg-white
-              px-3
-              py-2.5
-              text-sm
-              text-slate-700
-              outline-none
-              transition
-              focus:border-blue-400
-              focus:ring-4
-              focus:ring-blue-50
-            "
+            className={inputClasses}
           >
             <option value="">
               All Medicines
             </option>
 
-            <option value="valid">
-              Valid
-            </option>
-
-            <option value="near">
-              Near Expiry
-            </option>
-
-            <option value="expired">
-              Expired
-            </option>
+            <option value="valid">Valid</option>
+            <option value="near">Near Expiry</option>
+            <option value="expired">Expired</option>
           </select>
         </div>
 
         {/* Sort By */}
+
         <div>
-          <label className="mb-1.5 flex items-center gap-1 text-xs font-semibold text-slate-600">
+          <label
+            className={`
+              ${labelClasses}
+              flex
+              items-center
+              gap-1
+            `}
+          >
             <ArrowDownUp size={13} />
             Sort By
           </label>
@@ -211,22 +230,7 @@ function MedicineFilters({
                 e.target.value
               )
             }
-            className="
-              w-full
-              rounded-lg
-              border
-              border-slate-200
-              bg-white
-              px-3
-              py-2.5
-              text-sm
-              text-slate-700
-              outline-none
-              transition
-              focus:border-blue-400
-              focus:ring-4
-              focus:ring-blue-50
-            "
+            className={inputClasses}
           >
             <option value="createdAt">
               Newest
@@ -255,8 +259,9 @@ function MedicineFilters({
         </div>
 
         {/* Sort Order */}
+
         <div>
-          <label className="mb-1.5 block text-xs font-semibold text-slate-600">
+          <label className={labelClasses}>
             Sort Order
           </label>
 
@@ -268,22 +273,7 @@ function MedicineFilters({
                 e.target.value
               )
             }
-            className="
-              w-full
-              rounded-lg
-              border
-              border-slate-200
-              bg-white
-              px-3
-              py-2.5
-              text-sm
-              text-slate-700
-              outline-none
-              transition
-              focus:border-blue-400
-              focus:ring-4
-              focus:ring-blue-50
-            "
+            className={inputClasses}
           >
             <option value="desc">
               Descending ↓

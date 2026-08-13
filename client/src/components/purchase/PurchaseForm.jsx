@@ -139,20 +139,33 @@ const PurchaseForm = ({
           Purchase Information
       ========================================== */}
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <div
+        className="
+          rounded-2xl
+          border
+          border-slate-200
+          bg-white
+          p-5
+          shadow-sm
+          sm:p-6
+
+          dark:border-slate-800
+          dark:bg-slate-900
+        "
+      >
 
         <div className="mb-5 flex items-center gap-3">
 
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
             <FileText size={19} />
           </div>
 
           <div>
-            <h3 className="font-semibold text-slate-900">
+            <h3 className="font-semibold text-slate-900 dark:text-slate-100">
               Purchase Information
             </h3>
 
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Enter supplier and invoice details.
             </p>
           </div>
@@ -164,7 +177,7 @@ const PurchaseForm = ({
           {/* Supplier */}
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Supplier
             </label>
 
@@ -173,7 +186,31 @@ const PurchaseForm = ({
               value={formData.supplier}
               onChange={handleChange}
               required
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+              className="
+                w-full
+                rounded-xl
+                border
+                border-slate-200
+                bg-slate-50
+                px-4
+                py-3
+                text-sm
+                text-slate-700
+                outline-none
+                transition
+
+                focus:border-blue-500
+                focus:bg-white
+                focus:ring-4
+                focus:ring-blue-100
+
+                dark:border-slate-700
+                dark:bg-slate-800
+                dark:text-slate-200
+                dark:focus:border-blue-500
+                dark:focus:bg-slate-800
+                dark:focus:ring-blue-950
+              "
             >
               <option value="">
                 Select Supplier
@@ -195,7 +232,7 @@ const PurchaseForm = ({
           {/* Invoice */}
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Invoice Number
             </label>
 
@@ -203,7 +240,15 @@ const PurchaseForm = ({
 
               <FileText
                 size={17}
-                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                className="
+                  pointer-events-none
+                  absolute
+                  left-3.5
+                  top-1/2
+                  -translate-y-1/2
+                  text-slate-400
+                  dark:text-slate-500
+                "
               />
 
               <input
@@ -215,7 +260,35 @@ const PurchaseForm = ({
                 onChange={handleChange}
                 required
                 placeholder="Enter invoice number"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-200
+                  bg-slate-50
+                  py-3
+                  pl-10
+                  pr-4
+                  text-sm
+                  text-slate-700
+                  outline-none
+                  transition
+
+                  placeholder:text-slate-400
+
+                  focus:border-blue-500
+                  focus:bg-white
+                  focus:ring-4
+                  focus:ring-blue-100
+
+                  dark:border-slate-700
+                  dark:bg-slate-800
+                  dark:text-slate-200
+                  dark:placeholder:text-slate-500
+                  dark:focus:border-blue-500
+                  dark:focus:bg-slate-800
+                  dark:focus:ring-blue-950
+                "
               />
 
             </div>
@@ -224,7 +297,7 @@ const PurchaseForm = ({
           {/* Purchase Date */}
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-slate-700">
+            <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Purchase Date
             </label>
 
@@ -232,7 +305,15 @@ const PurchaseForm = ({
 
               <CalendarDays
                 size={17}
-                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+                className="
+                  pointer-events-none
+                  absolute
+                  left-3.5
+                  top-1/2
+                  -translate-y-1/2
+                  text-slate-400
+                  dark:text-slate-500
+                "
               />
 
               <input
@@ -242,7 +323,32 @@ const PurchaseForm = ({
                   formData.purchaseDate
                 }
                 onChange={handleChange}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                className="
+                  w-full
+                  rounded-xl
+                  border
+                  border-slate-200
+                  bg-slate-50
+                  py-3
+                  pl-10
+                  pr-4
+                  text-sm
+                  text-slate-700
+                  outline-none
+                  transition
+
+                  focus:border-blue-500
+                  focus:bg-white
+                  focus:ring-4
+                  focus:ring-blue-100
+
+                  dark:border-slate-700
+                  dark:bg-slate-800
+                  dark:text-slate-200
+                  dark:focus:border-blue-500
+                  dark:focus:bg-slate-800
+                  dark:focus:ring-blue-950
+                "
               />
 
             </div>
@@ -256,7 +362,20 @@ const PurchaseForm = ({
           Medicines
       ========================================== */}
 
-      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <div
+        className="
+          rounded-2xl
+          border
+          border-slate-200
+          bg-white
+          p-5
+          shadow-sm
+          sm:p-6
+
+          dark:border-slate-800
+          dark:bg-slate-900
+        "
+      >
 
         {/* Section Header */}
 
@@ -264,19 +383,19 @@ const PurchaseForm = ({
 
           <div className="flex items-center gap-3">
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
               <Package size={19} />
             </div>
 
             <div>
 
-              <h3 className="font-semibold text-slate-900">
+              <h3 className="font-semibold text-slate-900 dark:text-slate-100">
                 {selectedMedicine
                   ? "Increase Stock"
                   : "Medicines"}
               </h3>
 
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Add medicines included in this purchase.
               </p>
 
@@ -287,7 +406,26 @@ const PurchaseForm = ({
           <button
             type="button"
             onClick={addMedicine}
-            className="inline-flex w-fit items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+            className="
+              inline-flex
+              w-fit
+              items-center
+              gap-2
+              rounded-xl
+              bg-emerald-600
+              px-4
+              py-2.5
+              text-sm
+              font-semibold
+              text-white
+              transition
+              hover:bg-emerald-700
+
+              focus:outline-none
+              focus:ring-4
+              focus:ring-emerald-100
+              dark:focus:ring-emerald-950
+            "
           >
             <Plus size={17} />
 
@@ -305,7 +443,16 @@ const PurchaseForm = ({
 
               <div
                 key={index}
-                className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4"
+                className="
+                  rounded-2xl
+                  border
+                  border-slate-200
+                  bg-slate-50/70
+                  p-4
+
+                  dark:border-slate-700
+                  dark:bg-slate-800/60
+                "
               >
 
                 {/* Medicine Number */}
@@ -314,11 +461,11 @@ const PurchaseForm = ({
 
                   <div className="flex items-center gap-2">
 
-                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 text-xs font-bold text-blue-600">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100 text-xs font-bold text-blue-600 dark:bg-blue-950/60 dark:text-blue-400">
                       {index + 1}
                     </span>
 
-                    <span className="text-sm font-semibold text-slate-700">
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                       Medicine {index + 1}
                     </span>
 
@@ -333,7 +480,24 @@ const PurchaseForm = ({
                           index
                         )
                       }
-                      className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-500 transition hover:bg-red-100 hover:text-red-600"
+                      className="
+                        flex
+                        h-8
+                        w-8
+                        items-center
+                        justify-center
+                        rounded-lg
+                        bg-red-50
+                        text-red-500
+                        transition
+                        hover:bg-red-100
+                        hover:text-red-600
+
+                        dark:bg-red-950/40
+                        dark:text-red-400
+                        dark:hover:bg-red-950/60
+                        dark:hover:text-red-300
+                      "
                       title="Remove medicine"
                     >
                       <Trash2
@@ -349,7 +513,7 @@ const PurchaseForm = ({
                   {/* Medicine */}
 
                   <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       Medicine
                     </label>
 
@@ -369,11 +533,11 @@ const PurchaseForm = ({
                         !!selectedMedicine &&
                         index === 0
                       }
-                      className={`w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 ${
+                      className={`w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100 dark:border-slate-700 dark:focus:border-blue-500 dark:focus:ring-blue-950 ${
                         selectedMedicine &&
                         index === 0
-                          ? "cursor-not-allowed bg-slate-100 text-slate-500"
-                          : "bg-white text-slate-700"
+                          ? "cursor-not-allowed bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400"
+                          : "bg-white text-slate-700 dark:bg-slate-800 dark:text-slate-200"
                       }`}
                     >
                       <option value="">
@@ -402,7 +566,7 @@ const PurchaseForm = ({
                   {/* Quantity */}
 
                   <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       Quantity
                     </label>
 
@@ -420,20 +584,42 @@ const PurchaseForm = ({
                         )
                       }
                       required
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                      className="
+                        w-full
+                        rounded-xl
+                        border
+                        border-slate-200
+                        bg-white
+                        px-4
+                        py-3
+                        text-sm
+                        text-slate-700
+                        outline-none
+                        transition
+
+                        focus:border-blue-500
+                        focus:ring-4
+                        focus:ring-blue-100
+
+                        dark:border-slate-700
+                        dark:bg-slate-800
+                        dark:text-slate-200
+                        dark:focus:border-blue-500
+                        dark:focus:ring-blue-950
+                      "
                     />
                   </div>
 
                   {/* Purchase Price */}
 
                   <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
                       Purchase Price
                     </label>
 
                     <div className="relative">
 
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-400">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-400 dark:text-slate-500">
                         ₹
                       </span>
 
@@ -451,7 +637,30 @@ const PurchaseForm = ({
                           )
                         }
                         required
-                        className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-9 pr-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                        className="
+                          w-full
+                          rounded-xl
+                          border
+                          border-slate-200
+                          bg-white
+                          py-3
+                          pl-9
+                          pr-4
+                          text-sm
+                          text-slate-700
+                          outline-none
+                          transition
+
+                          focus:border-blue-500
+                          focus:ring-4
+                          focus:ring-blue-100
+
+                          dark:border-slate-700
+                          dark:bg-slate-800
+                          dark:text-slate-200
+                          dark:focus:border-blue-500
+                          dark:focus:ring-blue-950
+                        "
                       />
 
                     </div>
@@ -461,13 +670,13 @@ const PurchaseForm = ({
 
                 {/* Item Total */}
 
-                <div className="mt-4 flex justify-end border-t border-slate-200 pt-3">
+                <div className="mt-4 flex justify-end border-t border-slate-200 pt-3 dark:border-slate-700">
 
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
 
                     Item Total:{" "}
 
-                    <span className="font-bold text-slate-700">
+                    <span className="font-bold text-slate-700 dark:text-slate-200">
 
                       ₹
                       {(
@@ -504,23 +713,35 @@ const PurchaseForm = ({
           Total Amount
       ========================================== */}
 
-      <div className="rounded-2xl border border-blue-100 bg-blue-50 p-5 sm:p-6">
+      <div
+        className="
+          rounded-2xl
+          border
+          border-blue-100
+          bg-blue-50
+          p-5
+          sm:p-6
+
+          dark:border-blue-900/50
+          dark:bg-blue-950/40
+        "
+      >
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
 
           <div className="flex items-center gap-3">
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm dark:bg-slate-800 dark:text-blue-400">
               <ShoppingCart size={19} />
             </div>
 
             <div>
 
-              <p className="text-sm font-semibold text-slate-700">
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                 Total Purchase Amount
               </p>
 
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Calculated from all medicines.
               </p>
 
@@ -528,7 +749,7 @@ const PurchaseForm = ({
 
           </div>
 
-          <span className="text-2xl font-bold text-blue-600 sm:text-3xl">
+          <span className="text-2xl font-bold text-blue-600 dark:text-blue-400 sm:text-3xl">
             ₹
             {totalAmount.toLocaleString(
               "en-IN",
@@ -548,7 +769,29 @@ const PurchaseForm = ({
 
       <button
         type="submit"
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 hover:shadow-md"
+        className="
+          flex
+          w-full
+          items-center
+          justify-center
+          gap-2
+          rounded-xl
+          bg-blue-600
+          py-3.5
+          text-sm
+          font-semibold
+          text-white
+          shadow-sm
+          transition
+
+          hover:bg-blue-700
+          hover:shadow-md
+
+          focus:outline-none
+          focus:ring-4
+          focus:ring-blue-100
+          dark:focus:ring-blue-950
+        "
       >
         <ShoppingCart size={18} />
 

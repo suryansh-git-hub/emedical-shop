@@ -1,18 +1,69 @@
-
-
 function StatCard({ title, value, icon, color }) {
   return (
-    <div className="rounded-xl bg-white p-6 shadow-sm border hover:shadow-md transition">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-gray-500">{title}</p>
+    <div
+      className="
+        rounded-xl
+        border
+        border-slate-200
+        bg-white
+        p-6
+        shadow-sm
+        transition-all
+        duration-200
+        hover:-translate-y-0.5
+        hover:shadow-md
 
-          <h2 className="mt-2 text-3xl font-bold">{value}</h2>
+        dark:border-slate-700
+        dark:bg-slate-900
+        dark:shadow-none
+        dark:hover:border-slate-600
+        dark:hover:bg-slate-800
+      "
+    >
+      <div className="flex items-center justify-between">
+
+        {/* ================= Content ================= */}
+
+        <div className="min-w-0">
+
+          <p
+            className="
+              text-sm
+              font-medium
+              text-slate-500
+              dark:text-slate-400
+            "
+          >
+            {title}
+          </p>
+
+          <h2
+            className="
+              mt-2
+              text-3xl
+              font-bold
+              text-slate-900
+              dark:text-white
+            "
+          >
+            {value}
+          </h2>
+
         </div>
 
-        <div className={`rounded-full p-3 ${color}`}>
+        {/* ================= Icon ================= */}
+
+        <div
+          className={`
+            shrink-0
+            rounded-full
+            p-3
+            ${color}
+          `}
+        >
           {icon}
         </div>
+
       </div>
     </div>
   );

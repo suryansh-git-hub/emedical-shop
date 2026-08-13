@@ -13,7 +13,17 @@ function DashboardLayout() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F5F7FB] text-slate-900">
+    <div
+      className="
+        flex min-h-screen
+        bg-[#f5f7fb]
+        text-slate-900
+        transition-colors duration-200
+
+        dark:bg-slate-950
+        dark:text-slate-100
+      "
+    >
 
       {/* ================= Sidebar ================= */}
 
@@ -21,7 +31,15 @@ function DashboardLayout() {
 
       {/* ================= Main Area ================= */}
 
-      <div className="flex min-w-0 flex-1 flex-col bg-[#F5F7FB]">
+      <div
+        className="
+          flex min-w-0 flex-1 flex-col
+          bg-[#f5f7fb]
+          transition-colors duration-200
+
+          dark:bg-slate-950
+        "
+      >
 
         {/* ================= Navbar ================= */}
 
@@ -32,12 +50,29 @@ function DashboardLayout() {
 
         {/* ================= Page Content ================= */}
 
-        <main className="min-h-0 flex-1 overflow-y-auto bg-[#F5F7FB]">
+        <main
+          className="
+            min-h-0
+            flex-1
+            overflow-y-auto
+            bg-[#f5f7fb]
+            transition-colors duration-200
 
-          <div className="mx-auto w-full max-w-[1800px] p-4 sm:p-5 lg:p-6">
+            dark:bg-slate-950
+          "
+        >
 
+          <div
+            className="
+              mx-auto
+              w-full
+              max-w-[1800px]
+              p-4
+              sm:p-5
+              lg:p-6
+            "
+          >
             <Outlet />
-
           </div>
 
         </main>

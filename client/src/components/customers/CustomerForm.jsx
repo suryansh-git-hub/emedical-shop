@@ -6,10 +6,6 @@ const CustomerForm = ({
   onSubmit,
   isEditing,
 }) => {
-  // ==========================================
-  // Handle Input Change
-  // ==========================================
-
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -19,24 +15,71 @@ const CustomerForm = ({
     }));
   };
 
+  const inputClass = `
+    w-full
+    rounded-xl
+    border
+    border-slate-200
+    bg-slate-50
+    px-4
+    py-3
+    text-sm
+    text-slate-700
+    outline-none
+    transition
+    placeholder:text-slate-400
+    focus:border-blue-500
+    focus:bg-white
+    focus:ring-4
+    focus:ring-blue-100
+
+    dark:border-slate-700
+    dark:bg-slate-800
+    dark:text-slate-200
+    dark:placeholder:text-slate-500
+    dark:focus:border-blue-500
+    dark:focus:bg-slate-800
+    dark:focus:ring-blue-950/50
+  `;
+
+  const labelClass = `
+    mb-2
+    block
+    text-sm
+    font-medium
+    text-slate-700
+
+    dark:text-slate-300
+  `;
+
   return (
     <form
       onSubmit={onSubmit}
       className="space-y-6"
     >
-      {/* ==========================================
-          Customer Information
-      ========================================== */}
+
+      {/* Customer Information */}
 
       <div>
+
         <div className="mb-4">
-          <h3 className="text-sm font-semibold text-slate-800">
+
+          <h3
+            className="
+              text-sm
+              font-semibold
+              text-slate-800
+
+              dark:text-slate-100
+            "
+          >
             Customer Information
           </h3>
 
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
             Enter the customer's basic contact details.
           </p>
+
         </div>
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -44,9 +87,10 @@ const CustomerForm = ({
           {/* Customer Name */}
 
           <div>
+
             <label
               htmlFor="customerName"
-              className="mb-2 block text-sm font-medium text-slate-700"
+              className={labelClass}
             >
               Customer Name
             </label>
@@ -59,33 +103,18 @@ const CustomerForm = ({
               onChange={handleChange}
               placeholder="Enter customer name"
               required
-              className="
-                w-full
-                rounded-xl
-                border
-                border-slate-200
-                bg-slate-50
-                px-4
-                py-3
-                text-sm
-                text-slate-700
-                outline-none
-                transition
-                placeholder:text-slate-400
-                focus:border-blue-500
-                focus:bg-white
-                focus:ring-4
-                focus:ring-blue-100
-              "
+              className={inputClass}
             />
+
           </div>
 
-          {/* Contact Number */}
+          {/* Contact */}
 
           <div>
+
             <label
               htmlFor="contactNumber"
-              className="mb-2 block text-sm font-medium text-slate-700"
+              className={labelClass}
             >
               Contact Number
             </label>
@@ -98,33 +127,18 @@ const CustomerForm = ({
               onChange={handleChange}
               placeholder="Enter contact number"
               required
-              className="
-                w-full
-                rounded-xl
-                border
-                border-slate-200
-                bg-slate-50
-                px-4
-                py-3
-                text-sm
-                text-slate-700
-                outline-none
-                transition
-                placeholder:text-slate-400
-                focus:border-blue-500
-                focus:bg-white
-                focus:ring-4
-                focus:ring-blue-100
-              "
+              className={inputClass}
             />
+
           </div>
 
           {/* Email */}
 
           <div className="md:col-span-2">
+
             <label
               htmlFor="email"
-              className="mb-2 block text-sm font-medium text-slate-700"
+              className={labelClass}
             >
               Email Address
             </label>
@@ -137,38 +151,22 @@ const CustomerForm = ({
               onChange={handleChange}
               placeholder="Enter email address"
               required
-              className="
-                w-full
-                rounded-xl
-                border
-                border-slate-200
-                bg-slate-50
-                px-4
-                py-3
-                text-sm
-                text-slate-700
-                outline-none
-                transition
-                placeholder:text-slate-400
-                focus:border-blue-500
-                focus:bg-white
-                focus:ring-4
-                focus:ring-blue-100
-              "
+              className={inputClass}
             />
+
           </div>
 
         </div>
+
       </div>
 
-      {/* ==========================================
-          Address
-      ========================================== */}
+      {/* Address */}
 
       <div>
+
         <label
           htmlFor="address"
-          className="mb-2 block text-sm font-medium text-slate-700"
+          className={labelClass}
         >
           Address
         </label>
@@ -181,33 +179,30 @@ const CustomerForm = ({
           onChange={handleChange}
           placeholder="Enter customer address"
           required
-          className="
-            w-full
+          className={`
+            ${inputClass}
             resize-none
-            rounded-xl
-            border
-            border-slate-200
-            bg-slate-50
-            px-4
-            py-3
-            text-sm
-            text-slate-700
-            outline-none
-            transition
-            placeholder:text-slate-400
-            focus:border-blue-500
-            focus:bg-white
-            focus:ring-4
-            focus:ring-blue-100
-          "
+          `}
         />
+
       </div>
 
-      {/* ==========================================
-          Submit
-      ========================================== */}
+      {/* Submit */}
 
-      <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
+      <div
+        className="
+          flex
+          flex-col-reverse
+          gap-3
+          border-t
+          border-slate-100
+          pt-5
+          sm:flex-row
+          sm:justify-end
+
+          dark:border-slate-800
+        "
+      >
 
         <button
           type="submit"
@@ -240,6 +235,7 @@ const CustomerForm = ({
         </button>
 
       </div>
+
     </form>
   );
 };

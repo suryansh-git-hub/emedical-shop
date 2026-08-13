@@ -4,6 +4,7 @@ import {
   registerUser,
   loginUser,
   forgotPassword,
+  resetPassword,
   getProfile,
   logoutUser,
 } from "../controllers/authController.js";
@@ -14,15 +15,24 @@ import { ROLES } from "../constants/roles.js";
 
 const router = express.Router();
 
+
 // =======================================
 // Public Routes
 // =======================================
 
 // Register
-router.post("/register", registerUser);
+router.post(
+  "/register",
+  registerUser
+);
+
 
 // Login
-router.post("/login", loginUser);
+router.post(
+  "/login",
+  loginUser
+);
+
 
 // Forgot Password
 router.put(
@@ -30,11 +40,19 @@ router.put(
   forgotPassword
 );
 
+
+// Reset Password
+router.put(
+  "/reset-password/:token",
+  resetPassword
+);
+
+
 // =======================================
 // Protected Routes
 // =======================================
 
-// Profile (Admin Only)
+// Profile
 router.get(
   "/profile",
   authMiddleware,
@@ -42,11 +60,13 @@ router.get(
   getProfile
 );
 
+
 // Logout
 router.post(
   "/logout",
   authMiddleware,
   logoutUser
 );
+
 
 export default router;

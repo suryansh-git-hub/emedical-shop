@@ -21,10 +21,15 @@ function AddUserButton({ onClick }) {
         transition
         hover:bg-blue-700
         hover:shadow-md
+        focus:outline-none
+        focus:ring-4
+        focus:ring-blue-100
+        dark:focus:ring-blue-950
         active:scale-[0.98]
       "
     >
       <Plus size={18} />
+
       Add User
     </button>
   );

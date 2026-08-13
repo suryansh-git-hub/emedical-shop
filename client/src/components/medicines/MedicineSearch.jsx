@@ -21,7 +21,7 @@ function MedicineSearch({
       <div className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2">
         <Search
           size={19}
-          className="text-slate-400"
+          className="text-slate-400 dark:text-slate-500"
         />
       </div>
 
@@ -45,10 +45,20 @@ function MedicineSearch({
           placeholder:text-slate-400
           outline-none
           transition
+
           focus:border-blue-400
           focus:bg-white
           focus:ring-4
           focus:ring-blue-50
+
+          dark:border-slate-700
+          dark:bg-slate-800
+          dark:text-slate-100
+          dark:placeholder:text-slate-500
+
+          dark:focus:border-blue-500
+          dark:focus:bg-slate-800
+          dark:focus:ring-blue-950
         "
       />
 
@@ -71,8 +81,13 @@ function MedicineSearch({
             rounded-full
             text-slate-400
             transition
+
             hover:bg-slate-200
             hover:text-slate-600
+
+            dark:text-slate-500
+            dark:hover:bg-slate-700
+            dark:hover:text-slate-200
           "
         >
           <X size={16} />

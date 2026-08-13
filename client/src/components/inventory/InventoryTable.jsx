@@ -20,20 +20,22 @@ const InventoryTable = ({
 
   if (!inventory || inventory.length === 0) {
     return (
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
             <Package size={30} />
           </div>
 
-          <h2 className="text-xl font-bold text-slate-800">
+          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
             No Inventory Found
           </h2>
 
-          <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
+          <p className="mt-2 max-w-md text-sm leading-6 text-slate-500 dark:text-slate-400">
             No medicines are available for the selected filter.
             Try changing the filter or add medicine stock.
           </p>
+
         </div>
       </div>
     );
@@ -54,7 +56,7 @@ const InventoryTable = ({
       return {
         label: "Expired",
         className:
-          "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200",
+          "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200 dark:bg-red-950/40 dark:text-red-400 dark:ring-red-900",
         icon: XCircle,
       };
     }
@@ -63,7 +65,7 @@ const InventoryTable = ({
       return {
         label: "Out of Stock",
         className:
-          "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200",
+          "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200 dark:bg-red-950/40 dark:text-red-400 dark:ring-red-900",
         icon: XCircle,
       };
     }
@@ -72,7 +74,7 @@ const InventoryTable = ({
       return {
         label: "Low Stock",
         className:
-          "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200",
+          "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:ring-amber-900",
         icon: AlertTriangle,
       };
     }
@@ -80,7 +82,7 @@ const InventoryTable = ({
     return {
       label: "In Stock",
       className:
-        "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200",
+        "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:ring-emerald-900",
       icon: CheckCircle2,
     };
   };
@@ -105,14 +107,14 @@ const InventoryTable = ({
 
   const getStockColor = (item) => {
     if (item.currentStock === 0) {
-      return "text-red-600";
+      return "text-red-600 dark:text-red-400";
     }
 
     if (item.currentStock <= item.reorderLevel) {
-      return "text-amber-600";
+      return "text-amber-600 dark:text-amber-400";
     }
 
-    return "text-emerald-600";
+    return "text-emerald-600 dark:text-emerald-400";
   };
 
   // ==========================================
@@ -134,26 +136,26 @@ const InventoryTable = ({
   // ==========================================
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
 
       {/* ==========================================
           TABLE HEADER
       ========================================== */}
 
-      <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-5 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
 
         <div className="flex items-center gap-3">
 
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
             <Package size={19} />
           </div>
 
           <div>
-            <h2 className="text-base font-bold text-slate-800">
+            <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">
               Inventory Records
             </h2>
 
-            <p className="mt-0.5 text-xs text-slate-500">
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
               Manage medicine stock and inventory levels
             </p>
           </div>
@@ -162,7 +164,7 @@ const InventoryTable = ({
 
         {/* Record Count */}
 
-        <div className="inline-flex w-fit items-center rounded-full bg-slate-50 px-3.5 py-2 text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-200">
+        <div className="inline-flex w-fit items-center rounded-full bg-slate-50 px-3.5 py-2 text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
           {inventory.length}{" "}
           {inventory.length === 1
             ? "record"
@@ -184,51 +186,51 @@ const InventoryTable = ({
               TABLE HEAD
           ========================================== */}
 
-          <thead className="bg-slate-50">
+          <thead className="bg-slate-50 dark:bg-slate-800/70">
 
             <tr>
 
-              <th className="w-12 px-4 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="w-12 px-4 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 #
               </th>
 
-              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Medicine
               </th>
 
-              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Generic
               </th>
 
-              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Company
               </th>
 
-              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Category
               </th>
 
-              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Stock
               </th>
 
-              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Reorder
               </th>
 
-              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Stock Level
               </th>
 
-              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Expiry
               </th>
 
-              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Status
               </th>
 
-              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Actions
               </th>
 
@@ -240,7 +242,7 @@ const InventoryTable = ({
               TABLE BODY
           ========================================== */}
 
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
 
             {inventory.map((item, index) => {
 
@@ -254,41 +256,35 @@ const InventoryTable = ({
               return (
                 <tr
                   key={item._id}
-                  className="group transition-colors duration-150 hover:bg-slate-50/70"
+                  className="group transition-colors duration-150 hover:bg-slate-50/70 dark:hover:bg-slate-800/50"
                 >
 
-                  {/* ==================================
-                      #
-                  ================================== */}
+                  {/* # */}
 
                   <td className="px-4 py-5 text-center">
-
-                    <span className="text-xs font-semibold text-slate-400">
+                    <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">
                       {index + 1}
                     </span>
-
                   </td>
 
-                  {/* ==================================
-                      MEDICINE
-                  ================================== */}
+                  {/* MEDICINE */}
 
                   <td className="px-5 py-5">
 
                     <div className="flex items-center gap-3">
 
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
                         <Package size={17} />
                       </div>
 
                       <div className="min-w-0">
 
-                        <p className="truncate text-sm font-bold text-slate-800">
+                        <p className="truncate text-sm font-bold text-slate-800 dark:text-slate-100">
                           {item.medicine?.medicineName ||
                             "-"}
                         </p>
 
-                        <p className="mt-0.5 text-xs text-slate-400">
+                        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                           Medicine
                         </p>
 
@@ -298,48 +294,34 @@ const InventoryTable = ({
 
                   </td>
 
-                  {/* ==================================
-                      GENERIC
-                  ================================== */}
+                  {/* GENERIC */}
 
                   <td className="px-5 py-5">
-
-                    <span className="text-sm text-slate-600">
+                    <span className="text-sm text-slate-600 dark:text-slate-300">
                       {item.medicine?.genericName ||
                         "-"}
                     </span>
-
                   </td>
 
-                  {/* ==================================
-                      COMPANY
-                  ================================== */}
+                  {/* COMPANY */}
 
                   <td className="px-5 py-5">
-
-                    <span className="text-sm font-medium text-slate-700">
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
                       {item.medicine?.company ||
                         "-"}
                     </span>
-
                   </td>
 
-                  {/* ==================================
-                      CATEGORY
-                  ================================== */}
+                  {/* CATEGORY */}
 
                   <td className="px-5 py-5">
-
-                    <span className="inline-flex rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                    <span className="inline-flex rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                       {item.medicine?.category ||
                         "-"}
                     </span>
-
                   </td>
 
-                  {/* ==================================
-                      STOCK
-                  ================================== */}
+                  {/* STOCK */}
 
                   <td className="px-5 py-5 text-center">
 
@@ -353,21 +335,17 @@ const InventoryTable = ({
 
                   </td>
 
-                  {/* ==================================
-                      REORDER LEVEL
-                  ================================== */}
+                  {/* REORDER */}
 
                   <td className="px-5 py-5 text-center">
 
-                    <span className="text-sm font-medium text-slate-600">
+                    <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
                       {item.reorderLevel}
                     </span>
 
                   </td>
 
-                  {/* ==================================
-                      STOCK LEVEL
-                  ================================== */}
+                  {/* STOCK LEVEL */}
 
                   <td className="px-5 py-5">
 
@@ -375,7 +353,7 @@ const InventoryTable = ({
 
                       <div className="mb-1.5 flex items-center justify-between">
 
-                        <span className="text-[10px] font-medium text-slate-400">
+                        <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500">
                           Level
                         </span>
 
@@ -392,12 +370,11 @@ const InventoryTable = ({
 
                       </div>
 
-                      <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                      <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
 
                         <div
                           className={`h-full rounded-full transition-all duration-500 ${
-                            item.currentStock ===
-                            0
+                            item.currentStock === 0
                               ? "bg-red-500"
                               : item.currentStock <=
                                 item.reorderLevel
@@ -415,13 +392,11 @@ const InventoryTable = ({
 
                   </td>
 
-                  {/* ==================================
-                      EXPIRY
-                  ================================== */}
+                  {/* EXPIRY */}
 
                   <td className="px-5 py-5 text-center">
 
-                    <span className="text-sm font-medium text-slate-600">
+                    <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
                       {formatDate(
                         item.medicine?.expiryDate
                       )}
@@ -429,27 +404,20 @@ const InventoryTable = ({
 
                   </td>
 
-                  {/* ==================================
-                      STATUS
-                  ================================== */}
+                  {/* STATUS */}
 
                   <td className="px-5 py-5 text-center">
 
                     <span
                       className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-bold ${status.className}`}
                     >
-
                       <StatusIcon size={13} />
-
                       {status.label}
-
                     </span>
 
                   </td>
 
-                  {/* ==================================
-                      ACTIONS
-                  ================================== */}
+                  {/* ACTIONS */}
 
                   <td className="px-5 py-5">
 
@@ -484,10 +452,7 @@ const InventoryTable = ({
                         title="Increase stock"
                       >
                         <Plus size={14} />
-
-                        <span>
-                          Stock
-                        </span>
+                        <span>Stock</span>
                       </button>
 
                       {/* Reduce */}
@@ -519,10 +484,7 @@ const InventoryTable = ({
                         title="Reduce stock"
                       >
                         <Minus size={14} />
-
-                        <span>
-                          Stock
-                        </span>
+                        <span>Stock</span>
                       </button>
 
                       {/* History */}
@@ -554,10 +516,7 @@ const InventoryTable = ({
                         title="View stock history"
                       >
                         <History size={14} />
-
-                        <span>
-                          History
-                        </span>
+                        <span>History</span>
                       </button>
 
                     </div>

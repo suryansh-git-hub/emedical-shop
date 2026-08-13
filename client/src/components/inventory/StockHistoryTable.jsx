@@ -13,18 +13,18 @@ const StockHistoryTable = ({ history }) => {
 
   if (!history || history.length === 0) {
     return (
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-          
-          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
+
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
             <History size={30} />
           </div>
 
-          <h2 className="text-xl font-bold text-slate-800">
+          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
             No Stock History Found
           </h2>
 
-          <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
+          <p className="mt-2 max-w-md text-sm leading-6 text-slate-500 dark:text-slate-400">
             No purchase or sale records are available for
             this medicine yet.
           </p>
@@ -66,26 +66,26 @@ const StockHistoryTable = ({ history }) => {
   // ==========================================
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
 
       {/* ==========================================
           HEADER
       ========================================== */}
 
-      <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-5 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
 
         <div className="flex items-center gap-3">
 
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
             <History size={19} />
           </div>
 
           <div>
-            <h2 className="text-base font-bold text-slate-800">
+            <h2 className="text-base font-bold text-slate-800 dark:text-slate-100">
               Stock History
             </h2>
 
-            <p className="mt-0.5 text-xs text-slate-500">
+            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
               Track all stock movements for this medicine
             </p>
           </div>
@@ -94,7 +94,7 @@ const StockHistoryTable = ({ history }) => {
 
         {/* Record Count */}
 
-        <div className="inline-flex w-fit items-center gap-2 rounded-full bg-slate-50 px-3.5 py-2 text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-200">
+        <div className="inline-flex w-fit items-center gap-2 rounded-full bg-slate-50 px-3.5 py-2 text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
 
           <FileText size={13} />
 
@@ -119,23 +119,23 @@ const StockHistoryTable = ({ history }) => {
               TABLE HEAD
           ========================================== */}
 
-          <thead className="bg-slate-50">
+          <thead className="bg-slate-50 dark:bg-slate-800/70">
 
             <tr>
 
-              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Date
               </th>
 
-              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Movement
               </th>
 
-              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Quantity
               </th>
 
-              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              <th className="px-5 py-4 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Invoice Number
               </th>
 
@@ -147,7 +147,7 @@ const StockHistoryTable = ({ history }) => {
               TABLE BODY
           ========================================== */}
 
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
 
             {history.map((item, index) => {
 
@@ -161,7 +161,7 @@ const StockHistoryTable = ({ history }) => {
               return (
                 <tr
                   key={`${item.date}-${item.invoiceNumber}-${index}`}
-                  className="group transition-colors duration-150 hover:bg-slate-50/70"
+                  className="group transition-colors duration-150 hover:bg-slate-50/70 dark:hover:bg-slate-800/50"
                 >
 
                   {/* ==================================
@@ -175,8 +175,8 @@ const StockHistoryTable = ({ history }) => {
                       <div
                         className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
                           isPurchase
-                            ? "bg-emerald-50 text-emerald-600"
-                            : "bg-red-50 text-red-600"
+                            ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400"
+                            : "bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-400"
                         }`}
                       >
                         <MovementIcon size={17} />
@@ -184,11 +184,11 @@ const StockHistoryTable = ({ history }) => {
 
                       <div>
 
-                        <p className="text-sm font-semibold text-slate-700">
+                        <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                           {formatDate(item.date)}
                         </p>
 
-                        <p className="mt-0.5 text-xs text-slate-400">
+                        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                           {formatTime(item.date)}
                         </p>
 
@@ -207,8 +207,8 @@ const StockHistoryTable = ({ history }) => {
                     <span
                       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold ring-1 ring-inset ${
                         isPurchase
-                          ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-                          : "bg-red-50 text-red-700 ring-red-200"
+                          ? "bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:ring-emerald-900"
+                          : "bg-red-50 text-red-700 ring-red-200 dark:bg-red-950/40 dark:text-red-400 dark:ring-red-900"
                       }`}
                     >
 
@@ -233,15 +233,15 @@ const StockHistoryTable = ({ history }) => {
                       <span
                         className={`text-base font-bold ${
                           isPurchase
-                            ? "text-emerald-600"
-                            : "text-red-600"
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : "text-red-600 dark:text-red-400"
                         }`}
                       >
                         {isPurchase ? "+" : "-"}
                         {item.quantity}
                       </span>
 
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-slate-400 dark:text-slate-500">
                         units
                       </span>
 
@@ -257,18 +257,18 @@ const StockHistoryTable = ({ history }) => {
 
                     <div className="flex items-center gap-2.5">
 
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                         <Package size={16} />
                       </div>
 
                       <div>
 
-                        <p className="text-sm font-semibold text-slate-700">
+                        <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                           {item.invoiceNumber ||
                             "—"}
                         </p>
 
-                        <p className="mt-0.5 text-xs text-slate-400">
+                        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
                           Invoice
                         </p>
 

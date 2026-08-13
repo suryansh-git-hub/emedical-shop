@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+
 import {
   Loader,
   Search,
@@ -67,7 +68,6 @@ const Customers = () => {
   const [totalCustomers, setTotalCustomers] =
     useState(0);
 
-  // 10 customers per page
   const limit = 10;
 
   // ==========================================
@@ -97,17 +97,11 @@ const Customers = () => {
   // ==========================================
 
   useEffect(() => {
-    // Don't show searching indicator
-    // when search hasn't changed.
     setSearching(true);
 
     const timer = setTimeout(() => {
       setDebouncedSearch(search.trim());
-
-      // Whenever search changes,
-      // start from page 1.
       setPage(1);
-
       setSearching(false);
     }, 500);
 
@@ -136,16 +130,6 @@ const Customers = () => {
       setCustomers(
         response.customers || []
       );
-
-      /*
-       * Backend currently returns:
-       *
-       * customers
-       *
-       * If pagination has not yet been added
-       * to the backend, totalCustomers will
-       * fallback to the returned array length.
-       */
 
       setTotalCustomers(
         Number(
@@ -228,9 +212,7 @@ const Customers = () => {
   // Edit Customer
   // ==========================================
 
-  const handleEditCustomer = (
-    customer
-  ) => {
+  const handleEditCustomer = (customer) => {
     setEditingCustomer(customer);
 
     setFormData({
@@ -268,9 +250,7 @@ const Customers = () => {
   // Delete Customer
   // ==========================================
 
-  const handleDeleteCustomer = async (
-    id
-  ) => {
+  const handleDeleteCustomer = async (id) => {
     const confirmDelete =
       window.confirm(
         "Are you sure you want to delete this customer?"
@@ -286,11 +266,6 @@ const Customers = () => {
         response.message ||
           "Customer deleted successfully."
       );
-
-      /*
-       * If the last customer on the current
-       * page gets deleted, move back one page.
-       */
 
       if (
         customers.length === 1 &&
@@ -342,9 +317,7 @@ const Customers = () => {
   // Save Customer
   // ==========================================
 
-  const handleSaveCustomer = async (
-    e
-  ) => {
+  const handleSaveCustomer = async (e) => {
     e.preventDefault();
 
     try {
@@ -385,7 +358,7 @@ const Customers = () => {
   // ==========================================
 
   const handlePrevious = () => {
-    if (page > 1) {
+    if (page > 1 && !loading) {
       setPage(
         (previousPage) =>
           previousPage - 1
@@ -398,7 +371,10 @@ const Customers = () => {
   // ==========================================
 
   const handleNext = () => {
-    if (page < totalPages) {
+    if (
+      page < totalPages &&
+      !loading
+    ) {
       setPage(
         (previousPage) =>
           previousPage + 1
@@ -415,11 +391,10 @@ const Customers = () => {
       ? 0
       : (page - 1) * limit + 1;
 
-  const lastCustomer =
-    Math.min(
-      page * limit,
-      totalCustomers
-    );
+  const lastCustomer = Math.min(
+    page * limit,
+    totalCustomers
+  );
 
   // ==========================================
   // Initial Loading
@@ -431,20 +406,59 @@ const Customers = () => {
     !debouncedSearch
   ) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center">
+      <div
+        className="
+          flex
+          min-h-[60vh]
+          flex-col
+          items-center
+          justify-center
+          bg-[#f5f7fb]
 
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
+          dark:bg-slate-950
+        "
+      >
+
+        <div
+          className="
+            flex
+            h-14
+            w-14
+            items-center
+            justify-center
+            rounded-2xl
+            bg-blue-50
+
+            dark:bg-blue-950/50
+          "
+        >
           <Loader
             size={26}
-            className="animate-spin text-blue-600"
+            className="animate-spin text-blue-600 dark:text-blue-400"
           />
         </div>
 
-        <p className="mt-4 font-semibold text-slate-700">
+        <p
+          className="
+            mt-4
+            font-semibold
+            text-slate-700
+
+            dark:text-slate-200
+          "
+        >
           Loading customers...
         </p>
 
-        <p className="mt-1 text-sm text-slate-400">
+        <p
+          className="
+            mt-1
+            text-sm
+            text-slate-400
+
+            dark:text-slate-500
+          "
+        >
           Fetching customer information.
         </p>
 
@@ -457,40 +471,114 @@ const Customers = () => {
   // ==========================================
 
   return (
-    <div className="min-h-full bg-[#f5f7fb]">
+    <div
+      className="
+        min-h-full
+        bg-[#f5f7fb]
 
-      <div className="mx-auto max-w-[1500px] space-y-6">
+        dark:bg-slate-950
+      "
+    >
+
+      <div
+        className="
+          mx-auto
+          max-w-[1500px]
+          space-y-6
+        "
+      >
 
         {/* ==========================================
             HEADER
         ========================================== */}
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div
+          className="
+            rounded-3xl
+            border
+            border-slate-200
+            bg-white
+            p-6
+            shadow-sm
 
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            dark:border-slate-800
+            dark:bg-slate-900
+          "
+        >
+
+          <div
+            className="
+              flex
+              flex-col
+              gap-5
+              sm:flex-row
+              sm:items-center
+              sm:justify-between
+            "
+          >
 
             <div className="flex items-center gap-4">
 
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-600 shadow-lg shadow-blue-100">
+              <div
+                className="
+                  flex
+                  h-14
+                  w-14
+                  shrink-0
+                  items-center
+                  justify-center
+                  rounded-2xl
+                  bg-blue-600
+                  shadow-lg
+                  shadow-blue-100
 
+                  dark:shadow-none
+                "
+              >
                 <Users
                   size={27}
                   className="text-white"
                 />
-
               </div>
 
               <div>
 
-                <span className="text-sm font-semibold text-blue-600">
+                <span
+                  className="
+                    text-sm
+                    font-semibold
+                    text-blue-600
+
+                    dark:text-blue-400
+                  "
+                >
                   Customer Management
                 </span>
 
-                <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                <h1
+                  className="
+                    mt-1
+                    text-2xl
+                    font-bold
+                    tracking-tight
+                    text-slate-900
+                    sm:text-3xl
+
+                    dark:text-slate-100
+                  "
+                >
                   Customers
                 </h1>
 
-                <p className="mt-1 text-sm text-slate-500">
+                <p
+                  className="
+                    mt-1
+                    text-sm
+                    text-slate-500
+
+                    dark:text-slate-400
+                  "
+                >
                   Manage customer information,
                   contacts and purchase history.
                 </p>
@@ -500,9 +588,7 @@ const Customers = () => {
             </div>
 
             <AddCustomerButton
-              onClick={
-                handleAddCustomer
-              }
+              onClick={handleAddCustomer}
             />
 
           </div>
@@ -513,17 +599,55 @@ const Customers = () => {
             SEARCH
         ========================================== */}
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div
+          className="
+            rounded-3xl
+            border
+            border-slate-200
+            bg-white
+            p-5
+            shadow-sm
+            sm:p-6
 
-          <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            dark:border-slate-800
+            dark:bg-slate-900
+          "
+        >
+
+          <div
+            className="
+              mb-5
+              flex
+              flex-col
+              gap-2
+              sm:flex-row
+              sm:items-center
+              sm:justify-between
+            "
+          >
 
             <div>
 
-              <h2 className="font-semibold text-slate-900">
+              <h2
+                className="
+                  font-semibold
+                  text-slate-900
+
+                  dark:text-slate-100
+                "
+              >
                 Find Customers
               </h2>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p
+                className="
+                  mt-1
+                  text-sm
+                  text-slate-500
+
+                  dark:text-slate-400
+                "
+              >
                 Search customers by name or
                 contact number.
               </p>
@@ -550,6 +674,12 @@ const Customers = () => {
                 hover:border-blue-200
                 hover:bg-blue-50
                 hover:text-blue-600
+
+                dark:border-slate-700
+                dark:text-slate-300
+                dark:hover:border-blue-800
+                dark:hover:bg-blue-950/40
+                dark:hover:text-blue-400
               "
             >
               <RotateCcw size={15} />
@@ -579,9 +709,7 @@ const Customers = () => {
               type="text"
               value={search}
               onChange={(e) =>
-                setSearch(
-                  e.target.value
-                )
+                setSearch(e.target.value)
               }
               placeholder="Search by customer name or phone number..."
               className="
@@ -602,6 +730,14 @@ const Customers = () => {
                 focus:bg-white
                 focus:ring-4
                 focus:ring-blue-100
+
+                dark:border-slate-700
+                dark:bg-slate-800
+                dark:text-slate-200
+                dark:placeholder:text-slate-500
+                dark:focus:border-blue-500
+                dark:focus:bg-slate-800
+                dark:focus:ring-blue-950/50
               "
             />
 
@@ -610,9 +746,7 @@ const Customers = () => {
             {search && (
               <button
                 type="button"
-                onClick={
-                  handleClearSearch
-                }
+                onClick={handleClearSearch}
                 className="
                   absolute
                   right-3
@@ -628,6 +762,9 @@ const Customers = () => {
                   transition
                   hover:bg-slate-200
                   hover:text-slate-700
+
+                  dark:hover:bg-slate-700
+                  dark:hover:text-slate-200
                 "
                 title="Clear search"
               >
@@ -639,30 +776,52 @@ const Customers = () => {
 
           {/* Searching Indicator */}
 
-          {search !== debouncedSearch && (
-            <div className="mt-3 flex items-center gap-2 text-xs font-medium text-blue-600">
+          {(search !== debouncedSearch ||
+            searching) && (
+            <div
+              className="
+                mt-3
+                flex
+                items-center
+                gap-2
+                text-xs
+                font-medium
+                text-blue-600
 
+                dark:text-blue-400
+              "
+            >
               <Loader
                 size={13}
                 className="animate-spin"
               />
 
               Searching...
-
             </div>
           )}
 
           {/* Active Search */}
 
           {debouncedSearch && (
-            <div className="mt-4 rounded-xl bg-blue-50 px-4 py-3 text-sm text-blue-700">
+            <div
+              className="
+                mt-4
+                rounded-xl
+                bg-blue-50
+                px-4
+                py-3
+                text-sm
+                text-blue-700
 
+                dark:bg-blue-950/40
+                dark:text-blue-300
+              "
+            >
               Showing results for{" "}
 
               <span className="font-bold">
                 "{debouncedSearch}"
               </span>
-
             </div>
           )}
 
@@ -675,29 +834,35 @@ const Customers = () => {
         <CustomerTable
           customers={customers}
           onEdit={handleEditCustomer}
-          onDelete={
-            handleDeleteCustomer
-          }
-          onHistory={
-            handleCustomerHistory
-          }
+          onDelete={handleDeleteCustomer}
+          onHistory={handleCustomerHistory}
         />
 
         {/* ==========================================
-            TABLE LOADING OVERLAY
+            TABLE LOADING
         ========================================== */}
 
         {loading &&
           customers.length > 0 && (
-            <div className="flex items-center justify-center gap-2 text-sm font-medium text-blue-600">
+            <div
+              className="
+                flex
+                items-center
+                justify-center
+                gap-2
+                text-sm
+                font-medium
+                text-blue-600
 
+                dark:text-blue-400
+              "
+            >
               <Loader
                 size={16}
                 className="animate-spin"
               />
 
               Updating customers...
-
             </div>
           )}
 
@@ -706,34 +871,82 @@ const Customers = () => {
         ========================================== */}
 
         {totalCustomers > 0 && (
-          <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+          <div
+            className="
+              rounded-2xl
+              border
+              border-slate-200
+              bg-white
+              px-5
+              py-4
+              shadow-sm
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              dark:border-slate-800
+              dark:bg-slate-900
+            "
+          >
+
+            <div
+              className="
+                flex
+                flex-col
+                gap-4
+                sm:flex-row
+                sm:items-center
+                sm:justify-between
+              "
+            >
 
               {/* Showing */}
 
-              <p className="text-sm text-slate-500">
+              <p
+                className="
+                  text-sm
+                  text-slate-500
 
+                  dark:text-slate-400
+                "
+              >
                 Showing{" "}
 
-                <span className="font-semibold text-slate-800">
+                <span
+                  className="
+                    font-semibold
+                    text-slate-800
+
+                    dark:text-slate-200
+                  "
+                >
                   {firstCustomer}
                 </span>
 
                 {" "}to{" "}
 
-                <span className="font-semibold text-slate-800">
+                <span
+                  className="
+                    font-semibold
+                    text-slate-800
+
+                    dark:text-slate-200
+                  "
+                >
                   {lastCustomer}
                 </span>
 
                 {" "}of{" "}
 
-                <span className="font-semibold text-slate-800">
+                <span
+                  className="
+                    font-semibold
+                    text-slate-800
+
+                    dark:text-slate-200
+                  "
+                >
                   {totalCustomers}
                 </span>
 
                 {" "}customers
-
               </p>
 
               {/* Controls */}
@@ -744,9 +957,7 @@ const Customers = () => {
 
                 <button
                   type="button"
-                  onClick={
-                    handlePrevious
-                  }
+                  onClick={handlePrevious}
                   disabled={
                     page === 1 ||
                     loading
@@ -769,26 +980,48 @@ const Customers = () => {
                     hover:text-blue-600
                     disabled:cursor-not-allowed
                     disabled:opacity-40
+
+                    dark:border-slate-700
+                    dark:text-slate-300
+                    dark:hover:border-blue-800
+                    dark:hover:bg-blue-950/40
+                    dark:hover:text-blue-400
                   "
                 >
-
-                  <ChevronLeft
-                    size={16}
-                  />
+                  <ChevronLeft size={16} />
 
                   Previous
-
                 </button>
 
                 {/* Current Page */}
 
-                <div className="flex h-9 min-w-9 items-center justify-center rounded-xl bg-blue-600 px-3 text-sm font-bold text-white">
+                <div
+                  className="
+                    flex
+                    h-9
+                    min-w-9
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-blue-600
+                    px-3
+                    text-sm
+                    font-bold
+                    text-white
+                  "
+                >
                   {page}
                 </div>
 
                 {/* Total Pages */}
 
-                <span className="px-1 text-sm text-slate-400">
+                <span
+                  className="
+                    px-1
+                    text-sm
+                    text-slate-400
+                  "
+                >
                   of {totalPages}
                 </span>
 
@@ -798,8 +1031,7 @@ const Customers = () => {
                   type="button"
                   onClick={handleNext}
                   disabled={
-                    page >=
-                      totalPages ||
+                    page >= totalPages ||
                     loading
                   }
                   className="
@@ -820,15 +1052,17 @@ const Customers = () => {
                     hover:text-blue-600
                     disabled:cursor-not-allowed
                     disabled:opacity-40
+
+                    dark:border-slate-700
+                    dark:text-slate-300
+                    dark:hover:border-blue-800
+                    dark:hover:bg-blue-950/40
+                    dark:hover:text-blue-400
                   "
                 >
-
                   Next
 
-                  <ChevronRight
-                    size={16}
-                  />
-
+                  <ChevronRight size={16} />
                 </button>
 
               </div>
@@ -844,19 +1078,65 @@ const Customers = () => {
 
         {totalCustomers === 0 &&
           !loading && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
+            <div
+              className="
+                rounded-2xl
+                border
+                border-slate-200
+                bg-white
+                p-10
+                text-center
+                shadow-sm
 
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-500">
+                dark:border-slate-800
+                dark:bg-slate-900
+              "
+            >
+
+              <div
+                className="
+                  mx-auto
+                  flex
+                  h-14
+                  w-14
+                  items-center
+                  justify-center
+                  rounded-2xl
+                  bg-slate-100
+                  text-slate-500
+
+                  dark:bg-slate-800
+                  dark:text-slate-400
+                "
+              >
                 <Users size={25} />
               </div>
 
-              <h2 className="mt-4 text-lg font-semibold text-slate-800">
+              <h2
+                className="
+                  mt-4
+                  text-lg
+                  font-semibold
+                  text-slate-800
+
+                  dark:text-slate-100
+                "
+              >
                 No Customers Found
               </h2>
 
-              <p className="mt-1 text-sm text-slate-500">
-                Try a different name or phone
-                number.
+              <p
+                className="
+                  mt-1
+                  text-sm
+                  text-slate-500
+
+                  dark:text-slate-400
+                "
+              >
+                {debouncedSearch
+                  ? `No customers match "${debouncedSearch}".`
+                  : "Add your first customer to get started."}
               </p>
 
             </div>
@@ -868,19 +1148,13 @@ const Customers = () => {
 
         <CustomerModal
           isOpen={isModalOpen}
-          onClose={
-            handleCloseCustomerModal
-          }
+          onClose={handleCloseCustomerModal}
         >
           <CustomerForm
             formData={formData}
             setFormData={setFormData}
-            onSubmit={
-              handleSaveCustomer
-            }
-            isEditing={
-              editingCustomer
-            }
+            onSubmit={handleSaveCustomer}
+            isEditing={editingCustomer}
           />
         </CustomerModal>
 

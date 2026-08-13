@@ -145,7 +145,6 @@ const Purchases = () => {
 
       setPurchases(purchaseList);
 
-      // Backend should return totalPurchases
       setTotalPurchases(
         Number(response.totalPurchases) || 0
       );
@@ -359,7 +358,6 @@ const Purchases = () => {
 
       handleCloseModal();
 
-      // Refresh current page
       await fetchPurchases(
         debouncedSearch,
         page
@@ -430,20 +428,20 @@ const Purchases = () => {
     purchases.length === 0
   ) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center bg-[#f5f7fb] dark:bg-slate-950">
 
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-950/50">
           <Loader
             size={26}
-            className="animate-spin text-blue-600"
+            className="animate-spin text-blue-600 dark:text-blue-400"
           />
         </div>
 
-        <p className="mt-4 font-semibold text-slate-700">
+        <p className="mt-4 font-semibold text-slate-700 dark:text-slate-200">
           Loading purchases...
         </p>
 
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-1 text-sm text-slate-400 dark:text-slate-500">
           Fetching purchase information.
         </p>
 
@@ -456,7 +454,7 @@ const Purchases = () => {
   // ==========================================
 
   return (
-    <div className="min-h-full bg-[#f5f7fb]">
+    <div className="min-h-full bg-[#f5f7fb] dark:bg-slate-950">
 
       <div className="mx-auto max-w-[1500px] space-y-6">
 
@@ -464,7 +462,19 @@ const Purchases = () => {
             HEADER
         ========================================== */}
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div
+          className="
+            rounded-3xl
+            border
+            border-slate-200
+            bg-white
+            p-6
+            shadow-sm
+
+            dark:border-slate-800
+            dark:bg-slate-900
+          "
+        >
 
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 
@@ -472,7 +482,7 @@ const Purchases = () => {
 
             <div className="flex items-center gap-4">
 
-              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-600 shadow-lg shadow-blue-100">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-600 shadow-lg shadow-blue-100 dark:shadow-none">
 
                 <ShoppingCart
                   size={27}
@@ -483,15 +493,15 @@ const Purchases = () => {
 
               <div>
 
-                <span className="text-sm font-semibold text-blue-600">
+                <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
                   Purchase Management
                 </span>
 
-                <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
                   Purchases
                 </h1>
 
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                   Manage medicine purchases,
                   suppliers and inventory stock.
                 </p>
@@ -516,17 +526,30 @@ const Purchases = () => {
             SEARCH
         ========================================== */}
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div
+          className="
+            rounded-3xl
+            border
+            border-slate-200
+            bg-white
+            p-5
+            shadow-sm
+            sm:p-6
+
+            dark:border-slate-800
+            dark:bg-slate-900
+          "
+        >
 
           <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
 
             <div>
 
-              <h2 className="font-semibold text-slate-900">
+              <h2 className="font-semibold text-slate-900 dark:text-slate-100">
                 Find Purchases
               </h2>
 
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                 Search by invoice number or
                 supplier name.
               </p>
@@ -550,9 +573,16 @@ const Purchases = () => {
                 font-medium
                 text-slate-600
                 transition
+
                 hover:border-blue-200
                 hover:bg-blue-50
                 hover:text-blue-600
+
+                dark:border-slate-700
+                dark:text-slate-300
+                dark:hover:border-blue-800
+                dark:hover:bg-blue-950/40
+                dark:hover:text-blue-400
               "
             >
               <RotateCcw size={15} />
@@ -574,6 +604,8 @@ const Purchases = () => {
                 top-1/2
                 -translate-y-1/2
                 text-slate-400
+
+                dark:text-slate-500
               "
             />
 
@@ -599,11 +631,21 @@ const Purchases = () => {
                 text-slate-700
                 outline-none
                 transition
+
                 placeholder:text-slate-400
+
                 focus:border-blue-500
                 focus:bg-white
                 focus:ring-4
                 focus:ring-blue-100
+
+                dark:border-slate-700
+                dark:bg-slate-800
+                dark:text-slate-200
+                dark:placeholder:text-slate-500
+                dark:focus:border-blue-500
+                dark:focus:bg-slate-800
+                dark:focus:ring-blue-950
               "
             />
 
@@ -628,8 +670,12 @@ const Purchases = () => {
                   rounded-lg
                   text-slate-400
                   transition
+
                   hover:bg-slate-200
                   hover:text-slate-700
+
+                  dark:hover:bg-slate-700
+                  dark:hover:text-slate-200
                 "
                 title="Clear search"
               >
@@ -642,7 +688,7 @@ const Purchases = () => {
           {/* Debounce Indicator */}
 
           {search !== debouncedSearch && (
-            <div className="mt-3 flex items-center gap-2 text-xs font-medium text-blue-600">
+            <div className="mt-3 flex items-center gap-2 text-xs font-medium text-blue-600 dark:text-blue-400">
 
               <Loader
                 size={13}
@@ -657,7 +703,7 @@ const Purchases = () => {
           {/* Active Search */}
 
           {debouncedSearch && (
-            <div className="mt-4 flex items-center gap-2 rounded-xl bg-blue-50 px-4 py-3 text-sm text-blue-700">
+            <div className="mt-4 flex items-center gap-2 rounded-xl bg-blue-50 px-4 py-3 text-sm text-blue-700 dark:bg-blue-950/40 dark:text-blue-300">
 
               <Search size={15} />
 
@@ -687,7 +733,7 @@ const Purchases = () => {
 
         {loading &&
           purchases.length > 0 && (
-            <div className="flex items-center justify-center gap-2 py-2 text-sm font-medium text-blue-600">
+            <div className="flex items-center justify-center gap-2 py-2 text-sm font-medium text-blue-600 dark:text-blue-400">
 
               <Loader
                 size={16}
@@ -704,7 +750,20 @@ const Purchases = () => {
         ========================================== */}
 
         {totalPurchases > 0 && (
-          <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+          <div
+            className="
+              rounded-2xl
+              border
+              border-slate-200
+              bg-white
+              px-5
+              py-4
+              shadow-sm
+
+              dark:border-slate-800
+              dark:bg-slate-900
+            "
+          >
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
@@ -712,29 +771,29 @@ const Purchases = () => {
 
               <div className="flex items-center gap-3">
 
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
 
                   <FileText size={17} />
 
                 </div>
 
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
 
                   Showing{" "}
 
-                  <span className="font-semibold text-slate-800">
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
                     {firstPurchase}
                   </span>
 
                   {" "}to{" "}
 
-                  <span className="font-semibold text-slate-800">
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
                     {lastPurchase}
                   </span>
 
                   {" "}of{" "}
 
-                  <span className="font-semibold text-slate-800">
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">
                     {totalPurchases}
                   </span>
 
@@ -772,11 +831,19 @@ const Purchases = () => {
                     font-medium
                     text-slate-600
                     transition
+
                     hover:border-blue-200
                     hover:bg-blue-50
                     hover:text-blue-600
+
                     disabled:cursor-not-allowed
                     disabled:opacity-40
+
+                    dark:border-slate-700
+                    dark:text-slate-300
+                    dark:hover:border-blue-800
+                    dark:hover:bg-blue-950/40
+                    dark:hover:text-blue-400
                   "
                 >
 
@@ -794,7 +861,7 @@ const Purchases = () => {
                   {page}
                 </div>
 
-                <span className="px-1 text-sm text-slate-400">
+                <span className="px-1 text-sm text-slate-400 dark:text-slate-500">
                   of {totalPages}
                 </span>
 
@@ -820,11 +887,19 @@ const Purchases = () => {
                     font-medium
                     text-slate-600
                     transition
+
                     hover:border-blue-200
                     hover:bg-blue-50
                     hover:text-blue-600
+
                     disabled:cursor-not-allowed
                     disabled:opacity-40
+
+                    dark:border-slate-700
+                    dark:text-slate-300
+                    dark:hover:border-blue-800
+                    dark:hover:bg-blue-950/40
+                    dark:hover:text-blue-400
                   "
                 >
 

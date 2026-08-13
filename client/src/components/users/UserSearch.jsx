@@ -60,6 +60,15 @@ function UserSearch({
           focus:bg-white
           focus:ring-4
           focus:ring-blue-100
+
+          dark:border-slate-700
+          dark:bg-slate-800
+          dark:text-slate-200
+          dark:placeholder:text-slate-500
+          dark:hover:border-slate-600
+          dark:focus:border-blue-500
+          dark:focus:bg-slate-800
+          dark:focus:ring-blue-950/50
         "
       />
 
@@ -84,6 +93,9 @@ function UserSearch({
             transition
             hover:bg-slate-200
             hover:text-slate-700
+
+            dark:hover:bg-slate-700
+            dark:hover:text-slate-200
           "
           title="Clear search"
         >

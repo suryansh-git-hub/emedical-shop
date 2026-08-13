@@ -20,12 +20,19 @@ const AddSupplierButton = ({ onClick }) => {
         shadow-sm
         transition
         duration-200
+
         hover:bg-blue-700
         hover:shadow-md
+
         focus:outline-none
         focus:ring-4
         focus:ring-blue-100
+
         active:scale-[0.98]
+
+        dark:bg-blue-500
+        dark:hover:bg-blue-600
+        dark:focus:ring-blue-950
       "
     >
       <Plus size={18} />

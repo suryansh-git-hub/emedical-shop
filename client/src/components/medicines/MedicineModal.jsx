@@ -16,7 +16,14 @@ function MedicineModal({
       ========================================== */}
 
       <div
-        className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+        className="
+          absolute
+          inset-0
+          bg-slate-900/50
+          backdrop-blur-sm
+
+          dark:bg-black/70
+        "
         onClick={onClose}
       />
 
@@ -37,6 +44,10 @@ function MedicineModal({
           rounded-2xl
           bg-white
           shadow-2xl
+
+          dark:border
+          dark:border-slate-700
+          dark:bg-slate-900
         "
       >
 
@@ -44,25 +55,73 @@ function MedicineModal({
             Header
         ======================================== */}
 
-        <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-white px-6 py-4">
+        <div
+          className="
+            flex
+            shrink-0
+            items-center
+            justify-between
+            border-b
+            border-slate-100
+            bg-white
+            px-6
+            py-4
+
+            dark:border-slate-700
+            dark:bg-slate-900
+          "
+        >
 
           <div className="flex items-center gap-3">
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+            <div
+              className="
+                flex
+                h-10
+                w-10
+                items-center
+                justify-center
+                rounded-xl
+                bg-blue-50
+
+                dark:bg-blue-950/60
+              "
+            >
               <Pill
                 size={20}
-                className="text-blue-600"
+                className="
+                  text-blue-600
+                  dark:text-blue-400
+                "
               />
             </div>
 
             <div>
-              <h2 className="text-lg font-bold text-slate-900">
+
+              <h2
+                className="
+                  text-lg
+                  font-bold
+                  text-slate-900
+
+                  dark:text-white
+                "
+              >
                 {title}
               </h2>
 
-              <p className="text-xs text-slate-500">
-                Manage medicine information and inventory details
+              <p
+                className="
+                  text-xs
+                  text-slate-500
+
+                  dark:text-slate-400
+                "
+              >
+                Manage medicine information and
+                inventory details
               </p>
+
             </div>
 
           </div>
@@ -82,8 +141,13 @@ function MedicineModal({
               rounded-lg
               text-slate-400
               transition
+
               hover:bg-slate-100
               hover:text-slate-700
+
+              dark:text-slate-400
+              dark:hover:bg-slate-800
+              dark:hover:text-slate-200
             "
           >
             <X size={20} />
@@ -95,10 +159,18 @@ function MedicineModal({
             Form Content
         ======================================== */}
 
-        <div className="flex-1 overflow-y-auto bg-white px-6 py-6">
+        <div
+          className="
+            flex-1
+            overflow-y-auto
+            bg-white
+            px-6
+            py-6
 
+            dark:bg-slate-900
+          "
+        >
           {children}
-
         </div>
 
       </div>

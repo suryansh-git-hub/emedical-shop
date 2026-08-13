@@ -52,7 +52,6 @@ function Users() {
   const [totalUsers, setTotalUsers] =
     useState(0);
 
-  // Users per page
   const limit = 10;
 
   // ==========================================
@@ -72,7 +71,6 @@ function Users() {
     const timer = setTimeout(() => {
       setDebouncedSearch(search.trim());
 
-      // Every new search starts from page 1
       setPage(1);
     }, 500);
 
@@ -160,7 +158,6 @@ function Users() {
   const handleSubmit = async (data) => {
     try {
       if (editingUser) {
-        // Update existing user
         await updateUser(
           editingUser._id,
           data
@@ -170,7 +167,6 @@ function Users() {
           "User updated successfully."
         );
       } else {
-        // Create new user
         await createUser(data);
 
         toast.success(
@@ -178,13 +174,11 @@ function Users() {
         );
       }
 
-      // Refresh current page
       await fetchUsers(
         debouncedSearch,
         page
       );
 
-      // Close modal
       setOpen(false);
       setEditingUser(null);
 
@@ -228,7 +222,6 @@ function Users() {
           : "User deactivated successfully."
       );
 
-      // Refresh current page
       await fetchUsers(
         debouncedSearch,
         page
@@ -289,7 +282,7 @@ function Users() {
   // ==========================================
 
   return (
-    <div className="min-h-full bg-[#f5f7fb]">
+    <div className="min-h-full bg-[#f5f7fb] dark:bg-slate-950">
 
       <div className="mx-auto max-w-[1500px] space-y-6">
 
@@ -306,7 +299,20 @@ function Users() {
             SEARCH + ADD USER
         ========================================== */}
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+        <div
+          className="
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            p-4
+            shadow-sm
+            sm:p-5
+
+            dark:border-slate-800
+            dark:bg-slate-900
+          "
+        >
 
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
@@ -332,7 +338,7 @@ function Users() {
           {/* SEARCHING INDICATOR */}
 
           {search !== debouncedSearch && (
-            <div className="mt-3 flex items-center gap-2 text-xs font-medium text-blue-600">
+            <div className="mt-3 flex items-center gap-2 text-xs font-medium text-blue-600 dark:text-blue-400">
 
               <Loader
                 size={13}
@@ -362,29 +368,42 @@ function Users() {
         ========================================== */}
 
         {totalUsers > 0 && (
-          <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+          <div
+            className="
+              rounded-2xl
+              border
+              border-slate-200
+              bg-white
+              px-5
+              py-4
+              shadow-sm
+
+              dark:border-slate-800
+              dark:bg-slate-900
+            "
+          >
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
               {/* SHOWING USERS */}
 
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
 
                 Showing{" "}
 
-                <span className="font-semibold text-slate-800">
+                <span className="font-semibold text-slate-800 dark:text-slate-200">
                   {firstUser}
                 </span>
 
                 {" "}to{" "}
 
-                <span className="font-semibold text-slate-800">
+                <span className="font-semibold text-slate-800 dark:text-slate-200">
                   {lastUser}
                 </span>
 
                 {" "}of{" "}
 
-                <span className="font-semibold text-slate-800">
+                <span className="font-semibold text-slate-800 dark:text-slate-200">
                   {totalUsers}
                 </span>
 
@@ -418,39 +437,51 @@ function Users() {
                     font-medium
                     text-slate-600
                     transition
+
                     hover:border-blue-200
                     hover:bg-blue-50
                     hover:text-blue-600
+
                     disabled:cursor-not-allowed
                     disabled:opacity-40
+
+                    dark:border-slate-700
+                    dark:text-slate-300
+                    dark:hover:border-blue-800
+                    dark:hover:bg-blue-950/40
+                    dark:hover:text-blue-400
                   "
                 >
+
                   <ChevronLeft size={16} />
 
                   Previous
+
                 </button>
 
                 {/* CURRENT PAGE */}
 
-                <div className="
-                  flex
-                  h-9
-                  min-w-9
-                  items-center
-                  justify-center
-                  rounded-xl
-                  bg-blue-600
-                  px-3
-                  text-sm
-                  font-bold
-                  text-white
-                ">
+                <div
+                  className="
+                    flex
+                    h-9
+                    min-w-9
+                    items-center
+                    justify-center
+                    rounded-xl
+                    bg-blue-600
+                    px-3
+                    text-sm
+                    font-bold
+                    text-white
+                  "
+                >
                   {page}
                 </div>
 
                 {/* TOTAL PAGES */}
 
-                <span className="text-sm text-slate-400">
+                <span className="text-sm text-slate-400 dark:text-slate-500">
                   of {totalPages}
                 </span>
 
@@ -476,16 +507,26 @@ function Users() {
                     font-medium
                     text-slate-600
                     transition
+
                     hover:border-blue-200
                     hover:bg-blue-50
                     hover:text-blue-600
+
                     disabled:cursor-not-allowed
                     disabled:opacity-40
+
+                    dark:border-slate-700
+                    dark:text-slate-300
+                    dark:hover:border-blue-800
+                    dark:hover:bg-blue-950/40
+                    dark:hover:text-blue-400
                   "
                 >
+
                   Next
 
                   <ChevronRight size={16} />
+
                 </button>
 
               </div>
@@ -508,10 +549,12 @@ function Users() {
               : "Add User"
           }
         >
+
           <UserForm
             onSubmit={handleSubmit}
             defaultValues={editingUser}
           />
+
         </UserModal>
 
       </div>
