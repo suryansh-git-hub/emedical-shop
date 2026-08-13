@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import nodemailer from "nodemailer";
 
 import User from "../models/userModel.js";
 
@@ -7,9 +8,6 @@ import { hashPassword } from "../utils/hashPassword.js";
 import { generateToken } from "../utils/generateToken.js";
 
 import { MESSAGES } from "../constants/messages.js";
-
-import nodemailer from "nodemailer";
-
 
 // =======================================
 // Signup
@@ -63,7 +61,6 @@ export const registerUserService = async ({
   };
 };
 
-
 // =======================================
 // Login
 // =======================================
@@ -81,7 +78,9 @@ export const loginUserService = async ({
     throw error;
   }
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({
+    email,
+  });
 
   if (!user) {
     const error = new Error(
@@ -132,173 +131,167 @@ export const loginUserService = async ({
   };
 };
 
-
 // =======================================
 // Forgot Password
 // =======================================
 
-export const forgotPasswordService =
-  async ({ email }) => {
+export const forgotPasswordService = async ({
+  email,
+}) => {
+  // =====================================
+  // Validate email
+  // =====================================
 
-    // =====================================
-    // Validate email
-    // =====================================
+  if (!email) {
+    const error = new Error(
+      "Email is required."
+    );
 
-    if (!email) {
-      const error = new Error(
-        "Email is required."
-      );
+    error.statusCode = 400;
+    throw error;
+  }
 
-      error.statusCode = 400;
-      throw error;
-    }
+  // =====================================
+  // Find user
+  // =====================================
 
+  const user = await User.findOne({
+    email,
+  });
 
-    // =====================================
-    // Find user
-    // =====================================
+  /*
+   * Don't reveal whether an email exists.
+   *
+   * This prevents user enumeration.
+   */
 
-    const user = await User.findOne({
-      email,
+  if (!user) {
+    return {
+      message:
+        "If an account exists with this email, a password reset link has been sent.",
+    };
+  }
+
+  // =====================================
+  // Generate reset token
+  // =====================================
+
+  const resetToken =
+    crypto.randomBytes(32).toString("hex");
+
+  // =====================================
+  // Hash token before storing
+  // =====================================
+
+  const hashedToken =
+    crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+  // =====================================
+  // Save token + expiry
+  // =====================================
+
+  user.resetPasswordToken =
+    hashedToken;
+
+  /*
+   * Reset link expires after 15 minutes.
+   */
+
+  user.resetPasswordExpires =
+    new Date(
+      Date.now() + 15 * 60 * 1000
+    );
+
+  await user.save();
+
+  // =====================================
+  // Create reset URL
+  // =====================================
+
+  /*
+   * CLIENT_URL is your Vercel frontend URL.
+   *
+   * Example:
+   * https://emedical-shop-6w89.vercel.app
+   */
+
+  const resetUrl =
+    `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
+
+  // =====================================
+  // Create email transporter
+  // =====================================
+
+  const transporter =
+    nodemailer.createTransport({
+      service: "gmail",
+
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
     });
 
+  // =====================================
+  // Send reset email
+  // =====================================
 
-    // =====================================
-    // User not found
-    // =====================================
+  await transporter.sendMail({
+    from:
+      `"eMedi Pharmacy" <${process.env.EMAIL_USER}>`,
 
-    if (!user) {
-      /*
-       * We intentionally don't reveal
-       * whether an email exists.
-       *
-       * This prevents user enumeration.
-       */
+    to: user.email,
 
-      return {
-        message:
-          "If an account exists with this email, a password reset link has been sent.",
-      };
-    }
+    subject:
+      "Reset Your eMedi Pharmacy Password",
 
+    html: `
+      <div style="
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: auto;
+        padding: 30px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #ffffff;
+      ">
 
-    // =====================================
-    // Generate reset token
-    // =====================================
-
-    const resetToken =
-      crypto.randomBytes(32).toString("hex");
-
-
-    // =====================================
-    // Hash token before storing
-    // =====================================
-
-    const hashedToken =
-      crypto
-        .createHash("sha256")
-        .update(resetToken)
-        .digest("hex");
-
-
-    // =====================================
-    // Save token + expiry
-    // =====================================
-
-    user.resetPasswordToken =
-      hashedToken;
-
-    /*
-     * Reset link will expire
-     * after 15 minutes.
-     */
-
-    user.resetPasswordExpires =
-      new Date(
-        Date.now() + 15 * 60 * 1000
-      );
-
-
-    await user.save();
-
-
-    // =====================================
-    // Create reset URL
-    // =====================================
-
-    const resetUrl =
-      `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-
-
-    // =====================================
-    // Email transporter
-    // =====================================
-
-    const transporter =
-      nodemailer.createTransport({
-        service: "gmail",
-
-        auth: {
-          user: process.env.EMAIL_USER,
-
-          pass:
-            process.env.EMAIL_PASSWORD,
-        },
-      });
-
-
-    // =====================================
-    // Send Email
-    // =====================================
-
-    await transporter.sendMail({
-      from:
-        `"eMedi Pharmacy" <${process.env.EMAIL_USER}>`,
-
-      to: user.email,
-
-      subject:
-        "Reset Your eMedi Pharmacy Password",
-
-      html: `
-        <div style="
-          font-family: Arial, sans-serif;
-          max-width: 600px;
-          margin: auto;
-          padding: 30px;
-          border: 1px solid #ddd;
-          border-radius: 10px;
+        <h2 style="
+          color: #2563eb;
+          margin-bottom: 10px;
         ">
+          eMedi Pharmacy
+        </h2>
 
-          <h2 style="color: #2563eb;">
-            eMedi Pharmacy
-          </h2>
+        <h3>
+          Password Reset Request
+        </h3>
 
-          <h3>
-            Password Reset Request
-          </h3>
+        <p>
+          Hello ${user.name},
+        </p>
 
-          <p>
-            Hello ${user.name},
-          </p>
+        <p>
+          We received a request to reset
+          your eMedi Pharmacy account password.
+        </p>
 
-          <p>
-            We received a request to reset
-            your account password.
-          </p>
+        <p>
+          Click the button below to create
+          a new password.
+        </p>
 
-          <p>
-            Click the button below to create
-            a new password.
-          </p>
-
+        <div style="margin: 25px 0;">
           <a
             href="${resetUrl}"
             style="
               display: inline-block;
               padding: 12px 20px;
-              background: #2563eb;
-              color: white;
+              background-color: #2563eb;
+              color: #ffffff;
               text-decoration: none;
               border-radius: 6px;
               font-weight: bold;
@@ -306,156 +299,146 @@ export const forgotPasswordService =
           >
             Reset Password
           </a>
-
-          <p style="margin-top: 25px;">
-            This link will expire in
-            <strong>15 minutes</strong>.
-          </p>
-
-          <p style="color: #666;">
-            If you did not request this password
-            reset, you can safely ignore this email.
-          </p>
-
-          <p>
-            Regards,<br />
-            eMedi Pharmacy Team
-          </p>
-
         </div>
-      `,
-    });
 
+        <p>
+          This password reset link will expire
+          in <strong>15 minutes</strong>.
+        </p>
 
-    return {
-      message:
-        "If an account exists with this email, a password reset link has been sent.",
-    };
+        <p style="
+          color: #666666;
+          font-size: 14px;
+        ">
+          If you did not request this password
+          reset, you can safely ignore this email.
+        </p>
+
+        <p>
+          Regards,<br />
+          <strong>eMedi Pharmacy Team</strong>
+        </p>
+
+      </div>
+    `,
+  });
+
+  return {
+    message:
+      "If an account exists with this email, a password reset link has been sent.",
   };
-
+};
 
 // =======================================
 // Reset Password
 // =======================================
 
-export const resetPasswordService =
-  async ({
-    token,
-    newPassword,
-  }) => {
+export const resetPasswordService = async ({
+  token,
+  newPassword,
+}) => {
+  // =====================================
+  // Validate input
+  // =====================================
 
-    // =====================================
-    // Validate input
-    // =====================================
+  if (!token || !newPassword) {
+    const error = new Error(
+      "Reset token and new password are required."
+    );
 
-    if (!token || !newPassword) {
-      const error = new Error(
-        "Reset token and new password are required."
-      );
+    error.statusCode = 400;
+    throw error;
+  }
 
-      error.statusCode = 400;
-      throw error;
-    }
+  // =====================================
+  // Validate password length
+  // =====================================
 
+  if (newPassword.length < 8) {
+    const error = new Error(
+      "Password must be at least 8 characters."
+    );
 
-    // =====================================
-    // Validate password length
-    // =====================================
+    error.statusCode = 400;
+    throw error;
+  }
 
-    if (newPassword.length < 8) {
-      const error = new Error(
-        "Password must be at least 8 characters."
-      );
+  // =====================================
+  // Hash received token
+  // =====================================
 
-      error.statusCode = 400;
-      throw error;
-    }
+  const hashedToken =
+    crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
 
+  // =====================================
+  // Find user with valid token
+  // =====================================
 
-    // =====================================
-    // Hash received token
-    // =====================================
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
 
-    const hashedToken =
-      crypto
-        .createHash("sha256")
-        .update(token)
-        .digest("hex");
+    resetPasswordExpires: {
+      $gt: new Date(),
+    },
+  });
 
+  // =====================================
+  // Invalid / expired token
+  // =====================================
 
-    // =====================================
-    // Find user with valid token
-    // =====================================
+  if (!user) {
+    const error = new Error(
+      "Password reset link is invalid or expired."
+    );
 
-    const user = await User.findOne({
-      resetPasswordToken: hashedToken,
+    error.statusCode = 400;
+    throw error;
+  }
 
-      resetPasswordExpires: {
-        $gt: new Date(),
-      },
-    });
+  // =====================================
+  // Prevent same password
+  // =====================================
 
+  const isSamePassword =
+    await comparePassword(
+      newPassword,
+      user.password
+    );
 
-    // =====================================
-    // Invalid / expired token
-    // =====================================
+  if (isSamePassword) {
+    const error = new Error(
+      "New password cannot be same as old password."
+    );
 
-    if (!user) {
-      const error = new Error(
-        "Password reset link is invalid or expired."
-      );
+    error.statusCode = 400;
+    throw error;
+  }
 
-      error.statusCode = 400;
-      throw error;
-    }
+  // =====================================
+  // Hash new password
+  // =====================================
 
+  user.password =
+    await hashPassword(newPassword);
 
-    // =====================================
-    // Prevent same password
-    // =====================================
+  // =====================================
+  // Invalidate reset token
+  // =====================================
 
-    const isSamePassword =
-      await comparePassword(
-        newPassword,
-        user.password
-      );
+  user.resetPasswordToken = null;
+  user.resetPasswordExpires = null;
 
-    if (isSamePassword) {
-      const error = new Error(
-        "New password cannot be same as old password."
-      );
+  // =====================================
+  // Save updated user
+  // =====================================
 
-      error.statusCode = 400;
-      throw error;
-    }
+  await user.save();
 
-
-    // =====================================
-    // Hash new password
-    // =====================================
-
-    user.password =
-      await hashPassword(newPassword);
-
-
-    // =====================================
-    // Invalidate reset token
-    // =====================================
-
-    user.resetPasswordToken = null;
-
-    user.resetPasswordExpires = null;
-
-
-    // =====================================
-    // Save
-    // =====================================
-
-    await user.save();
-
-
-    return {
-      message:
-        "Password reset successfully.",
-    };
+  return {
+    message:
+      "Password reset successfully.",
   };
+};

@@ -17,8 +17,13 @@ function ForgotPassword() {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm();
+
+  // ==========================================
+  // Send Reset Link
+  // ==========================================
 
   const onSubmit = async (data) => {
     try {
@@ -44,20 +49,59 @@ function ForgotPassword() {
     }
   };
 
+  // ==========================================
+  // Resend Reset Link
+  // ==========================================
+
+  const handleResend = async () => {
+    const email = getValues("email");
+
+    if (!email) {
+      toast.error(
+        "Please enter your email address."
+      );
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await forgotPassword({
+        email,
+      });
+
+      toast.success(
+        response.message ||
+          "A new password reset link has been sent."
+      );
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to resend reset link."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
 
       <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-xl">
 
-        {/* Header */}
+        {/* ======================================
+            Header
+        ====================================== */}
 
         <div className="mb-7 text-center">
 
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
+
             <Mail
               size={26}
               className="text-blue-600"
             />
+
           </div>
 
           <h2 className="text-2xl font-bold text-slate-900">
@@ -73,9 +117,9 @@ function ForgotPassword() {
 
         {emailSent ? (
 
-          /* ===============================
+          /* ====================================
              EMAIL SENT
-          =============================== */
+          ==================================== */
 
           <div className="text-center">
 
@@ -97,26 +141,64 @@ function ForgotPassword() {
 
             </div>
 
-            <Link
-              to="/"
-              className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+            {/* ==================================
+                Resend Reset Link
+            ================================== */}
+
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={loading}
+              className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition hover:text-blue-700 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <ArrowLeft size={16} />
-              Back to Login
-            </Link>
+
+              {loading ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send size={16} />
+                  Didn't receive the email? Resend Reset Link
+                </>
+              )}
+
+            </button>
+
+            {/* ==================================
+                Back To Login
+            ================================== */}
+
+            <div>
+
+              <Link
+                to="/"
+                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+              >
+
+                <ArrowLeft size={16} />
+
+                Back to Login
+
+              </Link>
+
+            </div>
 
           </div>
 
         ) : (
 
-          /* ===============================
+          /* ====================================
              EMAIL FORM
-          =============================== */
+          ==================================== */
 
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-5"
           >
+
+            {/* Email */}
 
             <div>
 
@@ -155,6 +237,8 @@ function ForgotPassword() {
 
             </div>
 
+            {/* Send Reset Link */}
+
             <button
               type="submit"
               disabled={loading}
@@ -164,16 +248,20 @@ function ForgotPassword() {
               {loading ? (
                 <>
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+
                   Sending Link...
                 </>
               ) : (
                 <>
                   <Send size={18} />
+
                   Send Reset Link
                 </>
               )}
 
             </button>
+
+            {/* Back To Login */}
 
             <div className="text-center">
 
@@ -181,13 +269,17 @@ function ForgotPassword() {
                 to="/"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline"
               >
+
                 <ArrowLeft size={16} />
+
                 Back to Login
+
               </Link>
 
             </div>
 
           </form>
+
         )}
 
       </div>

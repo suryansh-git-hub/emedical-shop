@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import {
   Lock,
   Eye,
   EyeOff,
-  CheckCircle2,
+  ArrowLeft,
 } from "lucide-react";
 
 import { resetPassword } from "../../services/authService";
@@ -37,7 +41,7 @@ function ResetPassword() {
       const response = await resetPassword(
         token,
         {
-          password: data.password,
+          newPassword: data.password,
         }
       );
 
@@ -67,10 +71,12 @@ function ResetPassword() {
         <div className="mb-7 text-center">
 
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50">
+
             <Lock
               size={26}
               className="text-blue-600"
             />
+
           </div>
 
           <h2 className="text-2xl font-bold text-slate-900">
@@ -88,7 +94,9 @@ function ResetPassword() {
           className="space-y-5"
         >
 
-          {/* Password */}
+          {/* ==========================
+              New Password
+          ========================== */}
 
           <div>
 
@@ -118,6 +126,7 @@ function ResetPassword() {
                 {...register("password", {
                   required:
                     "Password is required",
+
                   minLength: {
                     value: 8,
                     message:
@@ -152,7 +161,9 @@ function ResetPassword() {
 
           </div>
 
-          {/* Confirm Password */}
+          {/* ==========================
+              Confirm Password
+          ========================== */}
 
           <div>
 
@@ -184,6 +195,7 @@ function ResetPassword() {
                   {
                     required:
                       "Confirm your password",
+
                     validate: (value) =>
                       value === password ||
                       "Passwords do not match",
@@ -217,7 +229,9 @@ function ResetPassword() {
 
           </div>
 
-          {/* Submit */}
+          {/* ==========================
+              Submit
+          ========================== */}
 
           <button
             type="submit"
@@ -228,6 +242,20 @@ function ResetPassword() {
               ? "Updating Password..."
               : "Set New Password"}
           </button>
+
+          {/* Back */}
+
+          <div className="text-center">
+
+            <Link
+              to="/"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+            >
+              <ArrowLeft size={16} />
+              Back to Login
+            </Link>
+
+          </div>
 
         </form>
 
