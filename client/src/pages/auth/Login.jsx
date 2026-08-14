@@ -72,7 +72,7 @@ function Login() {
                 <div>
 
                   <h1 className="text-xl font-bold">
-                    eMediShop
+                    eMedi Pharmacy
                   </h1>
 
                   <p className="text-sm text-blue-100">
@@ -338,7 +338,7 @@ function Login() {
             {/* Footer */}
 
             <p className="mt-8 text-center text-xs text-gray-400">
-              © {new Date().getFullYear()} Medical Shop
+              © {new Date().getFullYear()} Pharmacy
               Management System
             </p>
 

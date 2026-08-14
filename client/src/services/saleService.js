@@ -36,10 +36,18 @@ export const addSale = async (saleData) => {
 /**
  * ==========================
  * Get Customers
+ *
+ * Search is optional.
  * ==========================
  */
-export const getCustomers = async () => {
-  const response = await api.get("/customers");
+export const getCustomers = async (search = "") => {
+  const response = await api.get("/customers", {
+    params: {
+      search: search.trim(),
+      page: 1,
+      limit: 10,
+    },
+  });
 
   return response.data;
 };
@@ -47,10 +55,18 @@ export const getCustomers = async () => {
 /**
  * ==========================
  * Get Medicines
+ *
+ * Search is optional.
  * ==========================
  */
-export const getMedicines = async () => {
-  const response = await api.get("/medicines");
+export const getMedicines = async (search = "") => {
+  const response = await api.get("/medicines", {
+    params: {
+      search: search.trim(),
+      page: 1,
+      limit: 10,
+    },
+  });
 
   return response.data;
 };

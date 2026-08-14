@@ -38,11 +38,11 @@ const Invoice = ({ sale }) => {
             </p>
 
             <p className="text-sm">
-              +91 XXXXX XXXXX
+              +91 32145 98765
             </p>
 
             <p className="text-sm">
-              GSTIN : XXXXXXXX1234
+              GSTIN : WKPR001234
             </p>
 
           </div>

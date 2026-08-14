@@ -102,7 +102,7 @@ function Sidebar({ collapsed = false }) {
                   text-white
                 "
               >
-                eMediShop
+                eMedi Pharmacy
               </h1>
 
               <p
@@ -112,7 +112,7 @@ function Sidebar({ collapsed = false }) {
                   text-slate-400
                 "
               >
-                Medical Management
+                Pharmacy Management
               </p>
 
             </div>
@@ -320,7 +320,7 @@ function Sidebar({ collapsed = false }) {
                 text-slate-300
               "
             >
-              eMediShop
+              eMedi Pharmacy
             </p>
 
             <p
@@ -331,7 +331,7 @@ function Sidebar({ collapsed = false }) {
                 text-slate-500
               "
             >
-              Medical Shop Management System
+              Pharmacy Management System
             </p>
 
           </div>

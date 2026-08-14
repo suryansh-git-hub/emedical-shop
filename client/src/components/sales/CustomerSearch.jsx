@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Search, UserRound } from "lucide-react";
 
 const CustomerSearch = ({
@@ -8,30 +7,10 @@ const CustomerSearch = ({
   search,
   setSearch,
 }) => {
-  const filteredCustomers = useMemo(() => {
-    if (!search?.trim()) return [];
-
-    const keyword = search
-      .toLowerCase()
-      .trim();
-
-    return customers.filter((customer) => {
-      return (
-        customer.customerName
-          ?.toLowerCase()
-          .includes(keyword) ||
-        customer.contactNumber
-          ?.toLowerCase()
-          .includes(keyword) ||
-        customer.email
-          ?.toLowerCase()
-          .includes(keyword)
-      );
-    });
-  }, [customers, search]);
-
   return (
     <div className="relative">
+
+      {/* Label */}
 
       <label
         className="
@@ -46,6 +25,8 @@ const CustomerSearch = ({
       >
         Customer
       </label>
+
+      {/* Search Input */}
 
       <div className="relative">
 
@@ -109,7 +90,8 @@ const CustomerSearch = ({
 
       {/* Search Results */}
 
-      {filteredCustomers.length > 0 &&
+      {customers.length > 0 &&
+        search.trim() &&
         !selectedCustomer && (
 
           <div
@@ -132,94 +114,89 @@ const CustomerSearch = ({
             "
           >
 
-            {filteredCustomers.map(
-              (customer) => (
+            {customers.map((customer) => (
 
-                <button
-                  key={customer._id}
-                  type="button"
-                  onClick={() => {
-                    onSelectCustomer(
-                      customer
-                    );
+              <button
+                key={customer._id}
+                type="button"
+                onClick={() => {
+                  onSelectCustomer(customer);
+                  setSearch("");
+                }}
+                className="
+                  flex
+                  w-full
+                  items-center
+                  gap-3
+                  border-b
+                  border-slate-100
+                  px-4
+                  py-3
+                  text-left
+                  transition
+                  hover:bg-slate-50
 
-                    setSearch("");
-                  }}
+                  dark:border-slate-800
+                  dark:hover:bg-slate-800
+                "
+              >
+
+                <div
                   className="
                     flex
-                    w-full
+                    h-9
+                    w-9
+                    shrink-0
                     items-center
-                    gap-3
-                    border-b
-                    border-slate-100
-                    px-4
-                    py-3
-                    text-left
-                    transition
-                    hover:bg-slate-50
+                    justify-center
+                    rounded-lg
+                    bg-blue-50
+                    text-blue-600
 
-                    dark:border-slate-800
-                    dark:hover:bg-slate-800
+                    dark:bg-blue-950/50
+                    dark:text-blue-400
                   "
                 >
+                  <UserRound size={16} />
+                </div>
 
-                  <div
+                <div className="min-w-0">
+
+                  <span
                     className="
-                      flex
-                      h-9
-                      w-9
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-lg
-                      bg-blue-50
-                      text-blue-600
+                      block
+                      truncate
+                      text-sm
+                      font-semibold
+                      text-slate-800
 
-                      dark:bg-blue-950/50
-                      dark:text-blue-400
+                      dark:text-slate-100
                     "
                   >
-                    <UserRound size={16} />
-                  </div>
+                    {customer.customerName}
+                  </span>
 
-                  <div className="min-w-0">
+                  <span
+                    className="
+                      mt-0.5
+                      block
+                      text-xs
+                      text-slate-500
 
-                    <span
-                      className="
-                        block
-                        truncate
-                        text-sm
-                        font-semibold
-                        text-slate-800
+                      dark:text-slate-400
+                    "
+                  >
+                    {customer.contactNumber ||
+                      customer.phone ||
+                      customer.email ||
+                      "No contact information"}
+                  </span>
 
-                        dark:text-slate-100
-                      "
-                    >
-                      {customer.customerName}
-                    </span>
+                </div>
 
-                    <span
-                      className="
-                        mt-0.5
-                        block
-                        text-xs
-                        text-slate-500
+              </button>
 
-                        dark:text-slate-400
-                      "
-                    >
-                      {customer.contactNumber ||
-                        customer.phone ||
-                        customer.email ||
-                        "No contact information"}
-                    </span>
-
-                  </div>
-
-                </button>
-
-              )
-            )}
+            ))}
 
           </div>
 
@@ -227,8 +204,8 @@ const CustomerSearch = ({
 
       {/* No Results */}
 
-      {search?.trim() &&
-        filteredCustomers.length === 0 &&
+      {search.trim() &&
+        customers.length === 0 &&
         !selectedCustomer && (
 
           <div

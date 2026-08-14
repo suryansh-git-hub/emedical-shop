@@ -76,11 +76,11 @@ function Signup() {
           </div>
 
           <h1 className="text-xl font-bold text-slate-900">
-            eMediShop
+            eMedi Pharmacy
           </h1>
 
           <p className="text-sm text-slate-500">
-            Medical Shop Management System
+            Pharmacy Management System
           </p>
         </div>
 
@@ -349,7 +349,7 @@ function Signup() {
 
         {/* Footer */}
         <p className="mt-5 text-center text-xs text-slate-400">
-          © {new Date().getFullYear()} eMediShop. All rights reserved.
+          © {new Date().getFullYear()} eMedi Pharmacy. All rights reserved.
         </p>
       </div>
     </div>

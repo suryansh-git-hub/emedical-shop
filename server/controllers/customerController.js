@@ -21,9 +21,16 @@ export const createCustomer = async (
         req.body
       );
 
-    return res.status(201).json(result);
+    return res.status(201).json({
+      success: true,
+      message: result.message,
+      customer: result.customer,
+    });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(
+      error.statusCode || 400
+    ).json({
+      success: false,
       message: error.message,
     });
   }
@@ -52,12 +59,33 @@ export const getAllCustomers = async (
         limit,
       });
 
+    // =======================================
+    // Disable Browser / Proxy Cache
+    // =======================================
+
+    res.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate"
+    );
+
+    res.set(
+      "Pragma",
+      "no-cache"
+    );
+
+    res.set(
+      "Expires",
+      "0"
+    );
+
     return res.status(200).json({
       success: true,
 
-      message: result.message,
+      message:
+        result.message,
 
-      customers: result.customers,
+      customers:
+        result.customers,
 
       totalCustomers:
         result.totalCustomers,
@@ -68,10 +96,13 @@ export const getAllCustomers = async (
       currentPage:
         result.currentPage,
 
-      limit: result.limit,
+      limit:
+        result.limit,
     });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(
+      error.statusCode || 400
+    ).json({
       success: false,
       message: error.message,
     });
@@ -92,9 +123,16 @@ export const getCustomerById = async (
         req.params.id
       );
 
-    return res.status(200).json(result);
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      customer: result.customer,
+    });
   } catch (error) {
-    return res.status(404).json({
+    return res.status(
+      error.statusCode || 404
+    ).json({
+      success: false,
       message: error.message,
     });
   }
@@ -115,9 +153,16 @@ export const updateCustomer = async (
         req.body
       );
 
-    return res.status(200).json(result);
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      customer: result.customer,
+    });
   } catch (error) {
-    return res.status(400).json({
+    return res.status(
+      error.statusCode || 400
+    ).json({
+      success: false,
       message: error.message,
     });
   }
@@ -137,9 +182,15 @@ export const deleteCustomer = async (
         req.params.id
       );
 
-    return res.status(200).json(result);
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+    });
   } catch (error) {
-    return res.status(404).json({
+    return res.status(
+      error.statusCode || 404
+    ).json({
+      success: false,
       message: error.message,
     });
   }
@@ -157,9 +208,21 @@ export const getCustomerPurchaseHistory =
           req.params.id
         );
 
-      return res.status(200).json(result);
+      return res.status(200).json({
+        success: true,
+        message: result.message,
+        customer: result.customer,
+        totalOrders:
+          result.totalOrders,
+        totalSpent:
+          result.totalSpent,
+        sales: result.sales,
+      });
     } catch (error) {
-      return res.status(404).json({
+      return res.status(
+        error.statusCode || 404
+      ).json({
+        success: false,
         message: error.message,
       });
     }

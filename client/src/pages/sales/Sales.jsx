@@ -31,8 +31,14 @@ const Sales = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  const [customerSearching, setCustomerSearching] =
+    useState(false);
+
+  const [medicineSearching, setMedicineSearching] =
+    useState(false);
+
   // ==========================================
-  // Master Data
+  // Search Results
   // ==========================================
 
   const [customers, setCustomers] = useState([]);
@@ -90,16 +96,25 @@ const Sales = () => {
   // Fetch Customers
   // ==========================================
 
-  const fetchCustomers = async () => {
+  const fetchCustomers = async (searchValue = "") => {
     try {
-      const response = await getCustomers();
+      setCustomerSearching(true);
 
-      setCustomers(response.customers || []);
+      const response =
+        await getCustomers(searchValue);
+
+      setCustomers(
+        response.customers || []
+      );
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
           "Failed to fetch customers."
       );
+
+      setCustomers([]);
+    } finally {
+      setCustomerSearching(false);
     }
   };
 
@@ -107,16 +122,25 @@ const Sales = () => {
   // Fetch Medicines
   // ==========================================
 
-  const fetchMedicines = async () => {
+  const fetchMedicines = async (searchValue = "") => {
     try {
-      const response = await getMedicines();
+      setMedicineSearching(true);
 
-      setMedicines(response.medicines || []);
+      const response =
+        await getMedicines(searchValue);
+
+      setMedicines(
+        response.medicines || []
+      );
     } catch (error) {
       toast.error(
         error.response?.data?.message ||
           "Failed to fetch medicines."
       );
+
+      setMedicines([]);
+    } finally {
+      setMedicineSearching(false);
     }
   };
 
@@ -129,9 +153,10 @@ const Sales = () => {
       try {
         setLoading(true);
 
+        // Load initial data
         await Promise.all([
-          fetchCustomers(),
-          fetchMedicines(),
+          fetchCustomers(""),
+          fetchMedicines(""),
         ]);
       } finally {
         setLoading(false);
@@ -170,58 +195,38 @@ const Sales = () => {
   }, [medicineSearch]);
 
   // ==========================================
-  // Filter Customers
+  // CUSTOMER BACKEND SEARCH
   // ==========================================
 
-  const filteredCustomers = customers.filter(
-    (customer) => {
-      if (!debouncedCustomerSearch) {
-        return true;
-      }
-
-      const search =
-        debouncedCustomerSearch.toLowerCase();
-
-      return (
-        customer.customerName
-          ?.toLowerCase()
-          .includes(search) ||
-        customer.email
-          ?.toLowerCase()
-          .includes(search) ||
-        customer.phone
-          ?.toLowerCase()
-          .includes(search)
-      );
+  useEffect(() => {
+    // Do not call API when search is empty.
+    // Clear old results instead.
+    if (!debouncedCustomerSearch) {
+      setCustomers([]);
+      return;
     }
-  );
+
+    fetchCustomers(
+      debouncedCustomerSearch
+    );
+  }, [debouncedCustomerSearch]);
 
   // ==========================================
-  // Filter Medicines
+  // MEDICINE BACKEND SEARCH
   // ==========================================
 
-  const filteredMedicines = medicines.filter(
-    (medicine) => {
-      if (!debouncedMedicineSearch) {
-        return true;
-      }
-
-      const search =
-        debouncedMedicineSearch.toLowerCase();
-
-      return (
-        medicine.medicineName
-          ?.toLowerCase()
-          .includes(search) ||
-        medicine.genericName
-          ?.toLowerCase()
-          .includes(search) ||
-        medicine.batchNumber
-          ?.toLowerCase()
-          .includes(search)
-      );
+  useEffect(() => {
+    // Do not call API when search is empty.
+    // Clear old results instead.
+    if (!debouncedMedicineSearch) {
+      setMedicines([]);
+      return;
     }
-  );
+
+    fetchMedicines(
+      debouncedMedicineSearch
+    );
+  }, [debouncedMedicineSearch]);
 
   // ==========================================
   // Select Customer
@@ -344,6 +349,10 @@ const Sales = () => {
     setDebouncedCustomerSearch("");
 
     setDebouncedMedicineSearch("");
+
+    setCustomers([]);
+
+    setMedicines([]);
   };
 
   // ==========================================
@@ -526,26 +535,30 @@ const Sales = () => {
 
   if (loading) {
     return (
-      <div className="
-        flex
-        min-h-[60vh]
-        flex-col
-        items-center
-        justify-center
-        bg-transparent
-      ">
-
-        <div className="
+      <div
+        className="
           flex
-          h-14
-          w-14
+          min-h-[60vh]
+          flex-col
           items-center
           justify-center
-          rounded-2xl
-          bg-blue-50
+          bg-transparent
+        "
+      >
 
-          dark:bg-blue-950/50
-        ">
+        <div
+          className="
+            flex
+            h-14
+            w-14
+            items-center
+            justify-center
+            rounded-2xl
+            bg-blue-50
+
+            dark:bg-blue-950/50
+          "
+        >
 
           <Loader
             className="
@@ -558,21 +571,25 @@ const Sales = () => {
 
         </div>
 
-        <p className="
-          mt-4
-          font-semibold
-          text-slate-700
-          dark:text-slate-300
-        ">
+        <p
+          className="
+            mt-4
+            font-semibold
+            text-slate-700
+            dark:text-slate-300
+          "
+        >
           Loading billing...
         </p>
 
-        <p className="
-          mt-1
-          text-sm
-          text-slate-400
-          dark:text-slate-500
-        ">
+        <p
+          className="
+            mt-1
+            text-sm
+            text-slate-400
+            dark:text-slate-500
+          "
+        >
           Preparing customers and medicines.
         </p>
 
@@ -585,54 +602,62 @@ const Sales = () => {
   // ==========================================
 
   return (
-    <div className="
-      mx-auto
-      max-w-[1500px]
-      space-y-6
-      pb-10
-    ">
+    <div
+      className="
+        mx-auto
+        max-w-[1500px]
+        space-y-6
+        pb-10
+      "
+    >
 
       {/* ======================================
           PAGE HEADER
       ====================================== */}
 
-      <div className="
-        rounded-2xl
-        border
-        border-slate-200
-        bg-white
-        p-6
-        shadow-sm
+      <div
+        className="
+          rounded-2xl
+          border
+          border-slate-200
+          bg-white
+          p-6
+          shadow-sm
 
-        dark:border-slate-800
-        dark:bg-slate-900
-        dark:shadow-black/20
-      ">
+          dark:border-slate-800
+          dark:bg-slate-900
+          dark:shadow-black/20
+        "
+      >
 
-        <div className="
-          flex
-          flex-col
-          gap-4
-          sm:flex-row
-          sm:items-center
-          sm:justify-between
-        ">
+        <div
+          className="
+            flex
+            flex-col
+            gap-4
+            sm:flex-row
+            sm:items-center
+            sm:justify-between
+          "
+        >
 
           {/* Header Title */}
 
           <div className="flex items-center gap-4">
 
-            <div className="
-              flex
-              h-12
-              w-12
-              items-center
-              justify-center
-              rounded-xl
-              bg-blue-50
+            <div
+              className="
+                flex
+                h-12
+                w-12
+                items-center
+                justify-center
+                rounded-xl
+                bg-blue-50
 
-              dark:bg-blue-950/50
-            ">
+                dark:bg-blue-950/50
+              "
+            >
 
               <Receipt
                 size={24}
@@ -646,32 +671,38 @@ const Sales = () => {
 
             <div>
 
-              <p className="
-                text-sm
-                font-semibold
-                text-blue-600
-                dark:text-blue-400
-              ">
+              <p
+                className="
+                  text-sm
+                  font-semibold
+                  text-blue-600
+                  dark:text-blue-400
+                "
+              >
                 Point of Sale
               </p>
 
-              <h1 className="
-                text-2xl
-                font-bold
-                tracking-tight
-                text-slate-900
+              <h1
+                className="
+                  text-2xl
+                  font-bold
+                  tracking-tight
+                  text-slate-900
 
-                dark:text-slate-100
-              ">
+                  dark:text-slate-100
+                "
+              >
                 Billing
               </h1>
 
-              <p className="
-                mt-1
-                text-sm
-                text-slate-500
-                dark:text-slate-400
-              ">
+              <p
+                className="
+                  mt-1
+                  text-sm
+                  text-slate-500
+                  dark:text-slate-400
+                "
+              >
                 Create a customer invoice quickly
                 and securely.
               </p>
@@ -732,45 +763,53 @@ const Sales = () => {
           CUSTOMER + MEDICINE SEARCH
       ====================================== */}
 
-      <div className="
-        grid
-        gap-6
-        lg:grid-cols-2
-      ">
+      <div
+        className="
+          grid
+          gap-6
+          lg:grid-cols-2
+        "
+      >
 
         {/* Customer */}
 
-        <div className="
-          rounded-2xl
-          border
-          border-slate-200
-          bg-white
-          p-5
-          shadow-sm
+        <div
+          className="
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            p-5
+            shadow-sm
 
-          dark:border-slate-800
-          dark:bg-slate-900
-          dark:shadow-black/20
-        ">
+            dark:border-slate-800
+            dark:bg-slate-900
+            dark:shadow-black/20
+          "
+        >
 
-          <div className="
-            mb-4
-            flex
-            items-center
-            gap-3
-          ">
-
-            <div className="
+          <div
+            className="
+              mb-4
               flex
-              h-10
-              w-10
               items-center
-              justify-center
-              rounded-xl
-              bg-blue-50
+              gap-3
+            "
+          >
 
-              dark:bg-blue-950/50
-            ">
+            <div
+              className="
+                flex
+                h-10
+                w-10
+                items-center
+                justify-center
+                rounded-xl
+                bg-blue-50
+
+                dark:bg-blue-950/50
+              "
+            >
 
               <UserRound
                 size={19}
@@ -784,19 +823,23 @@ const Sales = () => {
 
             <div>
 
-              <h2 className="
-                font-semibold
-                text-slate-900
-                dark:text-slate-100
-              ">
+              <h2
+                className="
+                  font-semibold
+                  text-slate-900
+                  dark:text-slate-100
+                "
+              >
                 Customer
               </h2>
 
-              <p className="
-                text-xs
-                text-slate-500
-                dark:text-slate-400
-              ">
+              <p
+                className="
+                  text-xs
+                  text-slate-500
+                  dark:text-slate-400
+                "
+              >
                 Select the customer for this invoice.
               </p>
 
@@ -805,7 +848,7 @@ const Sales = () => {
           </div>
 
           <CustomerSearch
-            customers={filteredCustomers}
+            customers={customers}
             selectedCustomer={selectedCustomer}
             onSelectCustomer={
               handleCustomerSelect
@@ -814,14 +857,15 @@ const Sales = () => {
             setSearch={setCustomerSearch}
           />
 
-          {customerSearch !==
-            debouncedCustomerSearch && (
-            <p className="
-              mt-2
-              text-xs
-              text-slate-400
-              dark:text-slate-500
-            ">
+          {customerSearching && (
+            <p
+              className="
+                mt-2
+                text-xs
+                text-slate-400
+                dark:text-slate-500
+              "
+            >
               Searching customers...
             </p>
           )}
@@ -830,37 +874,43 @@ const Sales = () => {
 
         {/* Medicine */}
 
-        <div className="
-          rounded-2xl
-          border
-          border-slate-200
-          bg-white
-          p-5
-          shadow-sm
+        <div
+          className="
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            p-5
+            shadow-sm
 
-          dark:border-slate-800
-          dark:bg-slate-900
-          dark:shadow-black/20
-        ">
+            dark:border-slate-800
+            dark:bg-slate-900
+            dark:shadow-black/20
+          "
+        >
 
-          <div className="
-            mb-4
-            flex
-            items-center
-            gap-3
-          ">
-
-            <div className="
+          <div
+            className="
+              mb-4
               flex
-              h-10
-              w-10
               items-center
-              justify-center
-              rounded-xl
-              bg-emerald-50
+              gap-3
+            "
+          >
 
-              dark:bg-emerald-950/50
-            ">
+            <div
+              className="
+                flex
+                h-10
+                w-10
+                items-center
+                justify-center
+                rounded-xl
+                bg-emerald-50
+
+                dark:bg-emerald-950/50
+              "
+            >
 
               <ShoppingCart
                 size={19}
@@ -874,19 +924,23 @@ const Sales = () => {
 
             <div>
 
-              <h2 className="
-                font-semibold
-                text-slate-900
-                dark:text-slate-100
-              ">
+              <h2
+                className="
+                  font-semibold
+                  text-slate-900
+                  dark:text-slate-100
+                "
+              >
                 Add Medicines
               </h2>
 
-              <p className="
-                text-xs
-                text-slate-500
-                dark:text-slate-400
-              ">
+              <p
+                className="
+                  text-xs
+                  text-slate-500
+                  dark:text-slate-400
+                "
+              >
                 Search by name, generic or batch number.
               </p>
 
@@ -895,7 +949,7 @@ const Sales = () => {
           </div>
 
           <MedicineSearch
-            medicines={filteredMedicines}
+            medicines={medicines}
             onSelectMedicine={
               handleMedicineSelect
             }
@@ -903,14 +957,15 @@ const Sales = () => {
             setSearch={setMedicineSearch}
           />
 
-          {medicineSearch !==
-            debouncedMedicineSearch && (
-            <p className="
-              mt-2
-              text-xs
-              text-slate-400
-              dark:text-slate-500
-            ">
+          {medicineSearching && (
+            <p
+              className="
+                mt-2
+                text-xs
+                text-slate-400
+                dark:text-slate-500
+              "
+            >
               Searching medicines...
             </p>
           )}
@@ -923,50 +978,60 @@ const Sales = () => {
           SELECTED MEDICINES
       ====================================== */}
 
-      <div className="
-        overflow-hidden
-        rounded-2xl
-        border
-        border-slate-200
-        bg-white
-        shadow-sm
-
-        dark:border-slate-800
-        dark:bg-slate-900
-        dark:shadow-black/20
-      ">
-
-        <div className="
-          border-b
+      <div
+        className="
+          overflow-hidden
+          rounded-2xl
+          border
           border-slate-200
-          px-5
-          py-4
+          bg-white
+          shadow-sm
 
           dark:border-slate-800
-        ">
+          dark:bg-slate-900
+          dark:shadow-black/20
+        "
+      >
 
-          <div className="
-            flex
-            items-center
-            justify-between
-          ">
+        <div
+          className="
+            border-b
+            border-slate-200
+            px-5
+            py-4
+
+            dark:border-slate-800
+          "
+        >
+
+          <div
+            className="
+              flex
+              items-center
+              justify-between
+            "
+          >
 
             <div>
 
-              <h2 className="
-                font-semibold
-                text-slate-900
-                dark:text-slate-100
-              ">
+              <h2
+                className="
+                  font-semibold
+                  text-slate-900
+                  dark:text-slate-100
+                "
+              >
                 Current Bill
               </h2>
 
-              <p className="
-                mt-1
-                text-sm
-                text-slate-500
-                dark:text-slate-400
-              ">
+              <p
+                className="
+                  mt-1
+                  text-sm
+                  text-slate-500
+                  dark:text-slate-400
+                "
+              >
                 {billItems.length}{" "}
                 {billItems.length === 1
                   ? "medicine"
@@ -977,24 +1042,24 @@ const Sales = () => {
             </div>
 
             {billItems.length > 0 && (
-              <span className="
-                rounded-full
-                bg-blue-50
-                px-3
-                py-1
-                text-xs
-                font-semibold
-                text-blue-600
+              <span
+                className="
+                  rounded-full
+                  bg-blue-50
+                  px-3
+                  py-1
+                  text-xs
+                  font-semibold
+                  text-blue-600
 
-                dark:bg-blue-950/50
-                dark:text-blue-400
-              ">
+                  dark:bg-blue-950/50
+                  dark:text-blue-400
+                "
+              >
                 {billItems.reduce(
                   (sum, item) =>
                     sum +
-                    Number(
-                      item.quantity
-                    ),
+                    Number(item.quantity),
                   0
                 )}{" "}
                 units

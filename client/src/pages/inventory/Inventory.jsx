@@ -579,10 +579,7 @@ const Inventory = () => {
                   e.target.value
                 )
               }
-              placeholder="
-                Search medicine, generic name,
-                company, category or batch...
-              "
+              placeholder="Search medicine, generic name, company, category or batch..."
               className="
                 block
                 w-full

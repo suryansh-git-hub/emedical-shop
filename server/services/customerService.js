@@ -15,9 +15,13 @@ export const createCustomerService = async (
     await Customer.findOne({ email });
 
   if (existingCustomer) {
-    throw new Error(
+    const error = new Error(
       MESSAGES.CUSTOMER_ALREADY_EXISTS
     );
+
+    error.statusCode = 409;
+
+    throw error;
   }
 
   const customer =
@@ -40,7 +44,7 @@ export const getAllCustomersService = async ({
   limit = 10,
 }) => {
   // =======================================
-  // Convert pagination values to numbers
+  // Convert pagination values
   // =======================================
 
   page = Math.max(
@@ -54,20 +58,22 @@ export const getAllCustomersService = async ({
   );
 
   // =======================================
-  // Calculate documents to skip
+  // Calculate skip
   // =======================================
 
-  const skip = (page - 1) * limit;
+  const skip =
+    (page - 1) * limit;
 
   // =======================================
   // Search Filter
-  // Name OR Phone
+  // Name + Phone + Email
   // =======================================
 
   const filter = {};
 
   if (search.trim()) {
-    const searchValue = search.trim();
+    const searchValue =
+      search.trim();
 
     filter.$or = [
       {
@@ -82,25 +88,36 @@ export const getAllCustomersService = async ({
           $options: "i",
         },
       },
+      {
+        email: {
+          $regex: searchValue,
+          $options: "i",
+        },
+      },
     ];
   }
 
   // =======================================
-  // Count Total Customers
+  // Count Matching Customers
   // =======================================
 
   const totalCustomers =
-    await Customer.countDocuments(filter);
+    await Customer.countDocuments(
+      filter
+    );
 
   // =======================================
-  // Get Paginated Customers
+  // Fetch Matching Customers
   // =======================================
 
   const customers =
     await Customer.find(filter)
-      .sort({ createdAt: -1 })
+      .sort({
+        createdAt: -1,
+      })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
   // =======================================
   // Calculate Total Pages
@@ -112,11 +129,12 @@ export const getAllCustomersService = async ({
     ) || 1;
 
   // =======================================
-  // Return Result
+  // Return
   // =======================================
 
   return {
-    message: MESSAGES.CUSTOMERS_FETCHED,
+    message:
+      MESSAGES.CUSTOMERS_FETCHED,
 
     customers,
 
@@ -140,13 +158,19 @@ export const getCustomerByIdService =
       await Customer.findById(id);
 
     if (!customer) {
-      throw new Error(
+      const error = new Error(
         MESSAGES.CUSTOMER_NOT_FOUND
       );
+
+      error.statusCode = 404;
+
+      throw error;
     }
 
     return {
-      message: MESSAGES.CUSTOMER_FETCHED,
+      message:
+        MESSAGES.CUSTOMER_FETCHED,
+
       customer,
     };
   };
@@ -163,14 +187,23 @@ export const updateCustomerService = async (
     await Customer.findById(id);
 
   if (!customer) {
-    throw new Error(
+    const error = new Error(
       MESSAGES.CUSTOMER_NOT_FOUND
     );
+
+    error.statusCode = 404;
+
+    throw error;
   }
+
+  // =======================================
+  // Check Duplicate Email
+  // =======================================
 
   if (
     customerData.email &&
-    customerData.email !== customer.email
+    customerData.email !==
+      customer.email
   ) {
     const existingCustomer =
       await Customer.findOne({
@@ -178,11 +211,19 @@ export const updateCustomerService = async (
       });
 
     if (existingCustomer) {
-      throw new Error(
+      const error = new Error(
         MESSAGES.CUSTOMER_ALREADY_EXISTS
       );
+
+      error.statusCode = 409;
+
+      throw error;
     }
   }
+
+  // =======================================
+  // Update
+  // =======================================
 
   Object.assign(
     customer,
@@ -192,7 +233,9 @@ export const updateCustomerService = async (
   await customer.save();
 
   return {
-    message: MESSAGES.CUSTOMER_UPDATED,
+    message:
+      MESSAGES.CUSTOMER_UPDATED,
+
     customer,
   };
 };
@@ -201,24 +244,30 @@ export const updateCustomerService = async (
 // Delete Customer
 // =======================================
 
-export const deleteCustomerService = async (
-  id
-) => {
-  const customer =
-    await Customer.findById(id);
+export const deleteCustomerService =
+  async (id) => {
+    const customer =
+      await Customer.findById(id);
 
-  if (!customer) {
-    throw new Error(
-      MESSAGES.CUSTOMER_NOT_FOUND
+    if (!customer) {
+      const error = new Error(
+        MESSAGES.CUSTOMER_NOT_FOUND
+      );
+
+      error.statusCode = 404;
+
+      throw error;
+    }
+
+    await Customer.findByIdAndDelete(
+      id
     );
-  }
 
-  await Customer.findByIdAndDelete(id);
-
-  return {
-    message: MESSAGES.CUSTOMER_DELETED,
+    return {
+      message:
+        MESSAGES.CUSTOMER_DELETED,
+    };
   };
-};
 
 // =======================================
 // Customer Purchase History
@@ -232,20 +281,27 @@ export const getCustomerPurchaseHistoryService =
       );
 
     if (!customer) {
-      throw new Error(
+      const error = new Error(
         MESSAGES.CUSTOMER_NOT_FOUND
       );
+
+      error.statusCode = 404;
+
+      throw error;
     }
 
-    const sales = await Sale.find({
-      customer: customerId,
-    })
-      .populate(
-        "medicines.medicine",
-        "medicineName sellingPrice"
-      )
-      .sort({ saleDate: -1 })
-      .lean();
+    const sales =
+      await Sale.find({
+        customer: customerId,
+      })
+        .populate(
+          "medicines.medicine",
+          "medicineName sellingPrice"
+        )
+        .sort({
+          saleDate: -1,
+        })
+        .lean();
 
     const totalOrders =
       sales.length;
@@ -260,9 +316,13 @@ export const getCustomerPurchaseHistoryService =
     return {
       message:
         "Customer purchase history fetched successfully.",
+
       customer,
+
       totalOrders,
+
       totalSpent,
+
       sales,
     };
   };

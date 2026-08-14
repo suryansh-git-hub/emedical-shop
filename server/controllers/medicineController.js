@@ -6,110 +6,197 @@ import {
   deleteMedicineService,
 } from "../services/medicineService.js";
 
-export const createMedicine = async (req, res) => {
+// =======================================
+// Create Medicine
+// =======================================
+
+export const createMedicine = async (
+  req,
+  res
+) => {
   try {
-    // Create a new object from the request body
     const medicineData = {
       ...req.body,
     };
 
-    // If an image was uploaded, save its filename
+    // If an image was uploaded
     if (req.file) {
-      medicineData.medicineImage = req.file.filename;
+      medicineData.medicineImage =
+        req.file.filename;
     }
 
-    const result = await createMedicineService(medicineData);
+    const result =
+      await createMedicineService(
+        medicineData
+      );
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: result.message,
       medicine: result.medicine,
     });
   } catch (error) {
-    res.status(error.statusCode || 500).json({
+    return res.status(
+      error.statusCode || 500
+    ).json({
       success: false,
       message: error.message,
     });
   }
 };
 
-export const getAllMedicines = async (req, res) => {
+// =======================================
+// Get All Medicines
+// Search + Filter + Pagination
+// =======================================
+
+export const getAllMedicines = async (
+  req,
+  res
+) => {
   try {
-    const result = await getAllMedicinesService(req.query);
+    const result =
+      await getAllMedicinesService(
+        req.query
+      );
 
-    res.status(200).json({
-      success: true,
-      message: result.message,
-      medicines: result.medicines,
-       currentPage: result.currentPage,
-  totalPages: result.totalPages,
-  totalMedicines: result.totalMedicines,
-    });
-  } catch (error) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+    // =======================================
+    // Disable Browser / Proxy Cache
+    // =======================================
 
-export const getMedicineById = async (req, res) => {
-  try {
-    const result = await getMedicineByIdService(req.params.id);
-
-    res.status(200).json({
-      success: true,
-      message: result.message,
-      medicine: result.medicine,
-    });
-  } catch (error) {
-    res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-export const updateMedicine = async (req, res) => {
-  try {
-    // Create a new object from the request body
-    const medicineData = {
-      ...req.body,
-    };
-
-    // If a new image was uploaded, replace the old filename
-    if (req.file) {
-      medicineData.medicineImage = req.file.filename;
-    }
-
-    const result = await updateMedicineService(
-      req.params.id,
-      medicineData
+    res.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, proxy-revalidate"
     );
 
-    res.status(200).json({
+    res.set(
+      "Pragma",
+      "no-cache"
+    );
+
+    res.set(
+      "Expires",
+      "0"
+    );
+
+    return res.status(200).json({
       success: true,
+
       message: result.message,
-      medicine: result.medicine,
+
+      medicines:
+        result.medicines,
+
+      currentPage:
+        result.currentPage,
+
+      totalPages:
+        result.totalPages,
+
+      totalMedicines:
+        result.totalMedicines,
     });
   } catch (error) {
-    res.status(error.statusCode || 500).json({
+    return res.status(
+      error.statusCode || 500
+    ).json({
       success: false,
       message: error.message,
     });
   }
 };
 
-export const deleteMedicine = async (req, res) => {
-  try {
-    const result = await deleteMedicineService(req.params.id);
+// =======================================
+// Get Medicine By ID
+// =======================================
 
-    res.status(200).json({
+export const getMedicineById = async (
+  req,
+  res
+) => {
+  try {
+    const result =
+      await getMedicineByIdService(
+        req.params.id
+      );
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      medicine: result.medicine,
+    });
+  } catch (error) {
+    return res.status(
+      error.statusCode || 500
+    ).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// =======================================
+// Update Medicine
+// =======================================
+
+export const updateMedicine = async (
+  req,
+  res
+) => {
+  try {
+    const medicineData = {
+      ...req.body,
+    };
+
+    // If a new image was uploaded
+    if (req.file) {
+      medicineData.medicineImage =
+        req.file.filename;
+    }
+
+    const result =
+      await updateMedicineService(
+        req.params.id,
+        medicineData
+      );
+
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      medicine: result.medicine,
+    });
+  } catch (error) {
+    return res.status(
+      error.statusCode || 500
+    ).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// =======================================
+// Delete Medicine
+// =======================================
+
+export const deleteMedicine = async (
+  req,
+  res
+) => {
+  try {
+    const result =
+      await deleteMedicineService(
+        req.params.id
+      );
+
+    return res.status(200).json({
       success: true,
       message: result.message,
     });
   } catch (error) {
-    res.status(error.statusCode || 500).json({
+    return res.status(
+      error.statusCode || 500
+    ).json({
       success: false,
       message: error.message,
     });

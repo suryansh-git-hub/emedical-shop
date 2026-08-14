@@ -1,9 +1,18 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// =======================================
+// Public Pages
+// =======================================
+
+import Landing from "../pages/Landing";
 import Login from "../pages/auth/Login";
 import Signup from "../pages/auth/Signup";
 import ForgotPassword from "../pages/auth/ForgotPassword";
 import ResetPassword from "../pages/auth/ResetPassword";
+
+// =======================================
+// Application Pages
+// =======================================
 
 import Dashboard from "../pages/dashboard/Dashboard";
 import Sales from "../pages/sales/Sales";
@@ -16,10 +25,20 @@ import Purchases from "../pages/purchases/Purchases";
 import Inventory from "../pages/inventory/Inventory";
 import Reports from "../pages/reports/Reports";
 import Users from "../pages/users/Users";
+
 import NotFound from "../pages/NotFound";
+
+// =======================================
+// Route Protection
+// =======================================
 
 import ProtectedRoute from "./ProtectedRoute";
 import RoleProtectedRoute from "./RoleProtectedRoute";
+
+// =======================================
+// Layout
+// =======================================
+
 import DashboardLayout from "../components/layouts/DashboardLayout";
 
 function AppRoutes() {
@@ -27,13 +46,19 @@ function AppRoutes() {
     <BrowserRouter>
       <Routes>
 
-        {/* ================================
+        {/* =================================
             PUBLIC ROUTES
-        ================================= */}
+        ================================== */}
+
+        {/* Landing Page */}
+        <Route
+          path="/"
+          element={<Landing />}
+        />
 
         {/* Login */}
         <Route
-          path="/"
+          path="/login"
           element={<Login />}
         />
 
@@ -56,16 +81,17 @@ function AppRoutes() {
         />
 
 
-        {/* ================================
+        {/* =================================
             PROTECTED ROUTES
-        ================================= */}
+        ================================== */}
 
         <Route element={<ProtectedRoute />}>
+
           <Route element={<DashboardLayout />}>
 
-            {/* ============================
-                Admin + Pharmacist
-            ============================ */}
+            {/* =================================
+                ADMIN + PHARMACIST
+            ================================== */}
 
             {/* Dashboard */}
             <Route
@@ -104,9 +130,9 @@ function AppRoutes() {
             />
 
 
-            {/* ============================
+            {/* =================================
                 ADMIN ONLY
-            ============================ */}
+            ================================== */}
 
             <Route
               element={
@@ -143,9 +169,9 @@ function AppRoutes() {
             </Route>
 
 
-            {/* ============================
-                DASHBOARD 404
-            ============================ */}
+            {/* =================================
+                PROTECTED 404
+            ================================== */}
 
             <Route
               path="*"
@@ -153,12 +179,13 @@ function AppRoutes() {
             />
 
           </Route>
+
         </Route>
 
 
-        {/* ================================
+        {/* =================================
             PUBLIC 404
-        ================================= */}
+        ================================== */}
 
         <Route
           path="*"

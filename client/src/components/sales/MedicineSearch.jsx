@@ -1,8 +1,4 @@
-import { useMemo } from "react";
-import {
-  Search,
-  Package,
-} from "lucide-react";
+import { Search, Package } from "lucide-react";
 
 const MedicineSearch = ({
   medicines = [],
@@ -10,31 +6,6 @@ const MedicineSearch = ({
   search,
   setSearch,
 }) => {
-  const filteredMedicines = useMemo(() => {
-    if (!search?.trim()) {
-      return [];
-    }
-
-    const keyword =
-      search.toLowerCase().trim();
-
-    return medicines.filter(
-      (medicine) => {
-        return (
-          medicine.medicineName
-            ?.toLowerCase()
-            .includes(keyword) ||
-          medicine.genericName
-            ?.toLowerCase()
-            .includes(keyword) ||
-          medicine.batchNumber
-            ?.toLowerCase()
-            .includes(keyword)
-        );
-      }
-    );
-  }, [search, medicines]);
-
   return (
     <div className="relative">
 
@@ -74,9 +45,9 @@ const MedicineSearch = ({
           type="text"
           placeholder="Search medicine by name, generic or batch..."
           value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
+          onChange={(e) => {
+            setSearch(e.target.value);
+          }}
           className="
             w-full
             rounded-xl
@@ -110,7 +81,7 @@ const MedicineSearch = ({
 
       {/* Search Results */}
 
-      {filteredMedicines.length > 0 && (
+      {medicines.length > 0 && search.trim() && (
 
         <div
           className="
@@ -132,164 +103,101 @@ const MedicineSearch = ({
           "
         >
 
-          {filteredMedicines.map(
-            (medicine) => {
+          {medicines.map((medicine) => {
 
-              const stock =
-                Number(
-                  medicine.stock || 0
-                );
+            const stock =
+              Number(medicine.stock || 0);
 
-              const isOutOfStock =
-                stock <= 0;
+            const isOutOfStock =
+              stock <= 0;
 
-              const isLowStock =
-                stock > 0 &&
-                stock <= 10;
+            const isLowStock =
+              stock > 0 && stock <= 10;
 
-              return (
-                <button
-                  key={medicine._id}
-                  type="button"
-                  disabled={
-                    isOutOfStock
-                  }
-                  onClick={() => {
-                    onSelectMedicine(
-                      medicine
-                    );
+            return (
+              <button
+                key={medicine._id}
+                type="button"
+                disabled={isOutOfStock}
+                onClick={() => {
+                  onSelectMedicine(medicine);
+                  setSearch("");
+                }}
+                className="
+                  flex
+                  w-full
+                  items-center
+                  justify-between
+                  gap-4
+                  border-b
+                  border-slate-100
+                  px-4
+                  py-3.5
+                  text-left
+                  transition
+                  hover:bg-slate-50
 
-                    setSearch("");
-                  }}
-                  className="
-                    flex
-                    w-full
-                    items-center
-                    justify-between
-                    gap-4
-                    border-b
-                    border-slate-100
-                    px-4
-                    py-3.5
-                    text-left
-                    transition
-                    hover:bg-slate-50
+                  dark:border-slate-800
+                  dark:hover:bg-slate-800/70
 
-                    dark:border-slate-800
-                    dark:hover:bg-slate-800/70
+                  disabled:cursor-not-allowed
+                  disabled:opacity-50
+                "
+              >
 
-                    disabled:cursor-not-allowed
-                    disabled:opacity-50
-                  "
-                >
+                {/* Medicine Info */}
 
-                  {/* Medicine Info */}
+                <div className="flex min-w-0 items-center gap-3">
 
-                  <div className="flex min-w-0 items-center gap-3">
+                  <div
+                    className="
+                      flex
+                      h-10
+                      w-10
+                      shrink-0
+                      items-center
+                      justify-center
+                      rounded-xl
+                      bg-blue-50
+                      text-blue-600
 
-                    <div
-                      className="
-                        flex
-                        h-10
-                        w-10
-                        shrink-0
-                        items-center
-                        justify-center
-                        rounded-xl
-                        bg-blue-50
-                        text-blue-600
-
-                        dark:bg-blue-950/50
-                        dark:text-blue-400
-                      "
-                    >
-                      <Package size={17} />
-                    </div>
-
-                    <div className="min-w-0">
-
-                      <p
-                        className="
-                          truncate
-                          text-sm
-                          font-bold
-                          text-slate-800
-
-                          dark:text-slate-100
-                        "
-                      >
-                        {medicine.medicineName}
-                      </p>
-
-                      <p
-                        className="
-                          mt-0.5
-                          truncate
-                          text-xs
-                          text-slate-500
-
-                          dark:text-slate-400
-                        "
-                      >
-                        {medicine.genericName ||
-                          "Generic name not available"}
-                      </p>
-
-                      <p
-                        className="
-                          mt-1
-                          text-[11px]
-                          text-slate-400
-
-                          dark:text-slate-500
-                        "
-                      >
-                        Batch:{" "}
-                        {medicine.batchNumber ||
-                          "-"}
-                      </p>
-
-                    </div>
-
+                      dark:bg-blue-950/50
+                      dark:text-blue-400
+                    "
+                  >
+                    <Package size={17} />
                   </div>
 
-                  {/* Medicine Details */}
+                  <div className="min-w-0">
 
-                  <div className="shrink-0 text-right">
-
-                    <div
+                    <p
                       className="
+                        truncate
                         text-sm
                         font-bold
-                        text-emerald-600
+                        text-slate-800
 
-                        dark:text-emerald-400
+                        dark:text-slate-100
                       "
                     >
-                      ₹
-                      {Number(
-                        medicine.sellingPrice ||
-                          0
-                      ).toLocaleString(
-                        "en-IN"
-                      )}
-                    </div>
+                      {medicine.medicineName}
+                    </p>
 
-                    <div
-                      className={`mt-1 text-xs font-semibold ${
-                        isOutOfStock
-                          ? "text-red-600 dark:text-red-400"
-                          : isLowStock
-                          ? "text-amber-600 dark:text-amber-400"
-                          : "text-emerald-600 dark:text-emerald-400"
-                      }`}
+                    <p
+                      className="
+                        mt-0.5
+                        truncate
+                        text-xs
+                        text-slate-500
+
+                        dark:text-slate-400
+                      "
                     >
-                      {isOutOfStock
-                        ? "Out of Stock"
-                        : `Stock: ${stock}`}
-                    </div>
+                      {medicine.genericName ||
+                        "Generic name not available"}
+                    </p>
 
-                    <div
+                    <p
                       className="
                         mt-1
                         text-[11px]
@@ -298,22 +206,69 @@ const MedicineSearch = ({
                         dark:text-slate-500
                       "
                     >
-                      Exp:{" "}
-                      {medicine.expiryDate
-                        ? new Date(
-                            medicine.expiryDate
-                          ).toLocaleDateString(
-                            "en-IN"
-                          )
-                        : "-"}
-                    </div>
+                      Batch:{" "}
+                      {medicine.batchNumber || "-"}
+                    </p>
 
                   </div>
 
-                </button>
-              );
-            }
-          )}
+                </div>
+
+                {/* Medicine Details */}
+
+                <div className="shrink-0 text-right">
+
+                  <div
+                    className="
+                      text-sm
+                      font-bold
+                      text-emerald-600
+
+                      dark:text-emerald-400
+                    "
+                  >
+                    ₹
+                    {Number(
+                      medicine.sellingPrice || 0
+                    ).toLocaleString("en-IN")}
+                  </div>
+
+                  <div
+                    className={`mt-1 text-xs font-semibold ${
+                      isOutOfStock
+                        ? "text-red-600 dark:text-red-400"
+                        : isLowStock
+                        ? "text-amber-600 dark:text-amber-400"
+                        : "text-emerald-600 dark:text-emerald-400"
+                    }`}
+                  >
+                    {isOutOfStock
+                      ? "Out of Stock"
+                      : `Stock: ${stock}`}
+                  </div>
+
+                  <div
+                    className="
+                      mt-1
+                      text-[11px]
+                      text-slate-400
+
+                      dark:text-slate-500
+                    "
+                  >
+                    Exp:{" "}
+                    {medicine.expiryDate
+                      ? new Date(
+                          medicine.expiryDate
+                        ).toLocaleDateString("en-IN")
+                      : "-"}
+                  </div>
+
+                </div>
+
+              </button>
+            );
+          })}
 
         </div>
 
@@ -321,8 +276,8 @@ const MedicineSearch = ({
 
       {/* No Results */}
 
-      {search?.trim() &&
-        filteredMedicines.length === 0 && (
+      {search.trim() &&
+        medicines.length === 0 && (
 
           <div
             className="
