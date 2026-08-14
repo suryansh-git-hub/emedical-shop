@@ -8,6 +8,7 @@ import {
   getNearExpiryMedicines,
   getExpiredMedicines,
   getStockMovementHistory,
+  updateInventoryStock,
 } from "../controllers/inventoryController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -98,6 +99,20 @@ router.get(
     ROLES.PHARMACIST
   ),
   getStockMovementHistory
+);
+
+// =======================================
+// Add / Remove Stock
+// =======================================
+
+router.patch(
+  "/:medicineId/stock",
+  authMiddleware,
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
+  updateInventoryStock
 );
 
 // =======================================

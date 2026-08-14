@@ -61,7 +61,7 @@ const InventoryTable = ({
       };
     }
 
-    if (item.currentStock === 0) {
+    if (Number(item.currentStock) === 0) {
       return {
         label: "Out of Stock",
         className:
@@ -70,7 +70,10 @@ const InventoryTable = ({
       };
     }
 
-    if (item.currentStock <= item.reorderLevel) {
+    if (
+      Number(item.currentStock) <=
+      Number(item.reorderLevel)
+    ) {
       return {
         label: "Low Stock",
         className:
@@ -94,11 +97,14 @@ const InventoryTable = ({
   const formatDate = (date) => {
     if (!date) return "-";
 
-    return new Date(date).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
+    return new Date(date).toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }
+    );
   };
 
   // ==========================================
@@ -106,11 +112,17 @@ const InventoryTable = ({
   // ==========================================
 
   const getStockColor = (item) => {
-    if (item.currentStock === 0) {
+    const currentStock =
+      Number(item.currentStock) || 0;
+
+    const reorderLevel =
+      Number(item.reorderLevel) || 0;
+
+    if (currentStock === 0) {
       return "text-red-600 dark:text-red-400";
     }
 
-    if (item.currentStock <= item.reorderLevel) {
+    if (currentStock <= reorderLevel) {
       return "text-amber-600 dark:text-amber-400";
     }
 
@@ -122,11 +134,16 @@ const InventoryTable = ({
   // ==========================================
 
   const getStockPercentage = (item) => {
-    const reorderLevel = Number(item.reorderLevel) || 1;
-    const currentStock = Number(item.currentStock) || 0;
+    const reorderLevel =
+      Number(item.reorderLevel) || 1;
+
+    const currentStock =
+      Number(item.currentStock) || 0;
 
     return Math.min(
-      (currentStock / (reorderLevel * 2)) * 100,
+      (currentStock /
+        (reorderLevel * 2)) *
+        100,
       100
     );
   };
@@ -161,8 +178,6 @@ const InventoryTable = ({
           </div>
 
         </div>
-
-        {/* Record Count */}
 
         <div className="inline-flex w-fit items-center rounded-full bg-slate-50 px-3.5 py-2 text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
           {inventory.length}{" "}
@@ -246,9 +261,11 @@ const InventoryTable = ({
 
             {inventory.map((item, index) => {
 
-              const status = getStockStatus(item);
+              const status =
+                getStockStatus(item);
 
-              const StatusIcon = status.icon;
+              const StatusIcon =
+                status.icon;
 
               const stockPercentage =
                 getStockPercentage(item);
@@ -330,7 +347,9 @@ const InventoryTable = ({
                         item
                       )}`}
                     >
-                      {item.currentStock}
+                      {Number(
+                        item.currentStock
+                      ) || 0}
                     </span>
 
                   </td>
@@ -340,7 +359,9 @@ const InventoryTable = ({
                   <td className="px-5 py-5 text-center">
 
                     <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                      {item.reorderLevel}
+                      {Number(
+                        item.reorderLevel
+                      ) || 0}
                     </span>
 
                   </td>
@@ -374,10 +395,16 @@ const InventoryTable = ({
 
                         <div
                           className={`h-full rounded-full transition-all duration-500 ${
-                            item.currentStock === 0
+                            Number(
+                              item.currentStock
+                            ) === 0
                               ? "bg-red-500"
-                              : item.currentStock <=
-                                item.reorderLevel
+                              : Number(
+                                  item.currentStock
+                                ) <=
+                                Number(
+                                  item.reorderLevel
+                                )
                               ? "bg-amber-500"
                               : "bg-emerald-500"
                           }`}
@@ -398,7 +425,8 @@ const InventoryTable = ({
 
                     <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
                       {formatDate(
-                        item.medicine?.expiryDate
+                        item.medicine
+                          ?.expiryDate
                       )}
                     </span>
 
@@ -423,13 +451,15 @@ const InventoryTable = ({
 
                     <div className="flex items-center justify-center gap-1.5">
 
-                      {/* Increase */}
+                      {/* ==================================
+                          INCREASE STOCK
+                      ================================== */}
 
                       <button
                         type="button"
                         onClick={() =>
                           onIncreaseStock(
-                            item.medicine
+                            item
                           )
                         }
                         className="
@@ -455,13 +485,15 @@ const InventoryTable = ({
                         <span>Stock</span>
                       </button>
 
-                      {/* Reduce */}
+                      {/* ==================================
+                          REDUCE STOCK
+                      ================================== */}
 
                       <button
                         type="button"
                         onClick={() =>
                           onReduceStock(
-                            item.medicine
+                            item
                           )
                         }
                         className="
@@ -487,7 +519,9 @@ const InventoryTable = ({
                         <span>Stock</span>
                       </button>
 
-                      {/* History */}
+                      {/* ==================================
+                          STOCK HISTORY
+                      ================================== */}
 
                       <button
                         type="button"

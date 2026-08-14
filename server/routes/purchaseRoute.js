@@ -15,30 +15,42 @@ const router = express.Router();
 // ==========================
 // Create Purchase
 // ==========================
+
 router.post(
   "/",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   createPurchase
 );
 
 // ==========================
 // Get All Purchases
 // ==========================
+
 router.get(
   "/",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getAllPurchases
 );
 
 // ==========================
 // Get Purchase By ID
 // ==========================
+
 router.get(
   "/:id",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN, ROLES.PHARMACIST),
+  roleMiddleware(
+    ROLES.ADMIN,
+    ROLES.PHARMACIST
+  ),
   getPurchaseById
 );
 

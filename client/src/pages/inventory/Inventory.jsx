@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import {
@@ -24,16 +23,18 @@ import {
   getNearExpiryMedicines,
   getStockHistory,
   getExpiredMedicines,
+  updateInventoryStock,
 } from "../../services/inventoryService";
 
 const Inventory = () => {
-  const navigate = useNavigate();
-
   // ==========================================
   // Loading
   // ==========================================
 
   const [loading, setLoading] = useState(true);
+
+  const [updatingStock, setUpdatingStock] =
+    useState(false);
 
   // ==========================================
   // Inventory
@@ -82,7 +83,7 @@ const Inventory = () => {
     useState([]);
 
   // ==========================================
-  // REQUEST TRACKING
+  // Request Tracking
   // ==========================================
 
   const requestIdRef = useRef(0);
@@ -106,107 +107,118 @@ const Inventory = () => {
   // LOAD INVENTORY
   // ==========================================
 
-  useEffect(() => {
-    const loadInventory = async () => {
-      const currentRequestId =
-        ++requestIdRef.current;
+  const loadInventory = async (
+    showLoader = true
+  ) => {
+    const currentRequestId =
+      ++requestIdRef.current;
 
-      try {
+    try {
+      if (showLoader) {
         setLoading(true);
-
-        const params = {
-          search: debouncedSearch,
-          page: page,
-          limit: limit,
-        };
-
-        console.log(
-          "Inventory API Params:",
-          params
-        );
-
-        let response;
-
-        if (selectedFilter === "low-stock") {
-          response =
-            await getLowStockMedicines(params);
-        } else if (
-          selectedFilter === "out-of-stock"
-        ) {
-          response =
-            await getOutOfStockMedicines(params);
-        } else if (
-          selectedFilter === "near-expiry"
-        ) {
-          response =
-            await getNearExpiryMedicines(params);
-        } else if (
-          selectedFilter === "expired"
-        ) {
-          response =
-            await getExpiredMedicines(params);
-        } else {
-          response =
-            await getInventory(params);
-        }
-
-        console.log(
-          "Inventory API Response:",
-          response
-        );
-
-        if (
-          currentRequestId !==
-          requestIdRef.current
-        ) {
-          return;
-        }
-
-        setInventory(
-          response.inventory || []
-        );
-
-        setTotalItems(
-          Number(response.totalItems) || 0
-        );
-
-        setTotalPages(
-          Math.max(
-            Number(response.totalPages) || 1,
-            1
-          )
-        );
-      } catch (error) {
-        if (
-          currentRequestId !==
-          requestIdRef.current
-        ) {
-          return;
-        }
-
-        console.error(
-          "Inventory Error:",
-          error
-        );
-
-        toast.error(
-          error.response?.data?.message ||
-            "Failed to load inventory."
-        );
-
-        setInventory([]);
-        setTotalItems(0);
-        setTotalPages(1);
-      } finally {
-        if (
-          currentRequestId ===
-          requestIdRef.current
-        ) {
-          setLoading(false);
-        }
       }
-    };
 
+      const params = {
+        search: debouncedSearch,
+        page,
+        limit,
+      };
+
+      let response;
+
+      // ========================================
+      // Select API According To Filter
+      // ========================================
+
+      if (selectedFilter === "low-stock") {
+        response =
+          await getLowStockMedicines(params);
+      } else if (
+        selectedFilter === "out-of-stock"
+      ) {
+        response =
+          await getOutOfStockMedicines(params);
+      } else if (
+        selectedFilter === "near-expiry"
+      ) {
+        response =
+          await getNearExpiryMedicines(params);
+      } else if (
+        selectedFilter === "expired"
+      ) {
+        response =
+          await getExpiredMedicines(params);
+      } else {
+        response =
+          await getInventory(params);
+      }
+
+      // ========================================
+      // Ignore Old Request
+      // ========================================
+
+      if (
+        currentRequestId !==
+        requestIdRef.current
+      ) {
+        return;
+      }
+
+      // ========================================
+      // Update Inventory
+      // ========================================
+
+      setInventory(
+        response.inventory || []
+      );
+
+      setTotalItems(
+        Number(response.totalItems) || 0
+      );
+
+      setTotalPages(
+        Math.max(
+          Number(response.totalPages) || 1,
+          1
+        )
+      );
+    } catch (error) {
+      if (
+        currentRequestId !==
+        requestIdRef.current
+      ) {
+        return;
+      }
+
+      console.error(
+        "Inventory Error:",
+        error
+      );
+
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to load inventory."
+      );
+
+      setInventory([]);
+      setTotalItems(0);
+      setTotalPages(1);
+    } finally {
+      if (
+        currentRequestId ===
+        requestIdRef.current
+      ) {
+        setLoading(false);
+      }
+    }
+  };
+
+  // ==========================================
+  // LOAD INVENTORY WHEN FILTER / SEARCH / PAGE
+  // CHANGES
+  // ==========================================
+
+  useEffect(() => {
     loadInventory();
   }, [
     selectedFilter,
@@ -245,27 +257,187 @@ const Inventory = () => {
   };
 
   // ==========================================
+  // UPDATE STOCK
+  // Add / Remove
+  // ==========================================
+
+  const handleStockUpdate = async (
+    inventoryItem,
+    type
+  ) => {
+    // ========================================
+    // Validate Inventory Item
+    // ========================================
+
+    if (
+      !inventoryItem ||
+      !inventoryItem.medicine?._id
+    ) {
+      toast.error(
+        "Medicine information is missing."
+      );
+
+      return;
+    }
+
+    // ========================================
+    // Medicine Information
+    // ========================================
+
+    const medicineId =
+      inventoryItem.medicine._id;
+
+    const medicineName =
+      inventoryItem.medicine.medicineName ||
+      "this medicine";
+
+    // ========================================
+    // Determine Action
+    // Backend expects:
+    // "increase" or "decrease"
+    // ========================================
+
+    const action =
+      type === "add"
+        ? "increase"
+        : "decrease";
+
+    const actionText =
+      action === "increase"
+        ? "Add"
+        : "Remove";
+
+    // ========================================
+    // Ask Quantity
+    // ========================================
+
+    const quantityInput =
+      window.prompt(
+        `${actionText} how many units of ${medicineName}?`,
+        "1"
+      );
+
+    // User clicked Cancel
+    if (quantityInput === null) {
+      return;
+    }
+
+    // ========================================
+    // Convert Quantity
+    // ========================================
+
+    const quantity =
+      Number(quantityInput);
+
+    // ========================================
+    // Validate Quantity
+    // ========================================
+
+    if (
+      !Number.isInteger(quantity) ||
+      quantity <= 0
+    ) {
+      toast.error(
+        "Please enter a valid whole number greater than 0."
+      );
+
+      return;
+    }
+
+    // ========================================
+    // Current Inventory Stock
+    // ========================================
+
+    const currentStock =
+      Number(
+        inventoryItem.currentStock
+      ) || 0;
+
+    // ========================================
+    // Remove Stock Validation
+    // ========================================
+
+    if (
+      action === "decrease" &&
+      quantity > currentStock
+    ) {
+      toast.error(
+        `Only ${currentStock} units are available.`
+      );
+
+      return;
+    }
+
+    try {
+      setUpdatingStock(true);
+
+      // ======================================
+      // UPDATE BOTH:
+      //
+      // Medicine.stock
+      // Inventory.currentStock
+      // ======================================
+
+      const response =
+        await updateInventoryStock(
+          medicineId,
+          action,
+          quantity
+        );
+
+      toast.success(
+        response.message ||
+          `${
+            action === "increase"
+              ? "Stock added"
+              : "Stock removed"
+          } successfully.`
+      );
+
+      // ======================================
+      // Reload Current Inventory
+      // ======================================
+
+      await loadInventory(false);
+    } catch (error) {
+      console.error(
+        "Stock Update Error:",
+        error
+      );
+
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to update stock."
+      );
+    } finally {
+      setUpdatingStock(false);
+    }
+  };
+
+  // ==========================================
   // INCREASE STOCK
   // ==========================================
 
-  const handleIncreaseStock = (medicine) => {
-    navigate("/purchases", {
-      state: {
-        medicine,
-      },
-    });
+  const handleIncreaseStock = (
+    inventoryItem
+  ) => {
+    handleStockUpdate(
+      inventoryItem,
+      "add"
+    );
   };
 
   // ==========================================
   // REDUCE STOCK
   // ==========================================
 
-  const handleReduceStock = (medicine) => {
-    navigate("/sales", {
-      state: {
-        medicine,
-      },
-    });
+  const handleReduceStock = (
+    inventoryItem
+  ) => {
+    handleStockUpdate(
+      inventoryItem,
+      "remove"
+    );
   };
 
   // ==========================================
@@ -275,6 +447,14 @@ const Inventory = () => {
   const handleViewHistory = async (
     medicineId
   ) => {
+    if (!medicineId) {
+      toast.error(
+        "Medicine information is missing."
+      );
+
+      return;
+    }
+
     try {
       const response =
         await getStockHistory(
@@ -287,6 +467,11 @@ const Inventory = () => {
 
       setIsModalOpen(true);
     } catch (error) {
+      console.error(
+        "Stock History Error:",
+        error
+      );
+
       toast.error(
         error.response?.data?.message ||
           "Failed to fetch stock history."
@@ -299,19 +484,31 @@ const Inventory = () => {
   // ==========================================
 
   const handlePrevious = () => {
-    if (page > 1) {
-      setPage((prev) => prev - 1);
+    if (
+      page > 1 &&
+      !loading &&
+      !updatingStock
+    ) {
+      setPage(
+        (prev) => prev - 1
+      );
     }
   };
 
   const handleNext = () => {
-    if (page < totalPages) {
-      setPage((prev) => prev + 1);
+    if (
+      page < totalPages &&
+      !loading &&
+      !updatingStock
+    ) {
+      setPage(
+        (prev) => prev + 1
+      );
     }
   };
 
   // ==========================================
-  // LOADING
+  // INITIAL LOADING
   // ==========================================
 
   if (
@@ -326,7 +523,6 @@ const Inventory = () => {
         items-center
         justify-center
       ">
-
         <div className="
           flex
           h-14
@@ -337,7 +533,6 @@ const Inventory = () => {
           bg-blue-50
           dark:bg-blue-950/40
         ">
-
           <Loader
             size={26}
             className="
@@ -346,7 +541,6 @@ const Inventory = () => {
               dark:text-blue-400
             "
           />
-
         </div>
 
         <p className="
@@ -366,10 +560,13 @@ const Inventory = () => {
         ">
           Fetching your stock information.
         </p>
-
       </div>
     );
   }
+
+  // ==========================================
+  // PAGE
+  // ==========================================
 
   return (
     <div className="
@@ -418,12 +615,10 @@ const Inventory = () => {
               shadow-blue-100
               dark:shadow-none
             ">
-
               <PackageSearch
                 size={27}
                 className="text-white"
               />
-
             </div>
 
             <div>
@@ -463,11 +658,12 @@ const Inventory = () => {
 
           </div>
 
-          {/* Reset */}
+          {/* RESET */}
 
           <button
             type="button"
             onClick={handleReset}
+            disabled={updatingStock}
             className="
               flex
               items-center
@@ -483,11 +679,11 @@ const Inventory = () => {
               font-semibold
               text-slate-600
               transition
-
               hover:border-blue-200
               hover:bg-blue-50
               hover:text-blue-600
-
+              disabled:cursor-not-allowed
+              disabled:opacity-50
               dark:border-slate-700
               dark:bg-slate-800
               dark:text-slate-300
@@ -497,7 +693,6 @@ const Inventory = () => {
             "
           >
             <RotateCcw size={16} />
-
             Reset
           </button>
 
@@ -594,14 +789,11 @@ const Inventory = () => {
                 text-slate-700
                 outline-none
                 transition
-
                 placeholder:text-slate-400
-
                 focus:border-blue-500
                 focus:bg-white
                 focus:ring-4
                 focus:ring-blue-100
-
                 dark:border-slate-700
                 dark:bg-slate-800
                 dark:text-slate-200
@@ -630,10 +822,8 @@ const Inventory = () => {
                   rounded-lg
                   text-slate-400
                   transition
-
                   hover:bg-slate-200
                   hover:text-slate-700
-
                   dark:hover:bg-slate-700
                   dark:hover:text-slate-200
                 "
@@ -664,7 +854,8 @@ const Inventory = () => {
 
         {/* SEARCH STATUS */}
 
-        {search !== debouncedSearch && (
+        {search !==
+          debouncedSearch && (
           <div className="
             mt-3
             flex
@@ -675,20 +866,19 @@ const Inventory = () => {
             text-blue-600
             dark:text-blue-400
           ">
-
             <Loader
               size={13}
               className="animate-spin"
             />
 
             Searching...
-
           </div>
         )}
 
         {/* ACTIVE SEARCH */}
 
-        {search === debouncedSearch &&
+        {search ===
+          debouncedSearch &&
           debouncedSearch && (
             <div className="
               mt-4
@@ -701,13 +891,11 @@ const Inventory = () => {
               dark:bg-blue-950/40
               dark:text-blue-300
             ">
-
               Search results for{" "}
 
               <span className="font-bold">
                 "{debouncedSearch}"
               </span>
-
             </div>
           )}
 
@@ -728,7 +916,7 @@ const Inventory = () => {
         dark:bg-slate-900
       ">
 
-        {/* Inventory Header */}
+        {/* INVENTORY HEADER */}
 
         <div className="
           border-b
@@ -785,11 +973,11 @@ const Inventory = () => {
                 text-xs
                 font-semibold
                 text-blue-600
-
                 dark:bg-blue-950/40
                 dark:text-blue-400
               ">
-                Page {page} of {totalPages}
+                Page {page} of{" "}
+                {totalPages}
               </span>
             )}
 
@@ -812,6 +1000,9 @@ const Inventory = () => {
             onViewHistory={
               handleViewHistory
             }
+            updatingStock={
+              updatingStock
+            }
           />
 
         </div>
@@ -821,6 +1012,7 @@ const Inventory = () => {
         ========================================== */}
 
         {totalItems > 0 && (
+
           <div className="
             border-t
             border-slate-200
@@ -839,14 +1031,13 @@ const Inventory = () => {
               sm:justify-between
             ">
 
-              {/* Showing */}
+              {/* SHOWING */}
 
               <p className="
                 text-sm
                 text-slate-500
                 dark:text-slate-400
               ">
-
                 Showing{" "}
 
                 <span className="
@@ -854,7 +1045,9 @@ const Inventory = () => {
                   text-slate-700
                   dark:text-slate-200
                 ">
-                  {(page - 1) * limit + 1}
+                  {(page - 1) *
+                    limit +
+                    1}
                 </span>
 
                 {" "}to{" "}
@@ -879,22 +1072,24 @@ const Inventory = () => {
                 ">
                   {totalItems}
                 </span>
-
               </p>
 
-              {/* Controls */}
+              {/* CONTROLS */}
 
               <div className="flex items-center gap-2">
 
-                {/* Previous */}
+                {/* PREVIOUS */}
 
                 <button
                   type="button"
                   disabled={
                     page === 1 ||
-                    loading
+                    loading ||
+                    updatingStock
                   }
-                  onClick={handlePrevious}
+                  onClick={
+                    handlePrevious
+                  }
                   className="
                     flex
                     items-center
@@ -908,14 +1103,11 @@ const Inventory = () => {
                     font-medium
                     text-slate-600
                     transition
-
                     hover:border-blue-200
                     hover:bg-blue-50
                     hover:text-blue-600
-
                     disabled:cursor-not-allowed
                     disabled:opacity-40
-
                     dark:border-slate-700
                     dark:text-slate-300
                     dark:hover:border-blue-800
@@ -923,14 +1115,14 @@ const Inventory = () => {
                     dark:hover:text-blue-400
                   "
                 >
-
-                  <ChevronLeft size={16} />
+                  <ChevronLeft
+                    size={16}
+                  />
 
                   Previous
-
                 </button>
 
-                {/* Current Page */}
+                {/* CURRENT PAGE */}
 
                 <div className="
                   flex
@@ -948,16 +1140,19 @@ const Inventory = () => {
                   {page}
                 </div>
 
-                {/* Next */}
+                {/* NEXT */}
 
                 <button
                   type="button"
                   disabled={
                     page >=
                       totalPages ||
-                    loading
+                    loading ||
+                    updatingStock
                   }
-                  onClick={handleNext}
+                  onClick={
+                    handleNext
+                  }
                   className="
                     flex
                     items-center
@@ -971,26 +1166,23 @@ const Inventory = () => {
                     font-medium
                     text-slate-600
                     transition
-
                     hover:border-blue-200
                     hover:bg-blue-50
                     hover:text-blue-600
-
                     disabled:cursor-not-allowed
                     disabled:opacity-40
-
                     dark:border-slate-700
                     dark:text-slate-300
                     dark:hover:border-blue-800
                     dark:hover:bg-blue-950/40
                     dark:hover:text-blue-400
-                  " 
+                  "
                 >
-
                   Next
 
-                  <ChevronRight size={16} />
-
+                  <ChevronRight
+                    size={16}
+                  />
                 </button>
 
               </div>

@@ -6,6 +6,7 @@ import {
   getNearExpiryMedicinesService,
   getStockMovementHistoryService,
   getExpiredMedicinesService,
+  updateInventoryStockService,
 } from "../services/inventoryService.js";
 
 // =======================================
@@ -66,6 +67,43 @@ export const getInventoryByMedicine =
     } catch (error) {
       res.status(
         error.statusCode || 404
+      ).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  };
+
+// =======================================
+// Update Inventory Stock
+// Add / Remove Stock
+// =======================================
+
+export const updateInventoryStock =
+  async (req, res) => {
+    try {
+      const { medicineId } =
+        req.params;
+
+      const {
+        type,
+        quantity,
+      } = req.body;
+
+      const result =
+        await updateInventoryStockService(
+          medicineId,
+          type,
+          quantity
+        );
+
+      res.status(200).json({
+        success: true,
+        ...result,
+      });
+    } catch (error) {
+      res.status(
+        error.statusCode || 400
       ).json({
         success: false,
         message: error.message,

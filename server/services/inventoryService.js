@@ -6,6 +6,25 @@ import Sale from "../models/saleModel.js";
 import { MESSAGES } from "../constants/messages.js";
 
 // =======================================
+// Common Medicine Populate Fields
+// =======================================
+
+const MEDICINE_FIELDS = `
+  medicineName
+  genericName
+  company
+  category
+  batchNumber
+  expiryDate
+  stock
+  unit
+  purchasePrice
+  sellingPrice
+  gst
+  medicineImage
+`;
+
+// =======================================
 // Common Inventory Query
 // Search + Filter + Pagination
 // =======================================
@@ -32,8 +51,12 @@ const getInventoryWithPagination = async ({
   // =======================================
 
   if (search.trim()) {
+    const escapedSearch = search
+      .trim()
+      .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
     const searchRegex = new RegExp(
-      search.trim(),
+      escapedSearch,
       "i"
     );
 
@@ -91,13 +114,15 @@ const getInventoryWithPagination = async ({
   // Find Matching Medicines
   // =======================================
 
-  const medicines = await Medicine.find(
-    medicineQuery
-  ).select("_id");
+  const medicines =
+    await Medicine.find(
+      medicineQuery
+    ).select("_id");
 
-  const medicineIds = medicines.map(
-    (medicine) => medicine._id
-  );
+  const medicineIds =
+    medicines.map(
+      (medicine) => medicine._id
+    );
 
   // =======================================
   // Inventory Query
@@ -111,17 +136,6 @@ const getInventoryWithPagination = async ({
 
   // =======================================
   // Low Stock
-  // =======================================
-  // Low stock means:
-  //
-  // currentStock > 0
-  // AND
-  // currentStock <= reorderLevel
-  //
-  // Example:
-  // Stock = 15
-  // Reorder Level = 20
-  // => LOW STOCK
   // =======================================
 
   if (filter === "low-stock") {
@@ -170,7 +184,7 @@ const getInventoryWithPagination = async ({
     )
       .populate(
         "medicine",
-        "medicineName genericName company category batchNumber expiryDate"
+        MEDICINE_FIELDS
       )
       .sort({
         createdAt: -1,
@@ -180,11 +194,13 @@ const getInventoryWithPagination = async ({
       .lean();
 
   // =======================================
-  // Pagination Information
+  // Pagination
   // =======================================
 
   const totalPages =
-    Math.ceil(totalItems / limit) || 1;
+    Math.ceil(
+      totalItems / limit
+    ) || 1;
 
   return {
     inventory,
@@ -199,25 +215,26 @@ const getInventoryWithPagination = async ({
 // Get All Inventory
 // =======================================
 
-export const getAllInventoryService = async ({
-  search,
-  page,
-  limit,
-}) => {
-  const result =
-    await getInventoryWithPagination({
-      search,
-      page,
-      limit,
-      filter: "all",
-    });
+export const getAllInventoryService =
+  async ({
+    search,
+    page,
+    limit,
+  }) => {
+    const result =
+      await getInventoryWithPagination({
+        search,
+        page,
+        limit,
+        filter: "all",
+      });
 
-  return {
-    message:
-      MESSAGES.INVENTORY_FETCHED,
-    ...result,
+    return {
+      message:
+        MESSAGES.INVENTORY_FETCHED,
+      ...result,
+    };
   };
-};
 
 // =======================================
 // Get Inventory By Medicine
@@ -231,7 +248,7 @@ export const getInventoryByMedicineService =
       })
         .populate(
           "medicine",
-          "medicineName genericName company category batchNumber expiryDate"
+          MEDICINE_FIELDS
         )
         .lean();
 
@@ -248,7 +265,214 @@ export const getInventoryByMedicineService =
     return {
       message:
         MESSAGES.INVENTORY_FETCHED,
+
       inventory,
+    };
+  };
+
+// =======================================
+// UPDATE INVENTORY STOCK
+//
+// action:
+// "increase"
+// "decrease"
+// =======================================
+
+export const updateInventoryStockService =
+  async (
+    medicineId,
+    action,
+    quantity
+  ) => {
+    // =======================================
+    // Validate Quantity
+    // =======================================
+
+    const stockQuantity =
+      Number(quantity);
+
+    if (
+      !Number.isInteger(
+        stockQuantity
+      ) ||
+      stockQuantity <= 0
+    ) {
+      const error = new Error(
+        "Stock quantity must be a positive whole number."
+      );
+
+      error.statusCode = 400;
+
+      throw error;
+    }
+
+    // =======================================
+    // Validate Action
+    // =======================================
+
+    if (
+      action !== "increase" &&
+      action !== "decrease"
+    ) {
+      const error = new Error(
+        "Invalid stock action. Use increase or decrease."
+      );
+
+      error.statusCode = 400;
+
+      throw error;
+    }
+
+    // =======================================
+    // Find Medicine
+    // =======================================
+
+    const medicine =
+      await Medicine.findById(
+        medicineId
+      );
+
+    if (!medicine) {
+      const error = new Error(
+        MESSAGES.MEDICINE_NOT_FOUND
+      );
+
+      error.statusCode = 404;
+
+      throw error;
+    }
+
+    // =======================================
+    // Find Inventory
+    // =======================================
+
+    let inventory =
+      await Inventory.findOne({
+        medicine: medicineId,
+      });
+
+    // =======================================
+    // Create Inventory If Missing
+    // =======================================
+
+    if (!inventory) {
+      inventory =
+        await Inventory.create({
+          medicine: medicineId,
+
+          currentStock:
+            Number(
+              medicine.stock || 0
+            ),
+
+          reorderLevel: 20,
+        });
+    }
+
+    // =======================================
+    // Current Stock
+    // =======================================
+
+    const currentStock =
+      Number(
+        inventory.currentStock || 0
+      );
+
+    const medicineStock =
+      Number(
+        medicine.stock || 0
+      );
+
+    // =======================================
+    // Increase Stock
+    // =======================================
+
+    if (action === "increase") {
+      inventory.currentStock =
+        currentStock +
+        stockQuantity;
+
+      medicine.stock =
+        medicineStock +
+        stockQuantity;
+    }
+
+    // =======================================
+    // Decrease Stock
+    // =======================================
+
+    if (action === "decrease") {
+      if (
+        currentStock <
+        stockQuantity
+      ) {
+        const error = new Error(
+          `Cannot decrease stock below 0. Only ${currentStock} units are available.`
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+      }
+
+      if (
+        medicineStock <
+        stockQuantity
+      ) {
+        const error = new Error(
+          `Medicine stock is lower than requested quantity. Only ${medicineStock} units are available.`
+        );
+
+        error.statusCode = 400;
+
+        throw error;
+      }
+
+      inventory.currentStock =
+        currentStock -
+        stockQuantity;
+
+      medicine.stock =
+        medicineStock -
+        stockQuantity;
+    }
+
+    // =======================================
+    // Save Both
+    // =======================================
+
+    await inventory.save();
+
+    await medicine.save();
+
+    // =======================================
+    // Return Updated Inventory
+    // =======================================
+
+    const updatedInventory =
+      await Inventory.findById(
+        inventory._id
+      )
+        .populate(
+          "medicine",
+          MEDICINE_FIELDS
+        )
+        .lean();
+
+    return {
+      message:
+        action === "increase"
+          ? "Stock increased successfully."
+          : "Stock decreased successfully.",
+
+      inventory:
+        updatedInventory,
+
+      currentStock:
+        updatedInventory.currentStock,
+
+      medicineStock:
+        updatedInventory.medicine.stock,
     };
   };
 
@@ -358,11 +582,38 @@ export const getExpiredMedicinesService =
 
 export const getStockMovementHistoryService =
   async (medicineId) => {
+    // =======================================
+    // Verify Medicine
+    // =======================================
+
+    const medicine =
+      await Medicine.findById(
+        medicineId
+      ).select("_id");
+
+    if (!medicine) {
+      const error = new Error(
+        MESSAGES.MEDICINE_NOT_FOUND
+      );
+
+      error.statusCode = 404;
+
+      throw error;
+    }
+
+    // =======================================
+    // Get Purchases
+    // =======================================
+
     const purchases =
       await Purchase.find({
         "medicines.medicine":
           medicineId,
       }).lean();
+
+    // =======================================
+    // Get Sales
+    // =======================================
 
     const sales =
       await Sale.find({
@@ -381,7 +632,7 @@ export const getStockMovementHistoryService =
             .filter(
               (item) =>
                 item.medicine.toString() ===
-                medicineId
+                medicineId.toString()
             )
             .map((item) => ({
               date:
@@ -390,7 +641,9 @@ export const getStockMovementHistoryService =
               type: "PURCHASE",
 
               quantity:
-                item.quantity,
+                Number(
+                  item.quantity
+                ),
 
               invoiceNumber:
                 purchase.invoiceNumber,
@@ -408,7 +661,7 @@ export const getStockMovementHistoryService =
             .filter(
               (item) =>
                 item.medicine.toString() ===
-                medicineId
+                medicineId.toString()
             )
             .map((item) => ({
               date:
@@ -417,7 +670,9 @@ export const getStockMovementHistoryService =
               type: "SALE",
 
               quantity:
-                item.quantity,
+                Number(
+                  item.quantity
+                ),
 
               invoiceNumber:
                 sale.invoiceNumber,
@@ -426,6 +681,7 @@ export const getStockMovementHistoryService =
 
     // =======================================
     // Combine + Sort
+    // Newest First
     // =======================================
 
     const history = [
@@ -433,9 +689,13 @@ export const getStockMovementHistoryService =
       ...saleHistory,
     ].sort(
       (a, b) =>
-        new Date(a.date) -
-        new Date(b.date)
+        new Date(b.date) -
+        new Date(a.date)
     );
+
+    // =======================================
+    // Response
+    // =======================================
 
     return {
       message:

@@ -2,12 +2,16 @@ import Sale from "../models/saleModel.js";
 import Customer from "../models/customerModel.js";
 import Medicine from "../models/medicineModel.js";
 import Inventory from "../models/inventoryModel.js";
+
 import { MESSAGES } from "../constants/messages.js";
 
 // ==========================
 // Create Sale
 // ==========================
-export const createSaleService = async (data, userId) => {
+export const createSaleService = async (
+  data,
+  userId
+) => {
   const {
     customer,
     saleDate,
@@ -24,35 +28,78 @@ export const createSaleService = async (data, userId) => {
   // Basic Validation
   // ==========================
 
-  if (!medicines || medicines.length === 0) {
-    throw new Error("At least one medicine is required.");
+  if (
+    !medicines ||
+    !Array.isArray(medicines) ||
+    medicines.length === 0
+  ) {
+    throw new Error(
+      "At least one medicine is required."
+    );
   }
 
-  const customerExists = await Customer.findById(customer);
+  // ==========================
+  // Check Customer
+  // ==========================
+
+  const customerExists =
+    await Customer.findById(customer);
 
   if (!customerExists) {
-    throw new Error(MESSAGES.CUSTOMER_NOT_FOUND);
+    throw new Error(
+      MESSAGES.CUSTOMER_NOT_FOUND
+    );
   }
 
-  // Validate Reward Points
-  const availablePoints = customerExists.rewardPoints || 0;
+  // ==========================
+  // Reward Points Validation
+  // ==========================
 
-  if (redeemPoints < 0) {
-    throw new Error("Invalid reward points.");
+  const availablePoints =
+    Number(
+      customerExists.rewardPoints || 0
+    );
+
+  const redeemPointsNumber =
+    Number(redeemPoints);
+
+  if (
+    !Number.isInteger(
+      redeemPointsNumber
+    ) ||
+    redeemPointsNumber < 0
+  ) {
+    throw new Error(
+      "Invalid reward points."
+    );
   }
 
-  if (redeemPoints > availablePoints) {
-    throw new Error("Customer does not have enough reward points.");
+  if (
+    redeemPointsNumber >
+    availablePoints
+  ) {
+    throw new Error(
+      "Customer does not have enough reward points."
+    );
   }
 
   // ==========================
   // Duplicate Medicines Check
   // ==========================
 
-  const medicineIds = medicines.map((item) => item.medicine.toString());
+  const medicineIds =
+    medicines.map(
+      (item) =>
+        item.medicine.toString()
+    );
 
-  if (new Set(medicineIds).size !== medicineIds.length) {
-    throw new Error("Duplicate medicines are not allowed.");
+  if (
+    new Set(medicineIds).size !==
+    medicineIds.length
+  ) {
+    throw new Error(
+      "Duplicate medicines are not allowed."
+    );
   }
 
   // ==========================
@@ -61,15 +108,37 @@ export const createSaleService = async (data, userId) => {
 
   let invoiceNumber;
 
-  const lastSale = await Sale.findOne()
-    .sort({ createdAt: -1 })
-    .select("invoiceNumber");
+  const lastSale =
+    await Sale.findOne()
+      .sort({
+        createdAt: -1,
+      })
+      .select(
+        "invoiceNumber"
+      );
 
-  if (lastSale && lastSale.invoiceNumber.startsWith("INV-")) {
-    const lastNumber = parseInt(lastSale.invoiceNumber.split("-")[1], 10);
-    invoiceNumber = `INV-${String(lastNumber + 1).padStart(5, "0")}`;
+  if (
+    lastSale &&
+    lastSale.invoiceNumber &&
+    lastSale.invoiceNumber.startsWith(
+      "INV-"
+    )
+  ) {
+    const lastNumber =
+      parseInt(
+        lastSale.invoiceNumber.split(
+          "-"
+        )[1],
+        10
+      );
+
+    invoiceNumber =
+      `INV-${String(
+        lastNumber + 1
+      ).padStart(5, "0")}`;
   } else {
-    invoiceNumber = "INV-00001";
+    invoiceNumber =
+      "INV-00001";
   }
 
   // ==========================
@@ -87,42 +156,142 @@ export const createSaleService = async (data, userId) => {
   // ==========================
 
   for (const item of medicines) {
-    const medicine = await Medicine.findById(item.medicine).select(
-      "medicineName sellingPrice gst"
-    );
+    const quantity =
+      Number(item.quantity);
+
+    // ==========================
+    // Validate Quantity
+    // ==========================
+
+    if (
+      !Number.isInteger(quantity) ||
+      quantity <= 0
+    ) {
+      throw new Error(
+        "Medicine quantity must be a positive whole number."
+      );
+    }
+
+    // ==========================
+    // Find Medicine
+    // ==========================
+
+    const medicine =
+      await Medicine.findById(
+        item.medicine
+      ).select(
+        "medicineName sellingPrice gst stock"
+      );
 
     if (!medicine) {
-      throw new Error(MESSAGES.MEDICINE_NOT_FOUND);
+      throw new Error(
+        MESSAGES.MEDICINE_NOT_FOUND
+      );
     }
 
-    const inventory = await Inventory.findOne({
-      medicine: item.medicine,
-    });
+    // ==========================
+    // Find Inventory
+    // ==========================
+
+    const inventory =
+      await Inventory.findOne({
+        medicine:
+          item.medicine,
+      });
 
     if (!inventory) {
-      throw new Error(MESSAGES.INVENTORY_NOT_FOUND);
+      throw new Error(
+        MESSAGES.INVENTORY_NOT_FOUND
+      );
     }
 
-    if (inventory.currentStock < Number(item.quantity)) {
-      throw new Error(`${medicine.medicineName} has insufficient stock.`);
+    // ==========================
+    // Current Stock
+    // ==========================
+
+    const inventoryStock =
+      Number(
+        inventory.currentStock || 0
+      );
+
+    const medicineStock =
+      Number(
+        medicine.stock || 0
+      );
+
+    // ==========================
+    // Stock Validation
+    // ==========================
+
+    if (
+      inventoryStock <
+      quantity
+    ) {
+      throw new Error(
+        `${medicine.medicineName} has insufficient inventory stock.`
+      );
     }
 
-    const itemSubtotal = medicine.sellingPrice * Number(item.quantity);
-    const itemGST = (itemSubtotal * medicine.gst) / 100;
+    if (
+      medicineStock <
+      quantity
+    ) {
+      throw new Error(
+        `${medicine.medicineName} has insufficient medicine stock.`
+      );
+    }
 
-    subtotal += itemSubtotal;
-    gstAmount += itemGST;
+    // ==========================
+    // Calculate Item Amount
+    // ==========================
+
+    const sellingPrice =
+      Number(
+        medicine.sellingPrice || 0
+      );
+
+    const gst =
+      Number(
+        medicine.gst || 0
+      );
+
+    const itemSubtotal =
+      sellingPrice *
+      quantity;
+
+    const itemGST =
+      (itemSubtotal * gst) /
+      100;
+
+    subtotal +=
+      itemSubtotal;
+
+    gstAmount +=
+      itemGST;
+
+    // ==========================
+    // Store Inventory Update
+    // ==========================
 
     inventoryUpdates.push({
       inventory,
-      quantity: Number(item.quantity),
+      medicine,
+      quantity,
     });
 
+    // ==========================
+    // Store Sale Medicine
+    // ==========================
+
     saleMedicines.push({
-      medicine: medicine._id,
-      quantity: Number(item.quantity),
-      sellingPrice: medicine.sellingPrice,
-      gst: medicine.gst,
+      medicine:
+        medicine._id,
+
+      quantity,
+
+      sellingPrice,
+
+      gst,
     });
   }
 
@@ -130,89 +299,235 @@ export const createSaleService = async (data, userId) => {
   // Discount
   // ==========================
 
+  const discountNumber =
+    Number(discount);
+
+  if (
+    !Number.isFinite(
+      discountNumber
+    ) ||
+    discountNumber < 0
+  ) {
+    throw new Error(
+      "Invalid discount."
+    );
+  }
+
   let discountAmount = 0;
 
-  if (discountType === "percentage") {
-    discountAmount = ((subtotal + gstAmount) * Number(discount)) / 100;
+  if (
+    discountType ===
+    "percentage"
+  ) {
+    if (
+      discountNumber > 100
+    ) {
+      throw new Error(
+        "Percentage discount cannot exceed 100%."
+      );
+    }
+
+    discountAmount =
+      ((subtotal +
+        gstAmount) *
+        discountNumber) /
+      100;
+  } else if (
+    discountType === "flat"
+  ) {
+    discountAmount =
+      discountNumber;
   } else {
-    discountAmount = Number(discount);
-  }
-
-  if (discountAmount < 0) {
-    throw new Error("Invalid discount.");
-  }
-
-  if (discountAmount > subtotal + gstAmount) {
-    throw new Error("Discount exceeds bill amount.");
+    throw new Error(
+      "Invalid discount type."
+    );
   }
 
   // ==========================
-  // Grand Total & Reward Points
+  // Discount Validation
   // ==========================
 
-  const rewardDiscount = Number(redeemPoints);
+  if (
+    discountAmount >
+    subtotal + gstAmount
+  ) {
+    throw new Error(
+      "Discount exceeds bill amount."
+    );
+  }
 
-  const grandTotal = Math.max(
-    subtotal + gstAmount - discountAmount - rewardDiscount,
-    0
-  );
+  // ==========================
+  // Reward Discount
+  // ==========================
 
-  const earnedPoints = Math.floor(grandTotal / 100);
+  const rewardDiscount =
+    redeemPointsNumber;
+
+  // ==========================
+  // Grand Total
+  // ==========================
+
+  const grandTotal =
+    Math.max(
+      subtotal +
+        gstAmount -
+        discountAmount -
+        rewardDiscount,
+      0
+    );
+
+  // ==========================
+  // Earn Reward Points
+  // ==========================
+
+  const earnedPoints =
+    Math.floor(
+      grandTotal / 100
+    );
 
   // ==========================
   // Payment Validation
   // ==========================
 
-  let paymentStatus = "Paid";
-  const validMethods = ["Cash", "UPI", "Card", "Net Banking"];
+  const validMethods = [
+    "Cash",
+    "UPI",
+    "Card",
+    "Net Banking",
+  ];
 
-  if (!validMethods.includes(paymentMethod)) {
-    throw new Error("Invalid payment method.");
+  if (
+    !validMethods.includes(
+      paymentMethod
+    )
+  ) {
+    throw new Error(
+      "Invalid payment method."
+    );
   }
+
+  const receivedCash =
+    Number(
+      cashReceived || 0
+    );
 
   let changeReturned = 0;
 
-  if (paymentMethod === "Cash") {
-    if (Number(cashReceived) < grandTotal) {
-      throw new Error("Cash received is less than Grand Total.");
+  if (
+    paymentMethod === "Cash"
+  ) {
+    if (
+      !Number.isFinite(
+        receivedCash
+      ) ||
+      receivedCash <
+        grandTotal
+    ) {
+      throw new Error(
+        "Cash received is less than Grand Total."
+      );
     }
 
-    changeReturned = Number(cashReceived) - grandTotal;
+    changeReturned =
+      receivedCash -
+      grandTotal;
   }
 
   // ==========================
-  // Create Sale Document
+  // Create Sale
   // ==========================
 
-  const sale = await Sale.create({
-    customer,
-    invoiceNumber,
-    saleDate,
-    medicines: saleMedicines,
-    subtotal,
-    gstAmount,
-    discountType,
-    discount: discountAmount,
-    redeemedPoints: Number(redeemPoints),
-    earnedPoints,
-    grandTotal,
-    // Keeping for compatibility
-    totalAmount: grandTotal,
-    paymentMethod,
-    paymentStatus,
-    cashReceived: paymentMethod === "Cash" ? Number(cashReceived) : 0,
-    changeReturned,
-    notes,
-    createdBy: userId,
-  });
+  const sale =
+    await Sale.create({
+      customer,
+
+      invoiceNumber,
+
+      saleDate,
+
+      medicines:
+        saleMedicines,
+
+      subtotal,
+
+      gstAmount,
+
+      discountType,
+
+      discount:
+        discountAmount,
+
+      redeemedPoints:
+        redeemPointsNumber,
+
+      earnedPoints,
+
+      grandTotal,
+
+      // Compatibility
+      totalAmount:
+        grandTotal,
+
+      paymentMethod,
+
+      paymentStatus:
+        "Paid",
+
+      cashReceived:
+        paymentMethod ===
+        "Cash"
+          ? receivedCash
+          : 0,
+
+      changeReturned,
+
+      notes,
+
+      createdBy:
+        userId,
+    });
 
   // ==========================
-  // Update Inventory
+  // UPDATE STOCK
+  //
+  // Inventory.currentStock
+  // Medicine.stock
   // ==========================
 
-  for (const item of inventoryUpdates) {
-    item.inventory.currentStock -= item.quantity;
+  for (
+    const item of inventoryUpdates
+  ) {
+    const quantity =
+      Number(
+        item.quantity
+      );
+
+    // --------------------------
+    // Update Inventory
+    // --------------------------
+
+    item.inventory.currentStock =
+      Number(
+        item.inventory
+          .currentStock || 0
+      ) - quantity;
+
+    // --------------------------
+    // Update Medicine
+    // --------------------------
+
+    item.medicine.stock =
+      Number(
+        item.medicine.stock || 0
+      ) - quantity;
+
+    // --------------------------
+    // Save Both
+    // --------------------------
+
     await item.inventory.save();
+
+    await item.medicine.save();
   }
 
   // ==========================
@@ -220,11 +535,20 @@ export const createSaleService = async (data, userId) => {
   // ==========================
 
   customerExists.rewardPoints =
-    availablePoints - Number(redeemPoints) + earnedPoints;
+    availablePoints -
+    redeemPointsNumber +
+    earnedPoints;
+
   await customerExists.save();
 
+  // ==========================
+  // Return
+  // ==========================
+
   return {
-    message: MESSAGES.SALE_CREATED,
+    message:
+      MESSAGES.SALE_CREATED,
+
     sale,
   };
 };
@@ -233,40 +557,67 @@ export const createSaleService = async (data, userId) => {
 // Get All Sales
 // ==========================
 
-export const getAllSalesService = async () => {
-  const sales = await Sale.find()
-    .populate("customer", "customerName contactNumber")
-    .populate("createdBy", "name email role")
-    .populate("medicines.medicine", "medicineName genericName company")
-    .sort({ createdAt: -1 })
-    .lean();
+export const getAllSalesService =
+  async () => {
+    const sales =
+      await Sale.find()
+        .populate(
+          "customer",
+          "customerName contactNumber"
+        )
+        .populate(
+          "createdBy",
+          "name email role"
+        )
+        .populate(
+          "medicines.medicine",
+          "medicineName genericName company"
+        )
+        .sort({
+          createdAt: -1,
+        })
+        .lean();
 
-  return {
-    message: MESSAGES.SALES_FETCHED,
-    sales,
+    return {
+      message:
+        MESSAGES.SALES_FETCHED,
+
+      sales,
+    };
   };
-};
 
 // ==========================
 // Get Sale By ID
 // ==========================
 
-export const getSaleByIdService = async (id) => {
-  const sale = await Sale.findById(id)
-    .populate("customer",  "customerName contactNumber email address rewardPoints")
-    .populate("createdBy", "name email role")
-    .populate(
-      "medicines.medicine",
-      "medicineName genericName company category unit"
-    )
-    .lean();
+export const getSaleByIdService =
+  async (id) => {
+    const sale =
+      await Sale.findById(id)
+        .populate(
+          "customer",
+          "customerName contactNumber email address rewardPoints"
+        )
+        .populate(
+          "createdBy",
+          "name email role"
+        )
+        .populate(
+          "medicines.medicine",
+          "medicineName genericName company category unit"
+        )
+        .lean();
 
-  if (!sale) {
-    throw new Error(MESSAGES.SALE_NOT_FOUND);
-  }
+    if (!sale) {
+      throw new Error(
+        MESSAGES.SALE_NOT_FOUND
+      );
+    }
 
-  return {
-    message: MESSAGES.SALE_FETCHED,
-    sale,
+    return {
+      message:
+        MESSAGES.SALE_FETCHED,
+
+      sale,
+    };
   };
-};

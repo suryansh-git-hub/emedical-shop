@@ -7,16 +7,25 @@ import {
 // ==========================
 // Create Sale
 // ==========================
-export const createSale = async (req, res) => {
+export const createSale = async (
+  req,
+  res
+) => {
   try {
-    const result = await createSaleService(req.body, req.user._id);
+    const result =
+      await createSaleService(
+        req.body,
+        req.user._id
+      );
 
     res.status(201).json({
       success: true,
       ...result,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(
+      error.statusCode || 400
+    ).json({
       success: false,
       message: error.message,
     });
@@ -26,16 +35,22 @@ export const createSale = async (req, res) => {
 // ==========================
 // Get All Sales
 // ==========================
-export const getAllSales = async (req, res) => {
+export const getAllSales = async (
+  req,
+  res
+) => {
   try {
-    const result = await getAllSalesService();
+    const result =
+      await getAllSalesService();
 
     res.status(200).json({
       success: true,
       ...result,
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(
+      error.statusCode || 500
+    ).json({
       success: false,
       message: error.message,
     });
@@ -45,18 +60,25 @@ export const getAllSales = async (req, res) => {
 // ==========================
 // Get Sale By ID
 // ==========================
-export const getSaleById = async (req, res) => {
+export const getSaleById = async (
+  req,
+  res
+) => {
   try {
-    const { id } = req.params;
+    const { id } =
+      req.params;
 
-    const result = await getSaleByIdService(id);
+    const result =
+      await getSaleByIdService(id);
 
     res.status(200).json({
       success: true,
       ...result,
     });
   } catch (error) {
-    res.status(404).json({
+    res.status(
+      error.statusCode || 404
+    ).json({
       success: false,
       message: error.message,
     });

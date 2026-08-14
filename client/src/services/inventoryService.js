@@ -86,7 +86,7 @@ export const getExpiredMedicines =
   };
 
 // =======================================
-// Stock Movement History
+// Get Stock Movement History
 // =======================================
 
 export const getStockHistory =
@@ -94,6 +94,28 @@ export const getStockHistory =
     const response =
       await api.get(
         `/inventory/stock-history/${medicineId}`
+      );
+
+    return response.data;
+  };
+
+// =======================================
+// Add / Remove Stock
+// =======================================
+
+export const updateInventoryStock =
+  async (
+    medicineId,
+    type,
+    quantity
+  ) => {
+    const response =
+      await api.patch(
+        `/inventory/${medicineId}/stock`,
+        {
+          type,
+          quantity,
+        }
       );
 
     return response.data;

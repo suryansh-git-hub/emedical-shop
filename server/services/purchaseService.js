@@ -1,247 +1,399 @@
 import Purchase from "../models/purchaseModel.js";
 import Supplier from "../models/supplierModel.js";
 import Medicine from "../models/medicineModel.js";
-import { MESSAGES } from "../constants/messages.js";
 import Inventory from "../models/inventoryModel.js";
 
-// ==========================
+import { MESSAGES } from "../constants/messages.js";
+
+// =======================================
 // Create Purchase
-// ==========================
-export const createPurchaseService = async (
-  data,
-  userId
-) => {
-  const {
-    supplier,
-    invoiceNumber,
-    purchaseDate,
-    medicines,
-  } = data;
+// =======================================
 
-  // Check if medicines array is provided
-  if (!medicines || medicines.length === 0) {
-    throw new Error(
-      "At least one medicine is required."
-    );
-  }
-
-  // Check duplicate invoice
-  const existingPurchase =
-    await Purchase.findOne({
-      invoiceNumber,
-    });
-
-  if (existingPurchase) {
-    throw new Error(
-      MESSAGES.PURCHASE_ALREADY_EXISTS
-    );
-  }
-
-  // Check supplier
-  const supplierData =
-    await Supplier.findById(supplier);
-
-  if (!supplierData) {
-    throw new Error(
-      MESSAGES.SUPPLIER_NOT_FOUND
-    );
-  }
-
-  let totalAmount = 0;
-
-  // Validate medicines, calculate total & update inventory
-  for (const item of medicines) {
-    const medicine =
-      await Medicine.findById(
-        item.medicine
-      );
-
-    if (!medicine) {
-      throw new Error(
-        MESSAGES.MEDICINE_NOT_FOUND
-      );
-    }
-
-    totalAmount +=
-      item.quantity *
-      item.purchasePrice;
-
-    // Check inventory
-    let inventory =
-      await Inventory.findOne({
-        medicine: item.medicine,
-      });
-
-    if (inventory) {
-      // Increase stock
-      inventory.currentStock +=
-        item.quantity;
-
-      await inventory.save();
-    } else {
-      // Create inventory record
-      await Inventory.create({
-        medicine: item.medicine,
-        currentStock: item.quantity,
-        reorderLevel: 20,
-      });
-    }
-  }
-
-  // Create Purchase
-  const purchase =
-    await Purchase.create({
+export const createPurchaseService =
+  async (
+    data,
+    userId
+  ) => {
+    const {
       supplier,
-      invoiceNumber,
       purchaseDate,
       medicines,
-      totalAmount,
-      createdBy: userId,
-    });
+    } = data;
 
-  return {
-    message: MESSAGES.PURCHASE_CREATED,
-    purchase,
-  };
-};
+    // =====================================
+    // Validate Medicines
+    // =====================================
 
-// ==========================
-// Get All Purchases
-// Supports:
-// - Search by invoice number
-// - Search by supplier name
-// - Pagination
-// ==========================
-export const getAllPurchasesService = async (
-  search = "",
-  page = 1,
-  limit = 10
-) => {
-  // Convert values safely to numbers
-  page = Math.max(
-    Number(page) || 1,
-    1
-  );
+    if (
+      !medicines ||
+      !Array.isArray(medicines) ||
+      medicines.length === 0
+    ) {
+      throw new Error(
+        "At least one medicine is required."
+      );
+    }
 
-  limit = Math.max(
-    Number(limit) || 10,
-    1
-  );
+    // =====================================
+    // Check Supplier
+    // =====================================
 
-  const skip = (page - 1) * limit;
-
-  // ==========================================
-  // Search Filter
-  // ==========================================
-
-  const filter = {};
-
-  if (search.trim()) {
-    const searchValue =
-      search.trim();
-
-    // Find suppliers matching supplier name
-    const matchingSuppliers =
-      await Supplier.find({
-        supplierName: {
-          $regex: searchValue,
-          $options: "i",
-        },
-      }).select("_id");
-
-    const supplierIds =
-      matchingSuppliers.map(
-        (supplier) => supplier._id
+    const supplierExists =
+      await Supplier.findById(
+        supplier
       );
 
-    // Search invoice OR supplier
-    filter.$or = [
-      {
-        invoiceNumber: {
-          $regex: searchValue,
-          $options: "i",
-        },
-      },
-      {
-        supplier: {
-          $in: supplierIds,
-        },
-      },
-    ];
-  }
+    if (!supplierExists) {
+      const error = new Error(
+        MESSAGES.SUPPLIER_NOT_FOUND
+      );
 
-  // ==========================================
-  // Total Purchases
-  // ==========================================
+      error.statusCode = 404;
 
-  const totalPurchases =
-    await Purchase.countDocuments(
-      filter
-    );
+      throw error;
+    }
 
-  // ==========================================
-  // Get Purchases
-  // ==========================================
+    // =====================================
+    // Duplicate Medicine Check
+    // =====================================
 
-  const purchases =
-    await Purchase.find(filter)
-      .populate(
-        "supplier",
-        "supplierName contactNumber"
+    const medicineIds =
+      medicines.map(
+        (item) =>
+          item.medicine.toString()
+      );
+
+    if (
+      new Set(medicineIds).size !==
+      medicineIds.length
+    ) {
+      throw new Error(
+        "Duplicate medicines are not allowed."
+      );
+    }
+
+    // =====================================
+    // Generate Invoice Number
+    // =====================================
+
+    let invoiceNumber;
+
+    const lastPurchase =
+      await Purchase.findOne()
+        .sort({
+          createdAt: -1,
+        })
+        .select(
+          "invoiceNumber"
+        );
+
+    if (
+      lastPurchase &&
+      lastPurchase.invoiceNumber &&
+      lastPurchase.invoiceNumber.startsWith(
+        "PUR-"
       )
-      .populate(
-        "createdBy",
-        "name email role"
-      )
-      .populate(
-        "medicines.medicine",
-        "medicineName company"
-      )
-      .sort({
-        createdAt: -1,
-      })
-      .skip(skip)
-      .limit(limit)
-      .lean();
+    ) {
+      const lastNumber =
+        parseInt(
+          lastPurchase.invoiceNumber.split(
+            "-"
+          )[1],
+          10
+        );
 
-  // ==========================================
-  // Total Pages
-  // ==========================================
+      invoiceNumber =
+        `PUR-${String(
+          lastNumber + 1
+        ).padStart(5, "0")}`;
+    } else {
+      invoiceNumber =
+        "PUR-00001";
+    }
 
-  const totalPages =
-    Math.max(
-      Math.ceil(
-        totalPurchases / limit
-      ),
+    // =====================================
+    // Variables
+    // =====================================
+
+    let totalAmount = 0;
+
+    const purchaseMedicines = [];
+    const inventoryUpdates = [];
+
+    // =====================================
+    // Validate Each Medicine
+    // =====================================
+
+    for (
+      const item of medicines
+    ) {
+      const quantity =
+        Number(
+          item.quantity
+        );
+
+      const purchasePrice =
+        Number(
+          item.purchasePrice
+        );
+
+      // ===================================
+      // Quantity Validation
+      // ===================================
+
+      if (
+        !Number.isInteger(
+          quantity
+        ) ||
+        quantity <= 0
+      ) {
+        throw new Error(
+          "Medicine quantity must be a positive whole number."
+        );
+      }
+
+      // ===================================
+      // Price Validation
+      // ===================================
+
+      if (
+        !Number.isFinite(
+          purchasePrice
+        ) ||
+        purchasePrice < 0
+      ) {
+        throw new Error(
+          "Purchase price must be a valid number."
+        );
+      }
+
+      // ===================================
+      // Find Medicine
+      // ===================================
+
+      const medicine =
+        await Medicine.findById(
+          item.medicine
+        ).select(
+          "medicineName stock purchasePrice"
+        );
+
+      if (!medicine) {
+        throw new Error(
+          MESSAGES.MEDICINE_NOT_FOUND
+        );
+      }
+
+      // ===================================
+      // Find Inventory
+      // ===================================
+
+      let inventory =
+        await Inventory.findOne({
+          medicine:
+            medicine._id,
+        });
+
+      // ===================================
+      // Create Inventory If Missing
+      // ===================================
+
+      if (!inventory) {
+        inventory =
+          await Inventory.create({
+            medicine:
+              medicine._id,
+
+            currentStock:
+              Number(
+                medicine.stock || 0
+              ),
+
+            reorderLevel: 20,
+          });
+      }
+
+      // ===================================
+      // Calculate Total
+      // ===================================
+
+      const itemTotal =
+        purchasePrice *
+        quantity;
+
+      totalAmount +=
+        itemTotal;
+
+      // ===================================
+      // Purchase Medicine
+      // ===================================
+
+      purchaseMedicines.push({
+        medicine:
+          medicine._id,
+
+        quantity,
+
+        purchasePrice,
+      });
+
+      // ===================================
+      // Store Stock Update
+      // ===================================
+
+      inventoryUpdates.push({
+        inventory,
+        medicine,
+        quantity,
+      });
+    }
+
+    // =====================================
+    // Create Purchase
+    // =====================================
+
+    const purchase =
+      await Purchase.create({
+        supplier,
+
+        invoiceNumber,
+
+        purchaseDate,
+
+        medicines:
+          purchaseMedicines,
+
+        totalAmount,
+
+        createdBy:
+          userId,
+      });
+
+    // =====================================
+    // UPDATE STOCK
+    //
+    // Medicine.stock += quantity
+    // Inventory.currentStock += quantity
+    // =====================================
+
+    for (
+      const item of inventoryUpdates
+    ) {
+      const quantity =
+        Number(
+          item.quantity
+        );
+
+      // ===================================
+      // Update Medicine Stock
+      // ===================================
+
+      item.medicine.stock =
+        Number(
+          item.medicine.stock || 0
+        ) + quantity;
+
+      // ===================================
+      // Update Inventory Stock
+      // ===================================
+
+      item.inventory.currentStock =
+        Number(
+          item.inventory.currentStock ||
+            0
+        ) + quantity;
+
+      // ===================================
+      // Save Medicine
+      // ===================================
+
+      await item.medicine.save();
+
+      // ===================================
+      // Save Inventory
+      // ===================================
+
+      await item.inventory.save();
+    }
+
+    // =====================================
+    // Return
+    // =====================================
+
+    return {
+      message:
+        MESSAGES.PURCHASE_CREATED,
+
+      purchase,
+    };
+  };
+
+// =======================================
+// Get All Purchases
+// Search + Pagination
+// =======================================
+
+export const getAllPurchasesService =
+  async (
+    search = "",
+    page = 1,
+    limit = 10
+  ) => {
+    page = Math.max(
+      Number(page) || 1,
       1
     );
 
-  return {
-    message:
-      MESSAGES.PURCHASES_FETCHED,
+    limit = Math.max(
+      Number(limit) || 10,
+      1
+    );
 
-    purchases,
+    const skip =
+      (page - 1) *
+      limit;
 
-    totalPurchases,
+    // =====================================
+    // Search
+    // =====================================
 
-    totalPages,
+    const purchaseQuery = {};
 
-    currentPage: page,
+    if (
+      search &&
+      search.trim()
+    ) {
+      const searchRegex =
+        new RegExp(
+          search.trim(),
+          "i"
+        );
 
-    limit,
-  };
-};
+      // Search invoice number
+      purchaseQuery.invoiceNumber =
+        searchRegex;
+    }
 
-// ==========================
-// Get Purchase By ID
-// ==========================
-export const getPurchaseByIdService =
-  async (id) => {
-    const purchase =
-      await Purchase.findById(id)
+    // =====================================
+    // Total Items
+    // =====================================
+
+    const totalItems =
+      await Purchase.countDocuments(
+        purchaseQuery
+      );
+
+    // =====================================
+    // Get Purchases
+    // =====================================
+
+    const purchases =
+      await Purchase.find(
+        purchaseQuery
+      )
         .populate(
           "supplier",
-          "supplierName contactNumber"
+          "supplierName contactNumber email"
         )
         .populate(
           "createdBy",
@@ -249,19 +401,78 @@ export const getPurchaseByIdService =
         )
         .populate(
           "medicines.medicine",
-          "medicineName company"
+          "medicineName genericName company category unit"
+        )
+        .sort({
+          createdAt: -1,
+        })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+    // =====================================
+    // Pagination
+    // =====================================
+
+    const totalPages =
+      Math.ceil(
+        totalItems / limit
+      ) || 1;
+
+    return {
+      message:
+        MESSAGES.PURCHASES_FETCHED,
+
+      purchases,
+
+      totalItems,
+
+      totalPages,
+
+      currentPage: page,
+
+      limit,
+    };
+  };
+
+// =======================================
+// Get Purchase By ID
+// =======================================
+
+export const getPurchaseByIdService =
+  async (id) => {
+    const purchase =
+      await Purchase.findById(
+        id
+      )
+        .populate(
+          "supplier",
+          "supplierName contactNumber email address"
+        )
+        .populate(
+          "createdBy",
+          "name email role"
+        )
+        .populate(
+          "medicines.medicine",
+          "medicineName genericName company category unit"
         )
         .lean();
 
     if (!purchase) {
-      throw new Error(
+      const error = new Error(
         MESSAGES.PURCHASE_NOT_FOUND
       );
+
+      error.statusCode = 404;
+
+      throw error;
     }
 
     return {
       message:
         MESSAGES.PURCHASE_FETCHED,
+
       purchase,
     };
   };
