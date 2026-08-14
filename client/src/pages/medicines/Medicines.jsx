@@ -289,7 +289,8 @@ function Medicines() {
         <div>
           <div className="mb-2 flex items-center gap-2">
 
-            <div
+          
+  {/* <div
               className="
                 flex h-9 w-9
                 items-center justify-center
@@ -306,8 +307,8 @@ function Medicines() {
                   dark:text-blue-400
                 "
               />
-            </div>
-
+            </div> */}
+{/* 
             <span
               className="
                 text-sm font-semibold
@@ -316,7 +317,7 @@ function Medicines() {
               "
             >
               Inventory Management
-            </span>
+            </span> */}
 
           </div>
 

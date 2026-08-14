@@ -72,11 +72,11 @@ function Login() {
                 <div>
 
                   <h1 className="text-xl font-bold">
-                    Medical Shop
+                    eMediShop
                   </h1>
 
                   <p className="text-sm text-blue-100">
-                    Management System
+                    Online Pharmacy
                   </p>
 
                 </div>

@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
 import User from "../models/userModel.js";
 
@@ -8,6 +8,14 @@ import { hashPassword } from "../utils/hashPassword.js";
 import { generateToken } from "../utils/generateToken.js";
 
 import { MESSAGES } from "../constants/messages.js";
+
+// =======================================
+// Resend Email Client
+// =======================================
+
+const resend = new Resend(
+  process.env.RESEND_API_KEY
+);
 
 // =======================================
 // Signup
@@ -211,117 +219,154 @@ export const forgotPasswordService = async ({
   // Create reset URL
   // =====================================
 
-  /*
-   * CLIENT_URL is your Vercel frontend URL.
-   *
-   * Example:
-   * https://emedical-shop-6w89.vercel.app
-   */
-
   const resetUrl =
     `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
   // =====================================
-  // Create email transporter
+  // Send email using Resend
   // =====================================
 
-  const transporter =
-    nodemailer.createTransport({
-      service: "gmail",
+  try {
+    const { data, error } =
+      await resend.emails.send({
+        from:
+          "eMedi Pharmacy <onboarding@resend.dev>",
 
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
+        to: [user.email],
+
+        subject:
+          "Reset Your eMedi Pharmacy Password",
+
+        html: `
+          <div style="
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            background-color: #ffffff;
+          ">
+
+            <h2 style="
+              color: #2563eb;
+              margin-bottom: 10px;
+            ">
+              eMedi Pharmacy
+            </h2>
+
+            <h3>
+              Password Reset Request
+            </h3>
+
+            <p>
+              Hello ${user.name},
+            </p>
+
+            <p>
+              We received a request to reset
+              your eMedi Pharmacy account password.
+            </p>
+
+            <p>
+              Click the button below to create
+              a new password.
+            </p>
+
+            <div style="margin: 25px 0;">
+
+              <a
+                href="${resetUrl}"
+                style="
+                  display: inline-block;
+                  padding: 12px 20px;
+                  background-color: #2563eb;
+                  color: #ffffff;
+                  text-decoration: none;
+                  border-radius: 6px;
+                  font-weight: bold;
+                "
+              >
+                Reset Password
+              </a>
+
+            </div>
+
+            <p>
+              This password reset link will expire
+              in <strong>15 minutes</strong>.
+            </p>
+
+            <p style="
+              color: #666666;
+              font-size: 14px;
+            ">
+              If you did not request this password
+              reset, you can safely ignore this email.
+            </p>
+
+            <p>
+              Regards,<br />
+              <strong>eMedi Pharmacy Team</strong>
+            </p>
+
+          </div>
+        `,
+      });
+
+    if (error) {
+      console.error(
+        "Resend email error:",
+        error
+      );
+
+      const emailError = new Error(
+        "Failed to send password reset email."
+      );
+
+      emailError.statusCode = 500;
+
+      throw emailError;
+    }
+
+    console.log(
+      "Password reset email sent:",
+      data?.id
+    );
+
+  } catch (error) {
+    console.error(
+      "Password reset email failed:",
+      error
+    );
+
+    /*
+     * Remove the reset token if email sending fails.
+     * This prevents an unusable token from remaining
+     * in the database.
+     */
+
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+
+    await user.save();
+
+    if (error.statusCode) {
+      throw error;
+    }
+
+    const emailError = new Error(
+      "Failed to send password reset email."
+    );
+
+    emailError.statusCode = 500;
+
+    throw emailError;
+  }
 
   // =====================================
-  // Send reset email
+  // Success
   // =====================================
-
-  await transporter.sendMail({
-    from:
-      `"eMedi Pharmacy" <${process.env.EMAIL_USER}>`,
-
-    to: user.email,
-
-    subject:
-      "Reset Your eMedi Pharmacy Password",
-
-    html: `
-      <div style="
-        font-family: Arial, sans-serif;
-        max-width: 600px;
-        margin: auto;
-        padding: 30px;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        background-color: #ffffff;
-      ">
-
-        <h2 style="
-          color: #2563eb;
-          margin-bottom: 10px;
-        ">
-          eMedi Pharmacy
-        </h2>
-
-        <h3>
-          Password Reset Request
-        </h3>
-
-        <p>
-          Hello ${user.name},
-        </p>
-
-        <p>
-          We received a request to reset
-          your eMedi Pharmacy account password.
-        </p>
-
-        <p>
-          Click the button below to create
-          a new password.
-        </p>
-
-        <div style="margin: 25px 0;">
-          <a
-            href="${resetUrl}"
-            style="
-              display: inline-block;
-              padding: 12px 20px;
-              background-color: #2563eb;
-              color: #ffffff;
-              text-decoration: none;
-              border-radius: 6px;
-              font-weight: bold;
-            "
-          >
-            Reset Password
-          </a>
-        </div>
-
-        <p>
-          This password reset link will expire
-          in <strong>15 minutes</strong>.
-        </p>
-
-        <p style="
-          color: #666666;
-          font-size: 14px;
-        ">
-          If you did not request this password
-          reset, you can safely ignore this email.
-        </p>
-
-        <p>
-          Regards,<br />
-          <strong>eMedi Pharmacy Team</strong>
-        </p>
-
-      </div>
-    `,
-  });
 
   return {
     message:
