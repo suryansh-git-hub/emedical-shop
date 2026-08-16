@@ -19,8 +19,7 @@ function Signup() {
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] =
-    useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -38,7 +37,6 @@ function Signup() {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-
       const payload = {
         name: data.name,
         email: data.email,
@@ -47,16 +45,13 @@ function Signup() {
       };
 
       const response = await registerUser(payload);
-
       toast.success(
         response.message || "Account created successfully."
       );
-
       navigate("/");
     } catch (error) {
       toast.error(
-        error.response?.data?.message ||
-          "Registration failed."
+        error.response?.data?.message || "Registration failed."
       );
     } finally {
       setLoading(false);
@@ -64,78 +59,62 @@ function Signup() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-8">
+    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-8 dark:bg-slate-950">
       <div className="w-full max-w-md">
 
         {/* Logo / Brand */}
         <div className="mb-6 flex flex-col items-center">
-          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 shadow-lg shadow-blue-200">
-            <span className="text-xl font-bold text-white">
-              eM
-            </span>
+          <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 shadow-lg shadow-blue-200 dark:shadow-none">
+            <span className="text-xl font-bold text-white">eM</span>
           </div>
-
-          <h1 className="text-xl font-bold text-slate-900">
+          <h1 className="text-xl font-bold text-slate-900 dark:text-white">
             eMedi Pharmacy
           </h1>
-
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Pharmacy Management System
           </p>
         </div>
 
         {/* Signup Card */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-7 shadow-xl shadow-slate-200/60">
+        <div className="rounded-2xl border border-slate-200 bg-white p-7 shadow-xl shadow-slate-200/60 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
 
           {/* Header */}
           <div className="mb-7">
-            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50">
-              <UserPlus
-                size={22}
-                className="text-blue-600"
-              />
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950/40">
+              <UserPlus size={22} className="text-blue-600 dark:text-blue-400" />
             </div>
-
-            <h2 className="text-2xl font-bold text-slate-900">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
               Create Account
             </h2>
-
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               Create an account to manage your medical shop.
             </p>
           </div>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-5"
-          >
-
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {/* Name */}
             <div>
-              <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+              <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                 Full Name
               </label>
-
               <div className="relative">
                 <User
                   size={18}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                 />
-
                 <input
                   type="text"
                   placeholder="Enter your name"
-                  className={`w-full rounded-xl border bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:ring-2 ${
+                  className={`w-full rounded-xl border bg-white py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:bg-slate-800 ${
                     errors.name
-                      ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                      : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+                      ? "border-red-400 focus:border-red-500 focus:ring-red-100 dark:focus:ring-red-950"
+                      : "border-slate-200 focus:border-blue-500 focus:ring-blue-100 dark:focus:border-blue-500 dark:focus:ring-blue-950"
                   }`}
                   {...register("name", {
                     required: "Name is required",
                   })}
                 />
               </div>
-
               {errors.name && (
                 <p className="mt-1.5 text-xs font-medium text-red-500">
                   {errors.name.message}
@@ -145,30 +124,27 @@ function Signup() {
 
             {/* Email */}
             <div>
-              <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+              <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                 Email Address
               </label>
-
               <div className="relative">
                 <Mail
                   size={18}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                 />
-
                 <input
                   type="email"
                   placeholder="you@example.com"
-                  className={`w-full rounded-xl border bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:ring-2 ${
+                  className={`w-full rounded-xl border bg-white py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:bg-slate-800 ${
                     errors.email
-                      ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                      : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+                      ? "border-red-400 focus:border-red-500 focus:ring-red-100 dark:focus:ring-red-950"
+                      : "border-slate-200 focus:border-blue-500 focus:ring-blue-100 dark:focus:border-blue-500 dark:focus:ring-blue-950"
                   }`}
                   {...register("email", {
                     required: "Email is required",
                   })}
                 />
               </div>
-
               {errors.email && (
                 <p className="mt-1.5 text-xs font-medium text-red-500">
                   {errors.email.message}
@@ -178,53 +154,38 @@ function Signup() {
 
             {/* Password */}
             <div>
-              <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+              <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                 Password
               </label>
-
               <div className="relative">
                 <Lock
                   size={18}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                 />
-
                 <input
-                  type={
-                    showPassword
-                      ? "text"
-                      : "password"
-                  }
+                  type={showPassword ? "text" : "password"}
                   placeholder="Create a password"
-                  className={`w-full rounded-xl border bg-white py-3 pl-10 pr-11 text-sm outline-none transition focus:ring-2 ${
+                  className={`w-full rounded-xl border bg-white py-3 pl-10 pr-11 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:bg-slate-800 ${
                     errors.password
-                      ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                      : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+                      ? "border-red-400 focus:border-red-500 focus:ring-red-100 dark:focus:ring-red-950"
+                      : "border-slate-200 focus:border-blue-500 focus:ring-blue-100 dark:focus:border-blue-500 dark:focus:ring-blue-950"
                   }`}
                   {...register("password", {
                     required: "Password is required",
                     minLength: {
                       value: 8,
-                      message:
-                        "Password must be at least 8 characters",
+                      message: "Password must be at least 8 characters",
                     },
                   })}
                 />
-
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowPassword(!showPassword)
-                  }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
-                  {showPassword ? (
-                    <EyeOff size={18} />
-                  ) : (
-                    <Eye size={18} />
-                  )}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-
               {errors.password && (
                 <p className="mt-1.5 text-xs font-medium text-red-500">
                   {errors.password.message}
@@ -234,53 +195,36 @@ function Signup() {
 
             {/* Confirm Password */}
             <div>
-              <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+              <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                 Confirm Password
               </label>
-
               <div className="relative">
                 <Lock
                   size={18}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                 />
-
                 <input
-                  type={
-                    showConfirmPassword
-                      ? "text"
-                      : "password"
-                  }
+                  type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
-                  className={`w-full rounded-xl border bg-white py-3 pl-10 pr-11 text-sm outline-none transition focus:ring-2 ${
+                  className={`w-full rounded-xl border bg-white py-3 pl-10 pr-11 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:ring-2 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:bg-slate-800 ${
                     errors.confirmPassword
-                      ? "border-red-400 focus:border-red-500 focus:ring-red-100"
-                      : "border-slate-200 focus:border-blue-500 focus:ring-blue-100"
+                      ? "border-red-400 focus:border-red-500 focus:ring-red-100 dark:focus:ring-red-950"
+                      : "border-slate-200 focus:border-blue-500 focus:ring-blue-100 dark:focus:border-blue-500 dark:focus:ring-blue-950"
                   }`}
                   {...register("confirmPassword", {
                     required: "Confirm your password",
                     validate: (value) =>
-                      value === password ||
-                      "Passwords do not match",
+                      value === password || "Passwords do not match",
                   })}
                 />
-
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowConfirmPassword(
-                      !showConfirmPassword
-                    )
-                  }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff size={18} />
-                  ) : (
-                    <Eye size={18} />
-                  )}
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-
               {errors.confirmPassword && (
                 <p className="mt-1.5 text-xs font-medium text-red-500">
                   {errors.confirmPassword.message}
@@ -290,27 +234,20 @@ function Signup() {
 
             {/* Role */}
             <div>
-              <label className="mb-1.5 block text-sm font-semibold text-slate-700">
+              <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-200">
                 Account Role
               </label>
-
               <div className="relative">
                 <ShieldCheck
                   size={18}
                   className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                 />
-
                 <select
-                  className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:focus:border-blue-500 dark:focus:ring-blue-950"
                   {...register("role")}
                 >
-                  <option value="pharmacist">
-                    Pharmacist
-                  </option>
-
-                  <option value="admin">
-                    Admin
-                  </option>
+                  <option value="pharmacist">Pharmacist</option>
+                  <option value="admin">Admin</option>
                 </select>
               </div>
             </div>
@@ -319,7 +256,7 @@ function Signup() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 hover:shadow-blue-300 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-sm font-semibold text-white shadow-lg shadow-blue-200 transition hover:bg-blue-700 hover:shadow-blue-300 disabled:cursor-not-allowed disabled:opacity-60 dark:shadow-none"
             >
               {loading ? (
                 <>
@@ -336,11 +273,11 @@ function Signup() {
           </form>
 
           {/* Login */}
-          <div className="mt-6 border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
+          <div className="mt-6 border-t border-slate-100 pt-5 text-center text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
             Already have an account?{" "}
             <Link
               to="/"
-              className="font-semibold text-blue-600 transition hover:text-blue-700 hover:underline"
+              className="font-semibold text-blue-600 transition hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
             >
               Login
             </Link>
@@ -348,7 +285,7 @@ function Signup() {
         </div>
 
         {/* Footer */}
-        <p className="mt-5 text-center text-xs text-slate-400">
+        <p className="mt-5 text-center text-xs text-slate-400 dark:text-slate-500">
           © {new Date().getFullYear()} eMedi Pharmacy. All rights reserved.
         </p>
       </div>

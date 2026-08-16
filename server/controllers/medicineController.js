@@ -6,6 +6,8 @@ import {
   deleteMedicineService,
 } from "../services/medicineService.js";
 
+import uploadImageToCloudinary from "../utils/uploadImageToCloudinary.js";
+
 // =======================================
 // Create Medicine
 // =======================================
@@ -19,13 +21,13 @@ export const createMedicine = async (
       ...req.body,
     };
 
-    // =======================================
-    // Medicine Image
-    // =======================================
-
+    // If an image was uploaded, send it to
+    // Cloudinary and store the permanent URL
     if (req.file) {
       medicineData.medicineImage =
-        req.file.filename;
+        await uploadImageToCloudinary(
+          req.file
+        );
     }
 
     const result =
@@ -84,13 +86,18 @@ export const getAllMedicines = async (
 
     return res.status(200).json({
       success: true,
+
       message: result.message,
+
       medicines:
         result.medicines,
+
       currentPage:
         result.currentPage,
+
       totalPages:
         result.totalPages,
+
       totalMedicines:
         result.totalMedicines,
     });
@@ -146,19 +153,14 @@ export const updateMedicine = async (
       ...req.body,
     };
 
-    // =======================================
-    // New Medicine Image
-    // =======================================
-    // If user uploads a new image,
-    // send the new filename.
-    //
-    // If no image is uploaded,
-    // medicineImage is NOT added here,
-    // so the existing image remains unchanged.
-
+    // If a new image was uploaded, send it
+    // to Cloudinary and store the permanent
+    // URL
     if (req.file) {
       medicineData.medicineImage =
-        req.file.filename;
+        await uploadImageToCloudinary(
+          req.file
+        );
     }
 
     const result =

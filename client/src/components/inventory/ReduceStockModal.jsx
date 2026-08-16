@@ -173,40 +173,41 @@ const ReduceStockModal = ({
                 Quantity to remove
               </label>
 
-              <input
-                type="number"
-                min="1"
-                autoFocus
-                value={quantity}
-                onChange={(e) => {
-                  setQuantity(e.target.value);
-                  setError("");
-                }}
-                className="
-                  w-full
-                  rounded-xl
-                  border
-                  border-slate-200
-                  bg-slate-50
-                  px-3.5
-                  py-2.5
-                  text-sm
-                  text-slate-700
-                  outline-none
-                  transition
+            <input
+  type="number"
+  min="1"
+  autoFocus
+  value={quantity}
+  onChange={(e) => {
+    setQuantity(e.target.value);
+    setError("");
+  }}
+  className="
+    w-full
+    rounded-xl
+    border
+    border-slate-200
+    bg-slate-50
+    px-3.5
+    py-2.5
+    text-sm
+    text-slate-900
+    outline-none
+    transition
 
-                  focus:border-blue-500
-                  focus:bg-white
-                  focus:ring-4
-                  focus:ring-blue-100
+    focus:border-blue-500
+    focus:bg-white
+    focus:ring-4
+    focus:ring-blue-100
 
-                  dark:border-slate-700
-                  dark:bg-slate-800
-                  dark:text-slate-200
-                  dark:focus:border-blue-500
-                  dark:focus:ring-blue-950
-                "
-              />
+    dark:border-slate-700
+    dark:bg-slate-800
+    dark:text-white
+    dark:focus:bg-slate-800
+    dark:focus:border-blue-500
+    dark:focus:ring-blue-950
+  "
+/>
 
               <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">
                 Currently in stock: {currentStock}

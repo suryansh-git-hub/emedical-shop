@@ -62,6 +62,11 @@ app.use(
       "Content-Type",
       "Authorization",
     ],
+
+    // Let the browser cache this preflight
+    // check for 10 minutes instead of
+    // re-asking before every single request.
+    maxAge: 600,
   })
 );
 
@@ -70,94 +75,49 @@ app.use(
 // =======================================
 
 app.use(express.json());
-
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
+app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 
 // =======================================
-// Static Uploaded Images
+// Static Uploads
 // =======================================
 
-// uploads folder:
-// server/uploads/
-
+// Absolute path to uploads folder
 const uploadPath = path.join(
   process.cwd(),
   "uploads"
 );
 
-// Make uploaded images publicly accessible.
-//
-// Example:
-// http://localhost:5000/uploads/123456789-image.jpg
-
+// Make uploaded images publicly accessible
 app.use(
   "/uploads",
-  express.static(uploadPath, {
-    maxAge: 0,
-    etag: false,
-    lastModified: false,
-  })
+  express.static(uploadPath)
 );
 
 // =======================================
 // API Routes
 // =======================================
 
-app.use(
-  "/api/auth",
-  authRoute
-);
+app.use("/api/auth", authRoute);
 
-app.use(
-  "/api/users",
-  userRoute
-);
+app.use("/api/users", userRoute);
 
-app.use(
-  "/api/medicines",
-  medicineRoute
-);
+app.use("/api/medicines", medicineRoute);
 
-app.use(
-  "/api/suppliers",
-  supplierRoute
-);
+app.use("/api/suppliers", supplierRoute);
 
-app.use(
-  "/api/customers",
-  customerRoute
-);
+app.use("/api/customers", customerRoute);
 
-app.use(
-  "/api/purchases",
-  purchaseRoute
-);
+app.use("/api/purchases", purchaseRoute);
 
-app.use(
-  "/api/inventory",
-  inventoryRoute
-);
+app.use("/api/inventory", inventoryRoute);
 
-app.use(
-  "/api/sales",
-  saleRoute
-);
+app.use("/api/sales", saleRoute);
 
-app.use(
-  "/api/dashboard",
-  dashboardRoute
-);
+app.use("/api/dashboard", dashboardRoute);
 
-app.use(
-  "/api/reports",
-  reportRoute
-);
+app.use("/api/reports", reportRoute);
 
 // =======================================
 // Export
