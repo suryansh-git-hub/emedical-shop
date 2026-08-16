@@ -146,7 +146,7 @@ const Purchases = () => {
       setPurchases(purchaseList);
 
       setTotalPurchases(
-        Number(response.totalPurchases) || 0
+        Number(response.totalItems) || 0
       );
 
       setTotalPages(
@@ -725,6 +725,7 @@ const Purchases = () => {
 
         <PurchaseTable
           purchases={purchases}
+          totalPurchases={totalPurchases}
         />
 
         {/* ==========================================

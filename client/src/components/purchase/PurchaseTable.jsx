@@ -1,6 +1,14 @@
 import { ShoppingCart, Package } from "lucide-react";
 
-const PurchaseTable = ({ purchases }) => {
+const PurchaseTable = ({
+  purchases,
+  totalPurchases,
+}) => {
+  const displayCount =
+    typeof totalPurchases === "number"
+      ? totalPurchases
+      : purchases.length;
+
   return (
     <div
       className="
@@ -41,8 +49,8 @@ const PurchaseTable = ({ purchases }) => {
           </h2>
 
           <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-            {purchases.length} purchase
-            {purchases.length !== 1 ? "s" : ""} found
+            {displayCount} purchase
+            {displayCount !== 1 ? "s" : ""} found
           </p>
         </div>
 

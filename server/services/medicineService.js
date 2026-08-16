@@ -4,6 +4,9 @@ import Inventory from "../models/inventoryModel.js";
 import Purchase from "../models/purchaseModel.js";
 import Sale from "../models/saleModel.js";
 
+import fs from "fs";
+import path from "path";
+
 // =======================================
 // Create Medicine
 // =======================================
@@ -327,7 +330,33 @@ export const updateMedicineService =
     }
 
     // =======================================
-    // Update
+    // Replace Old Medicine Image
+    // =======================================
+
+    if (
+      medicineData.medicineImage &&
+      medicine.medicineImage &&
+      medicineData.medicineImage !==
+        medicine.medicineImage
+    ) {
+      const oldImagePath =
+        path.join(
+          process.cwd(),
+          "uploads",
+          medicine.medicineImage
+        );
+
+      if (
+        fs.existsSync(oldImagePath)
+      ) {
+        fs.unlinkSync(
+          oldImagePath
+        );
+      }
+    }
+
+    // =======================================
+    // Update Medicine
     // =======================================
 
     Object.assign(
@@ -410,6 +439,27 @@ export const deleteMedicineService =
     await Inventory.deleteOne({
       medicine: id,
     });
+
+    // =======================================
+    // Delete Medicine Image
+    // =======================================
+
+    if (medicine.medicineImage) {
+      const imagePath =
+        path.join(
+          process.cwd(),
+          "uploads",
+          medicine.medicineImage
+        );
+
+      if (
+        fs.existsSync(imagePath)
+      ) {
+        fs.unlinkSync(
+          imagePath
+        );
+      }
+    }
 
     // =======================================
     // Delete Medicine

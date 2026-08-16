@@ -6,6 +6,8 @@ import {
   IndianRupee,
   TriangleAlert,
   RefreshCw,
+  PackageSearch,
+  ShoppingCart,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -276,6 +278,7 @@ function Dashboard() {
           <StatCard
             title="Medicines"
             value={dashboard.totalMedicines}
+            subtitle="In your catalog"
             icon={
               <Pill
                 size={24}
@@ -289,6 +292,7 @@ function Dashboard() {
             <StatCard
               title="Suppliers"
               value={dashboard.totalSuppliers}
+              subtitle="Active suppliers"
               icon={
                 <Truck
                   size={24}
@@ -302,6 +306,7 @@ function Dashboard() {
           <StatCard
             title="Customers"
             value={dashboard.totalCustomers}
+            subtitle="Registered customers"
             icon={
               <Users
                 size={24}
@@ -316,6 +321,7 @@ function Dashboard() {
             value={`₹${Number(
               dashboard.todaySales || 0
             ).toLocaleString("en-IN")}`}
+            subtitle="Revenue today"
             icon={
               <IndianRupee
                 size={24}
@@ -330,6 +336,7 @@ function Dashboard() {
             value={`₹${Number(
               dashboard.monthlyRevenue || 0
             ).toLocaleString("en-IN")}`}
+            subtitle="This calendar month"
             icon={
               <IndianRupee
                 size={24}
@@ -344,6 +351,7 @@ function Dashboard() {
             value={
               dashboard.expiredMedicines?.length || 0
             }
+            subtitle="Past expiry date"
             icon={
               <TriangleAlert
                 size={24}
@@ -352,6 +360,36 @@ function Dashboard() {
             }
             color="bg-red-500"
           />
+
+          <StatCard
+            title="Low Stock"
+            value={
+              dashboard.lowStockMedicines?.length || 0
+            }
+            subtitle="Medicines need restocking"
+            icon={
+              <PackageSearch
+                size={24}
+                className="text-white"
+              />
+            }
+            color="bg-amber-500"
+          />
+
+          {isAdmin && (
+            <StatCard
+              title="Total Purchases"
+              value={dashboard.totalPurchases || 0}
+              subtitle="Purchase records"
+              icon={
+                <ShoppingCart
+                  size={24}
+                  className="text-white"
+                />
+              }
+              color="bg-purple-500"
+            />
+          )}
 
         </div>
 
@@ -376,17 +414,13 @@ function Dashboard() {
         "
       >
 
-   
-
-           <CategorySalesChart
+        <CategorySalesChart
           data={
             dashboard.categorySales || []
           }
         />
 
-      
-
-         <TopSellingMedicines
+        <TopSellingMedicines
           medicines={
             dashboard.topSellingMedicines || []
           }
@@ -418,12 +452,12 @@ function Dashboard() {
           xl:grid-cols-2
         "
       >
-     <LowStockTable
+
+        <LowStockTable
           medicines={
             dashboard.lowStockMedicines || []
           }
         />
-     
 
         {isAdmin && (
           <RecentPurchases
@@ -447,13 +481,12 @@ function Dashboard() {
           xl:grid-cols-2
         "
       >
-  
-    <RecentSales
+
+        <RecentSales
           sales={
             dashboard.recentSales || []
           }
         />
-       
 
         <ExpiringMedicines
           medicines={

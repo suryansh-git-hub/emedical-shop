@@ -26,7 +26,9 @@ const monthNames = [
 
 function SalesOverview({ data = [] }) {
   const chartData = data.map((item) => ({
-    month: monthNames[item._id.month],
+    month: `${
+      monthNames[item._id.month]
+    } ${item._id.year}`,
     sales: Number(item.totalSales || 0),
   }));
 

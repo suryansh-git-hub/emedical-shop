@@ -194,12 +194,34 @@ export const getDashboardStatsService = async () => {
 
   // =========================
   // Monthly Sales Chart
+  //
+  // Always return the last 6 months
+  // (including months with zero sales) so the
+  // dashboard chart always has a proper line
+  // to draw, instead of a single dot when the
+  // shop has only been used for one month.
   // =========================
 
-  const monthlySales = await Sale.aggregate([
+  const sixMonthsAgo = new Date(
+    today.getFullYear(),
+    today.getMonth() - 5,
+    1
+  );
+
+  const monthlySalesRaw = await Sale.aggregate([
+    {
+      $match: {
+        saleDate: {
+          $gte: sixMonthsAgo,
+        },
+      },
+    },
     {
       $group: {
         _id: {
+          year: {
+            $year: "$saleDate",
+          },
           month: {
             $month: "$saleDate",
           },
@@ -209,12 +231,36 @@ export const getDashboardStatsService = async () => {
         },
       },
     },
-    {
-      $sort: {
-        "_id.month": 1,
-      },
-    },
   ]);
+
+  const monthlySales = [];
+
+  for (let i = 5; i >= 0; i--) {
+    const monthDate = new Date(
+      today.getFullYear(),
+      today.getMonth() - i,
+      1
+    );
+
+    const year = monthDate.getFullYear();
+    const month = monthDate.getMonth() + 1;
+
+    const match = monthlySalesRaw.find(
+      (item) =>
+        item._id.year === year &&
+        item._id.month === month
+    );
+
+    monthlySales.push({
+      _id: {
+        year,
+        month,
+      },
+      totalSales: match
+        ? match.totalSales
+        : 0,
+    });
+  }
 
   // =========================
   // Category-wise Sales

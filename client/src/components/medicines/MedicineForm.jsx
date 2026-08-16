@@ -801,6 +801,7 @@ function MedicineForm({ onSubmit, defaultValues }) {
                 type="number"
                 min="0"
                 placeholder="Enter quantity"
+                readOnly={!!defaultValues}
                 {...register("stock", {
                   required:
                     "Stock Quantity is required",
@@ -813,6 +814,11 @@ function MedicineForm({ onSubmit, defaultValues }) {
                 className={`
                   ${inputClass(errors.stock)}
                   pl-9
+                  ${
+                    defaultValues
+                      ? "cursor-not-allowed opacity-60"
+                      : ""
+                  }
                 `}
               />
 
@@ -821,6 +827,20 @@ function MedicineForm({ onSubmit, defaultValues }) {
             {errors.stock && (
               <p className="mt-1 text-xs text-red-500">
                 {errors.stock.message}
+              </p>
+            )}
+
+            {defaultValues && (
+              <p
+                className="
+                  mt-1
+                  text-xs
+                  text-slate-400
+                  dark:text-slate-500
+                "
+              >
+                Stock can only be changed from the
+                Inventory page.
               </p>
             )}
 

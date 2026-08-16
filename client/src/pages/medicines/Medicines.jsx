@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import {
-  Pill,
+  
   RefreshCw,
   PackageSearch,
 } from "lucide-react";
@@ -290,34 +290,7 @@ function Medicines() {
           <div className="mb-2 flex items-center gap-2">
 
           
-  {/* <div
-              className="
-                flex h-9 w-9
-                items-center justify-center
-                rounded-xl
-                bg-blue-50
-
-                dark:bg-blue-950/60
-              "
-            >
-              <Pill
-                size={19}
-                className="
-                  text-blue-600
-                  dark:text-blue-400
-                "
-              />
-            </div> */}
-{/* 
-            <span
-              className="
-                text-sm font-semibold
-                text-blue-600
-                dark:text-blue-400
-              "
-            >
-              Inventory Management
-            </span> */}
+  
 
           </div>
 

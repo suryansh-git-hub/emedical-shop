@@ -19,7 +19,10 @@ export const createMedicine = async (
       ...req.body,
     };
 
-    // If an image was uploaded
+    // =======================================
+    // Medicine Image
+    // =======================================
+
     if (req.file) {
       medicineData.medicineImage =
         req.file.filename;
@@ -81,18 +84,13 @@ export const getAllMedicines = async (
 
     return res.status(200).json({
       success: true,
-
       message: result.message,
-
       medicines:
         result.medicines,
-
       currentPage:
         result.currentPage,
-
       totalPages:
         result.totalPages,
-
       totalMedicines:
         result.totalMedicines,
     });
@@ -148,7 +146,16 @@ export const updateMedicine = async (
       ...req.body,
     };
 
-    // If a new image was uploaded
+    // =======================================
+    // New Medicine Image
+    // =======================================
+    // If user uploads a new image,
+    // send the new filename.
+    //
+    // If no image is uploaded,
+    // medicineImage is NOT added here,
+    // so the existing image remains unchanged.
+
     if (req.file) {
       medicineData.medicineImage =
         req.file.filename;

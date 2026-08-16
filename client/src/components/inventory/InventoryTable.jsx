@@ -302,7 +302,10 @@ const InventoryTable = ({
                         </p>
 
                         <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
-                          Medicine
+                          Batch:{" "}
+                          {item.medicine
+                            ?.batchNumber ||
+                            "-"}
                         </p>
 
                       </div>

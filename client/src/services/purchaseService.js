@@ -71,7 +71,16 @@ export const getSuppliers = async () => {
 
 export const getMedicines = async () => {
   const response = await api.get(
-    "/medicines"
+    "/medicines",
+    {
+      params: {
+        // The Purchase form needs every
+        // medicine available to select from,
+        // not just the first page (default
+        // page size is 10).
+        limit: 1000,
+      },
+    }
   );
 
   return response.data;

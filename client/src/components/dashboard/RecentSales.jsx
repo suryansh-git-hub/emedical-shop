@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+//import { Link } from "react-router-dom";
 import { Receipt, ShoppingBag } from "lucide-react";
 
 function RecentSales({ sales = [] }) {
@@ -61,7 +61,7 @@ function RecentSales({ sales = [] }) {
           </div>
         </div>
 
-        <Link
+        {/* <Link
           to="/sales"
           className="
             rounded-lg
@@ -76,7 +76,7 @@ function RecentSales({ sales = [] }) {
           "
         >
           View All →
-        </Link>
+        </Link> */}
       </div>
 
       {/* Empty State */}

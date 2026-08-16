@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import {
@@ -14,6 +15,7 @@ import {
 import InventoryTable from "../../components/inventory/InventoryTable";
 import InventoryFilter from "../../components/inventory/InventoryFilter";
 import InventoryModal from "../../components/inventory/InventoryModal";
+import ReduceStockModal from "../../components/inventory/ReduceStockModal";
 import StockHistoryTable from "../../components/inventory/StockHistoryTable";
 
 import {
@@ -27,6 +29,8 @@ import {
 } from "../../services/inventoryService";
 
 const Inventory = () => {
+  const navigate = useNavigate();
+
   // ==========================================
   // Loading
   // ==========================================
@@ -257,22 +261,27 @@ const Inventory = () => {
   };
 
   // ==========================================
-  // UPDATE STOCK
-  // Add / Remove
+  // REDUCE STOCK MODAL
   // ==========================================
 
-  const handleStockUpdate = async (
-    inventoryItem,
-    type
-  ) => {
-    // ========================================
-    // Validate Inventory Item
-    // ========================================
+  const [
+    reduceStockItem,
+    setReduceStockItem,
+  ] = useState(null);
 
-    if (
-      !inventoryItem ||
-      !inventoryItem.medicine?._id
-    ) {
+  const [
+    reducingStock,
+    setReducingStock,
+  ] = useState(false);
+
+  // ==========================================
+  // UPDATE STOCK (Reduce)
+  // ==========================================
+
+  const handleConfirmReduceStock = async (
+    quantity
+  ) => {
+    if (!reduceStockItem?.medicine?._id) {
       toast.error(
         "Medicine information is missing."
       );
@@ -280,96 +289,8 @@ const Inventory = () => {
       return;
     }
 
-    // ========================================
-    // Medicine Information
-    // ========================================
-
-    const medicineId =
-      inventoryItem.medicine._id;
-
-    const medicineName =
-      inventoryItem.medicine.medicineName ||
-      "this medicine";
-
-    // ========================================
-    // Determine Action
-    // Backend expects:
-    // "increase" or "decrease"
-    // ========================================
-
-    const action =
-      type === "add"
-        ? "increase"
-        : "decrease";
-
-    const actionText =
-      action === "increase"
-        ? "Add"
-        : "Remove";
-
-    // ========================================
-    // Ask Quantity
-    // ========================================
-
-    const quantityInput =
-      window.prompt(
-        `${actionText} how many units of ${medicineName}?`,
-        "1"
-      );
-
-    // User clicked Cancel
-    if (quantityInput === null) {
-      return;
-    }
-
-    // ========================================
-    // Convert Quantity
-    // ========================================
-
-    const quantity =
-      Number(quantityInput);
-
-    // ========================================
-    // Validate Quantity
-    // ========================================
-
-    if (
-      !Number.isInteger(quantity) ||
-      quantity <= 0
-    ) {
-      toast.error(
-        "Please enter a valid whole number greater than 0."
-      );
-
-      return;
-    }
-
-    // ========================================
-    // Current Inventory Stock
-    // ========================================
-
-    const currentStock =
-      Number(
-        inventoryItem.currentStock
-      ) || 0;
-
-    // ========================================
-    // Remove Stock Validation
-    // ========================================
-
-    if (
-      action === "decrease" &&
-      quantity > currentStock
-    ) {
-      toast.error(
-        `Only ${currentStock} units are available.`
-      );
-
-      return;
-    }
-
     try {
-      setUpdatingStock(true);
+      setReducingStock(true);
 
       // ======================================
       // UPDATE BOTH:
@@ -380,19 +301,17 @@ const Inventory = () => {
 
       const response =
         await updateInventoryStock(
-          medicineId,
-          action,
+          reduceStockItem.medicine._id,
+          "decrease",
           quantity
         );
 
       toast.success(
         response.message ||
-          `${
-            action === "increase"
-              ? "Stock added"
-              : "Stock removed"
-          } successfully.`
+          "Stock removed successfully."
       );
+
+      setReduceStockItem(null);
 
       // ======================================
       // Reload Current Inventory
@@ -410,34 +329,58 @@ const Inventory = () => {
           "Failed to update stock."
       );
     } finally {
-      setUpdatingStock(false);
+      setReducingStock(false);
     }
   };
 
   // ==========================================
   // INCREASE STOCK
+  //
+  // Stock should only ever go up through a
+  // recorded Purchase (so supplier, price and
+  // batch are tracked). Send the user to the
+  // Purchases page with this medicine
+  // pre-selected instead of silently bumping
+  // the number here.
   // ==========================================
 
   const handleIncreaseStock = (
     inventoryItem
   ) => {
-    handleStockUpdate(
-      inventoryItem,
-      "add"
-    );
+    if (!inventoryItem?.medicine?._id) {
+      toast.error(
+        "Medicine information is missing."
+      );
+
+      return;
+    }
+
+    navigate("/purchases", {
+      state: {
+        medicine: inventoryItem.medicine,
+      },
+    });
   };
 
   // ==========================================
   // REDUCE STOCK
+  //
+  // Opens the Reduce Stock modal instead of a
+  // raw browser prompt().
   // ==========================================
 
   const handleReduceStock = (
     inventoryItem
   ) => {
-    handleStockUpdate(
-      inventoryItem,
-      "remove"
-    );
+    if (!inventoryItem?.medicine?._id) {
+      toast.error(
+        "Medicine information is missing."
+      );
+
+      return;
+    }
+
+    setReduceStockItem(inventoryItem);
   };
 
   // ==========================================
@@ -1208,6 +1151,28 @@ const Inventory = () => {
           history={stockHistory}
         />
       </InventoryModal>
+
+      {/* ==========================================
+          REDUCE STOCK
+      ========================================== */}
+
+      <ReduceStockModal
+        isOpen={!!reduceStockItem}
+        medicineName={
+          reduceStockItem?.medicine
+            ?.medicineName
+        }
+        currentStock={
+          reduceStockItem?.currentStock || 0
+        }
+        submitting={reducingStock}
+        onClose={() =>
+          setReduceStockItem(null)
+        }
+        onConfirm={
+          handleConfirmReduceStock
+        }
+      />
 
     </div>
   );

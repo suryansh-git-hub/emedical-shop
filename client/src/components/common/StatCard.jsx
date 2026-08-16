@@ -1,7 +1,16 @@
-function StatCard({ title, value, icon, color }) {
+function StatCard({
+  title,
+  value,
+  subtitle,
+  icon,
+  color,
+}) {
   return (
     <div
       className="
+        group
+        relative
+        overflow-hidden
         rounded-xl
         border
         border-slate-200
@@ -20,6 +29,23 @@ function StatCard({ title, value, icon, color }) {
         dark:hover:bg-slate-800
       "
     >
+
+      {/* Accent bar */}
+
+      <div
+        className={`
+          absolute
+          inset-x-0
+          top-0
+          h-1
+          opacity-0
+          transition-opacity
+          duration-200
+          group-hover:opacity-100
+          ${color}
+        `}
+      />
+
       <div className="flex items-center justify-between">
 
         {/* ================= Content ================= */}
@@ -48,6 +74,20 @@ function StatCard({ title, value, icon, color }) {
           >
             {value}
           </h2>
+
+          {subtitle && (
+            <p
+              className="
+                mt-1
+                text-xs
+                font-medium
+                text-slate-400
+                dark:text-slate-500
+              "
+            >
+              {subtitle}
+            </p>
+          )}
 
         </div>
 

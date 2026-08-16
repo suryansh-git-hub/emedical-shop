@@ -70,49 +70,94 @@ app.use(
 // =======================================
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 
 app.use(cookieParser());
 
 // =======================================
-// Static Uploads
+// Static Uploaded Images
 // =======================================
 
-// Absolute path to uploads folder
+// uploads folder:
+// server/uploads/
+
 const uploadPath = path.join(
   process.cwd(),
   "uploads"
 );
 
-// Make uploaded images publicly accessible
+// Make uploaded images publicly accessible.
+//
+// Example:
+// http://localhost:5000/uploads/123456789-image.jpg
+
 app.use(
   "/uploads",
-  express.static(uploadPath)
+  express.static(uploadPath, {
+    maxAge: 0,
+    etag: false,
+    lastModified: false,
+  })
 );
 
 // =======================================
 // API Routes
 // =======================================
 
-app.use("/api/auth", authRoute);
+app.use(
+  "/api/auth",
+  authRoute
+);
 
-app.use("/api/users", userRoute);
+app.use(
+  "/api/users",
+  userRoute
+);
 
-app.use("/api/medicines", medicineRoute);
+app.use(
+  "/api/medicines",
+  medicineRoute
+);
 
-app.use("/api/suppliers", supplierRoute);
+app.use(
+  "/api/suppliers",
+  supplierRoute
+);
 
-app.use("/api/customers", customerRoute);
+app.use(
+  "/api/customers",
+  customerRoute
+);
 
-app.use("/api/purchases", purchaseRoute);
+app.use(
+  "/api/purchases",
+  purchaseRoute
+);
 
-app.use("/api/inventory", inventoryRoute);
+app.use(
+  "/api/inventory",
+  inventoryRoute
+);
 
-app.use("/api/sales", saleRoute);
+app.use(
+  "/api/sales",
+  saleRoute
+);
 
-app.use("/api/dashboard", dashboardRoute);
+app.use(
+  "/api/dashboard",
+  dashboardRoute
+);
 
-app.use("/api/reports", reportRoute);
+app.use(
+  "/api/reports",
+  reportRoute
+);
 
 // =======================================
 // Export

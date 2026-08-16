@@ -208,7 +208,7 @@ function LowStockTable({ medicines = [] }) {
                   Medicine
                 </th>
 
-                <th
+                {/* <th
                   className="
                     px-3
                     py-3
@@ -222,7 +222,7 @@ function LowStockTable({ medicines = [] }) {
                   "
                 >
                   Category
-                </th>
+                </th> */}
 
                 <th
                   className="
@@ -341,7 +341,7 @@ function LowStockTable({ medicines = [] }) {
 
                   {/* Category */}
 
-                  <td
+                  {/* <td
                     className="
                       px-3
                       py-4
@@ -352,7 +352,7 @@ function LowStockTable({ medicines = [] }) {
                     "
                   >
                     {item.medicine?.category || "—"}
-                  </td>
+                  </td> */}
 
                   {/* Current Stock */}
 

@@ -111,31 +111,32 @@ function CategorySalesChart({ data = [] }) {
             </Pie>
 
             {/* Center text */}
-            <text
-              x="50%"
-              y="42%"
-              textAnchor="middle"
-              dominantBaseline="middle"
-            >
-              <tspan
-                x="50%"
-                dy="-4"
-                fontSize="20"
-                fontWeight="700"
-                fill="#f8fafc"
-              >
-                ₹{totalSales.toLocaleString("en-IN")}
-              </tspan>
+        {/* Center text */}
+<text
+  x="50%"
+  y="42%"
+  textAnchor="middle"
+  dominantBaseline="middle"
+>
+  <tspan
+    x="50%"
+    dy="-4"
+    fontSize="20"
+    fontWeight="700"
+    className="fill-slate-900 dark:fill-white"
+  >
+    ₹{totalSales.toLocaleString("en-IN")}
+  </tspan>
 
-              <tspan
-                x="50%"
-                dy="24"
-                fontSize="11"
-                fill="#94a3b8"
-              >
-                Total Sales
-              </tspan>
-            </text>
+  <tspan
+    x="50%"
+    dy="24"
+    fontSize="11"
+    className="fill-slate-400 dark:fill-slate-400"
+  >
+    Total Sales
+  </tspan>
+</text>
 
             {/* Tooltip */}
             <Tooltip

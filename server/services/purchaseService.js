@@ -73,42 +73,67 @@ export const createPurchaseService =
     }
 
     // =====================================
-    // Generate Invoice Number
+    // Invoice Number
+    //
+    // Use what the user typed in (the
+    // supplier's real invoice number) when
+    // provided. Only auto-generate one as a
+    // fallback if the field was left blank.
     // =====================================
 
-    let invoiceNumber;
+    let invoiceNumber =
+      data.invoiceNumber &&
+      data.invoiceNumber.trim()
+        ? data.invoiceNumber.trim()
+        : null;
 
-    const lastPurchase =
-      await Purchase.findOne()
-        .sort({
-          createdAt: -1,
-        })
-        .select(
-          "invoiceNumber"
+    if (invoiceNumber) {
+      const duplicateInvoice =
+        await Purchase.findOne({
+          invoiceNumber,
+        });
+
+      if (duplicateInvoice) {
+        const error = new Error(
+          "This invoice number has already been used. Please check and enter a different one."
         );
 
-    if (
-      lastPurchase &&
-      lastPurchase.invoiceNumber &&
-      lastPurchase.invoiceNumber.startsWith(
-        "PUR-"
-      )
-    ) {
-      const lastNumber =
-        parseInt(
-          lastPurchase.invoiceNumber.split(
-            "-"
-          )[1],
-          10
-        );
-
-      invoiceNumber =
-        `PUR-${String(
-          lastNumber + 1
-        ).padStart(5, "0")}`;
+        error.statusCode = 409;
+        throw error;
+      }
     } else {
-      invoiceNumber =
-        "PUR-00001";
+      const lastPurchase =
+        await Purchase.findOne()
+          .sort({
+            createdAt: -1,
+          })
+          .select(
+            "invoiceNumber"
+          );
+
+      if (
+        lastPurchase &&
+        lastPurchase.invoiceNumber &&
+        lastPurchase.invoiceNumber.startsWith(
+          "PUR-"
+        )
+      ) {
+        const lastNumber =
+          parseInt(
+            lastPurchase.invoiceNumber.split(
+              "-"
+            )[1],
+            10
+          );
+
+        invoiceNumber =
+          `PUR-${String(
+            lastNumber + 1
+          ).padStart(5, "0")}`;
+      } else {
+        invoiceNumber =
+          "PUR-00001";
+      }
     }
 
     // =====================================

@@ -14,14 +14,16 @@ const IMAGE_URL = import.meta.env.VITE_BASE_URL.replace(
 // Get proper image URL
 // ==========================================
 
-const getImageUrl = (image) => {
+const getImageUrl = (image, updatedAt) => {
   if (!image) return null;
 
   if (
     image.startsWith("http://") ||
     image.startsWith("https://")
   ) {
-    return image;
+    return `${image}${
+      image.includes("?") ? "&" : "?"
+    }v=${updatedAt || Date.now()}`;
   }
 
   let imageName = image.replace(/^\/+/, "");
@@ -31,7 +33,10 @@ const getImageUrl = (image) => {
     ""
   );
 
-  return `${IMAGE_URL}/uploads/${imageName}`;
+  const url = `${IMAGE_URL}/uploads/${imageName}`;
+
+  // Cache busting
+  return `${url}?v=${updatedAt || Date.now()}`;
 };
 
 // ==========================================
@@ -112,7 +117,6 @@ function MedicineTable({
             items-center justify-center
             rounded-full
             bg-blue-50
-
             dark:bg-blue-950/50
           "
         >
@@ -164,7 +168,6 @@ function MedicineTable({
             items-center justify-center
             rounded-2xl
             bg-slate-100
-
             dark:bg-slate-800
           "
         >
@@ -224,7 +227,6 @@ function MedicineTable({
             dark:border-slate-700
           "
         >
-
           {[
             "Medicine",
             "Generic",
@@ -277,7 +279,6 @@ function MedicineTable({
               Actions
             </th>
           )}
-
         </tr>
       </thead>
 
@@ -286,14 +287,14 @@ function MedicineTable({
       ========================================== */}
 
       <tbody>
-
         {medicines.map((medicine) => {
           const expiryStatus = getExpiryStatus(
             medicine.expiryDate
           );
 
           const imageUrl = getImageUrl(
-            medicine.medicineImage
+            medicine.medicineImage,
+            medicine.updatedAt
           );
 
           return (
@@ -303,9 +304,7 @@ function MedicineTable({
                 border-b
                 border-slate-100
                 transition
-
                 hover:bg-slate-50
-
                 dark:border-slate-800
                 dark:hover:bg-slate-800/50
               "
@@ -314,13 +313,11 @@ function MedicineTable({
               {/* Medicine */}
 
               <td className="px-4 py-4">
-
                 <div className="flex items-center gap-3">
 
                   {/* Image */}
 
                   <div className="h-12 w-12 shrink-0">
-
                     {imageUrl ? (
                       <img
                         src={imageUrl}
@@ -333,7 +330,6 @@ function MedicineTable({
                           border-slate-200
                           bg-white
                           object-cover
-
                           dark:border-slate-700
                           dark:bg-slate-800
                         "
@@ -368,9 +364,7 @@ function MedicineTable({
                         justify-center
                         rounded-xl
                         bg-blue-50
-
                         dark:bg-blue-950/50
-
                         ${
                           imageUrl
                             ? "hidden"
@@ -386,13 +380,11 @@ function MedicineTable({
                         "
                       />
                     </div>
-
                   </div>
 
                   {/* Medicine name */}
 
                   <div className="min-w-0">
-
                     <p
                       className="
                         font-semibold
@@ -413,11 +405,8 @@ function MedicineTable({
                     >
                       Medicine
                     </p>
-
                   </div>
-
                 </div>
-
               </td>
 
               {/* Generic */}
@@ -437,7 +426,6 @@ function MedicineTable({
               {/* Company */}
 
               <td className="px-4 py-4">
-
                 <span
                   className="
                     text-sm
@@ -448,13 +436,11 @@ function MedicineTable({
                 >
                   {medicine.company || "—"}
                 </span>
-
               </td>
 
               {/* Category */}
 
               <td className="px-4 py-4">
-
                 <span
                   className="
                     inline-flex
@@ -465,20 +451,17 @@ function MedicineTable({
                     text-xs
                     font-semibold
                     text-blue-600
-
                     dark:bg-blue-950/50
                     dark:text-blue-400
                   "
                 >
                   {medicine.category || "—"}
                 </span>
-
               </td>
 
               {/* Batch */}
 
               <td className="px-4 py-4">
-
                 <span
                   className="
                     rounded-md
@@ -489,22 +472,18 @@ function MedicineTable({
                     text-xs
                     font-medium
                     text-slate-600
-
                     dark:bg-slate-800
                     dark:text-slate-400
                   "
                 >
                   {medicine.batchNumber || "—"}
                 </span>
-
               </td>
 
               {/* Stock */}
 
               <td className="px-4 py-4 text-center">
-
                 <div className="flex flex-col items-center gap-1">
-
                   <span
                     className={`
                       font-bold
@@ -525,7 +504,6 @@ function MedicineTable({
                       py-0.5
                       text-[10px]
                       font-semibold
-
                       ${
                         medicine.stock <= 10
                           ? "bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-400"
@@ -537,9 +515,7 @@ function MedicineTable({
                       ? "Low Stock"
                       : "In Stock"}
                   </span>
-
                 </div>
-
               </td>
 
               {/* Unit */}
@@ -560,7 +536,6 @@ function MedicineTable({
               {/* Purchase */}
 
               <td className="px-4 py-4 text-center">
-
                 <span
                   className="
                     font-medium
@@ -573,13 +548,11 @@ function MedicineTable({
                     medicine.purchasePrice || 0
                   ).toLocaleString("en-IN")}
                 </span>
-
               </td>
 
               {/* Selling */}
 
               <td className="px-4 py-4 text-center">
-
                 <span
                   className="
                     font-semibold
@@ -592,13 +565,11 @@ function MedicineTable({
                     medicine.sellingPrice || 0
                   ).toLocaleString("en-IN")}
                 </span>
-
               </td>
 
               {/* GST */}
 
               <td className="px-4 py-4 text-center">
-
                 <span
                   className="
                     rounded-full
@@ -608,22 +579,18 @@ function MedicineTable({
                     text-xs
                     font-semibold
                     text-slate-600
-
                     dark:bg-slate-800
                     dark:text-slate-400
                   "
                 >
                   {medicine.gst || 0}%
                 </span>
-
               </td>
 
               {/* Expiry */}
 
               <td className="px-4 py-4">
-
                 <div className="flex flex-col items-center gap-1">
-
                   <span
                     className={`
                       inline-flex
@@ -669,16 +636,13 @@ function MedicineTable({
                         )
                       : "—"}
                   </div>
-
                 </div>
-
               </td>
 
               {/* Actions */}
 
               {isAdmin && (
                 <td className="px-4 py-4">
-
                   <div className="flex justify-center gap-2">
 
                     <button
@@ -697,10 +661,8 @@ function MedicineTable({
                         bg-amber-50
                         text-amber-600
                         transition
-
                         hover:bg-amber-100
                         hover:text-amber-700
-
                         dark:bg-amber-950/50
                         dark:text-amber-400
                         dark:hover:bg-amber-900/60
@@ -726,10 +688,8 @@ function MedicineTable({
                         bg-red-50
                         text-red-600
                         transition
-
                         hover:bg-red-100
                         hover:text-red-700
-
                         dark:bg-red-950/50
                         dark:text-red-400
                         dark:hover:bg-red-900/60
@@ -740,16 +700,12 @@ function MedicineTable({
                     </button>
 
                   </div>
-
                 </td>
               )}
-
             </tr>
           );
         })}
-
       </tbody>
-
     </table>
   );
 }

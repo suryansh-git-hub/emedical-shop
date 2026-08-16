@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import {
-  Loader,
   Receipt,
   UserRound,
   ShoppingCart,
@@ -24,11 +23,6 @@ import {
 const Sales = () => {
   const navigate = useNavigate();
 
-  // ==========================================
-  // Loading
-  // ==========================================
-
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const [customerSearching, setCustomerSearching] =
@@ -143,28 +137,6 @@ const Sales = () => {
       setMedicineSearching(false);
     }
   };
-
-  // ==========================================
-  // Initial Load
-  // ==========================================
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-
-        // Load initial data
-        await Promise.all([
-          fetchCustomers(""),
-          fetchMedicines(""),
-        ]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, []);
 
   // ==========================================
   // CUSTOMER SEARCH DEBOUNCING
@@ -528,74 +500,6 @@ const Sales = () => {
       setSaving(false);
     }
   };
-
-  // ==========================================
-  // Loading
-  // ==========================================
-
-  if (loading) {
-    return (
-      <div
-        className="
-          flex
-          min-h-[60vh]
-          flex-col
-          items-center
-          justify-center
-          bg-transparent
-        "
-      >
-
-        <div
-          className="
-            flex
-            h-14
-            w-14
-            items-center
-            justify-center
-            rounded-2xl
-            bg-blue-50
-
-            dark:bg-blue-950/50
-          "
-        >
-
-          <Loader
-            className="
-              animate-spin
-              text-blue-600
-              dark:text-blue-400
-            "
-            size={26}
-          />
-
-        </div>
-
-        <p
-          className="
-            mt-4
-            font-semibold
-            text-slate-700
-            dark:text-slate-300
-          "
-        >
-          Loading billing...
-        </p>
-
-        <p
-          className="
-            mt-1
-            text-sm
-            text-slate-400
-            dark:text-slate-500
-          "
-        >
-          Preparing customers and medicines.
-        </p>
-
-      </div>
-    );
-  }
 
   // ==========================================
   // UI

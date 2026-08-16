@@ -258,8 +258,7 @@ const PurchaseForm = ({
                   formData.invoiceNumber
                 }
                 onChange={handleChange}
-                required
-                placeholder="Enter invoice number"
+                placeholder="Enter supplier's invoice number (optional)"
                 className="
                   w-full
                   rounded-xl
@@ -292,6 +291,13 @@ const PurchaseForm = ({
               />
 
             </div>
+
+            <p className="mt-1.5 text-xs text-slate-400 dark:text-slate-500">
+              If this delivery came with a bill,
+              enter that exact number here.
+              Otherwise leave it blank and one
+              will be generated for you.
+            </p>
           </div>
 
           {/* Purchase Date */}
@@ -557,6 +563,13 @@ const PurchaseForm = ({
                             {
                               medicine.medicineName
                             }
+                            {medicine.batchNumber
+                              ? ` — Batch: ${medicine.batchNumber}`
+                              : ""}
+                            {" "}
+                            (Stock:{" "}
+                            {medicine.stock ?? 0}
+                            )
                           </option>
                         )
                       )}
@@ -795,7 +808,7 @@ const PurchaseForm = ({
       >
         <ShoppingCart size={18} />
 
-        Save Purchase
+        Purchase
       </button>
 
     </form>
