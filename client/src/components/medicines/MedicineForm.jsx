@@ -6,7 +6,7 @@ import {
   IndianRupee,
   Package,
   ImagePlus,
-  FileText,
+
 } from "lucide-react";
 
 function MedicineForm({ onSubmit, defaultValues }) {
@@ -1083,102 +1083,7 @@ function MedicineForm({ onSubmit, defaultValues }) {
         </label>
       </div>
 
-      {/* ==========================================
-          Description
-      ========================================== */}
-
-      <div
-        className="
-          border-t
-          border-slate-100
-          pt-6
-
-          dark:border-slate-800
-        "
-      >
-
-        <div className="mb-4 flex items-center gap-3">
-
-          <div
-            className="
-              flex
-              h-9
-              w-9
-              items-center
-              justify-center
-              rounded-lg
-              bg-slate-100
-
-              dark:bg-slate-800
-            "
-          >
-            <FileText
-              size={19}
-              className="
-                text-slate-600
-                dark:text-slate-400
-              "
-            />
-          </div>
-
-          <div>
-
-            <h3
-              className="
-                font-semibold
-                text-slate-900
-                dark:text-slate-100
-              "
-            >
-              Additional Information
-            </h3>
-
-            <p
-              className="
-                text-xs
-                text-slate-500
-                dark:text-slate-400
-              "
-            >
-              Add an optional description for this medicine.
-            </p>
-
-          </div>
-
-        </div>
-
-        <textarea
-          rows={4}
-          placeholder="Enter medicine description..."
-          {...register("description")}
-          className="
-            w-full
-            resize-none
-            rounded-lg
-            border
-            border-slate-200
-            bg-white
-            px-3
-            py-2.5
-            text-sm
-            text-slate-700
-            placeholder:text-slate-400
-            outline-none
-            transition
-
-            focus:border-blue-400
-            focus:ring-4
-            focus:ring-blue-50
-
-            dark:border-slate-700
-            dark:bg-slate-800
-            dark:text-slate-100
-            dark:placeholder:text-slate-500
-            dark:focus:border-blue-500
-            dark:focus:ring-blue-950
-          "
-        />
-      </div>
+ 
 
       {/* ==========================================
           Submit

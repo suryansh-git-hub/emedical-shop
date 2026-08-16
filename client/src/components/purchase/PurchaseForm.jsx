@@ -231,7 +231,7 @@ const PurchaseForm = ({
 
           {/* Invoice */}
 
-          <div>
+          {/* <div>
             <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
               Invoice Number
             </label>
@@ -298,7 +298,7 @@ const PurchaseForm = ({
               Otherwise leave it blank and one
               will be generated for you.
             </p>
-          </div>
+          </div> */}
 
           {/* Purchase Date */}
 
