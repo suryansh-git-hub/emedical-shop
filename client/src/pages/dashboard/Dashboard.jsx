@@ -7,8 +7,11 @@ import {
   TriangleAlert,
   RefreshCw,
   PackageSearch,
-  ShoppingCart,
+  Package,
 } from "lucide-react";
+
+import { useNavigate } from "react-router-dom";
+
 import toast from "react-hot-toast";
 
 import { useAuth } from "../../context/AuthContext";
@@ -27,6 +30,8 @@ import CategorySalesChart from "../../components/dashboard/CategorySalesChart";
 
 function Dashboard() {
   const { user } = useAuth();
+
+  const navigate = useNavigate();
 
   const isAdmin = user?.role === "admin";
 
@@ -162,18 +167,6 @@ function Dashboard() {
             Dashboard
           </h1>
 
-          {/* <p
-            className="
-              mt-1 text-sm
-              text-slate-500
-              sm:text-base
-              dark:text-slate-400
-            "
-          >
-            Welcome back, {user?.name || "Admin"}. Here's what's
-            happening in your medical shop.
-          </p> */}
-
         </div>
 
         {/* Refresh */}
@@ -275,6 +268,10 @@ function Dashboard() {
           "
         >
 
+          {/* =====================================================
+              Medicines
+          ===================================================== */}
+
           <StatCard
             title="Medicines"
             value={dashboard.totalMedicines}
@@ -286,7 +283,12 @@ function Dashboard() {
               />
             }
             color="bg-blue-500"
+            onClick={() => navigate("/medicines")}
           />
+
+          {/* =====================================================
+              Suppliers
+          ===================================================== */}
 
           {isAdmin && (
             <StatCard
@@ -300,8 +302,13 @@ function Dashboard() {
                 />
               }
               color="bg-emerald-500"
+              onClick={() => navigate("/suppliers")}
             />
           )}
+
+          {/* =====================================================
+              Customers
+          ===================================================== */}
 
           <StatCard
             title="Customers"
@@ -314,7 +321,12 @@ function Dashboard() {
               />
             }
             color="bg-orange-500"
+            onClick={() => navigate("/customers")}
           />
+
+          {/* =====================================================
+              Today's Sales
+          ===================================================== */}
 
           <StatCard
             title="Today's Sales"
@@ -329,7 +341,12 @@ function Dashboard() {
               />
             }
             color="bg-violet-500"
+            onClick={() => navigate("/reports")}
           />
+
+          {/* =====================================================
+              Monthly Revenue
+          ===================================================== */}
 
           <StatCard
             title="Monthly Revenue"
@@ -344,7 +361,31 @@ function Dashboard() {
               />
             }
             color="bg-cyan-500"
+            onClick={() => navigate("/reports")}
           />
+
+          
+          {/* =====================================================
+              Total Stock Units
+          ===================================================== */}
+
+          <StatCard
+            title="Total Stock Units"
+            value={dashboard.totalStock || 0}
+            subtitle="Units currently in inventory"
+            icon={
+              <Package
+                size={24}
+                className="text-white"
+              />
+            }
+            color="bg-purple-500"
+            onClick={() => navigate("/inventory")}
+          />
+
+          {/* =====================================================
+              Expired Medicines
+          ===================================================== */}
 
           <StatCard
             title="Expired Medicines"
@@ -359,7 +400,12 @@ function Dashboard() {
               />
             }
             color="bg-red-500"
+            onClick={() => navigate("/inventory")}
           />
+
+          {/* =====================================================
+              Low Stock
+          ===================================================== */}
 
           <StatCard
             title="Low Stock"
@@ -374,22 +420,9 @@ function Dashboard() {
               />
             }
             color="bg-amber-500"
+            onClick={() => navigate("/inventory")}
           />
 
-          {isAdmin && (
-            <StatCard
-              title="Total Purchases"
-              value={dashboard.totalPurchases || 0}
-              subtitle="Purchase records"
-              icon={
-                <ShoppingCart
-                  size={24}
-                  className="text-white"
-                />
-              }
-              color="bg-purple-500"
-            />
-          )}
 
         </div>
 

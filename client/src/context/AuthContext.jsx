@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { logoutUser } from "../services/authService.js";
 
 const AuthContext = createContext();
 
@@ -25,7 +26,23 @@ function AuthProvider({ children }) {
     localStorage.setItem("token", jwtToken);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      // Let the server know this session
+      // ended (useful for audit logs, and
+      // future server-side session/token
+      // invalidation). If this fails (e.g.
+      // no internet), we still log the user
+      // out locally below - they shouldn't
+      // get stuck unable to log out.
+      await logoutUser();
+    } catch (error) {
+      console.error(
+        "Logout API call failed:",
+        error
+      );
+    }
+
     setUser(null);
     setToken("");
 

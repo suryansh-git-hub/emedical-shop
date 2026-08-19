@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import {
-  
   RefreshCw,
   PackageSearch,
 } from "lucide-react";
@@ -63,6 +62,10 @@ function Medicines() {
 
   const [company, setCompany] = useState("");
 
+  // Debounced company search
+  const [debouncedCompany, setDebouncedCompany] =
+    useState("");
+
   const [expiry, setExpiry] = useState("");
 
   // ==========================================
@@ -85,7 +88,7 @@ function Medicines() {
     useState(1);
 
   // ==========================================
-  // Debouncing
+  // Debouncing - Medicine Search
   // ==========================================
 
   useEffect(() => {
@@ -100,6 +103,21 @@ function Medicines() {
   }, [search]);
 
   // ==========================================
+  // Debouncing - Company Search
+  // ==========================================
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedCompany(company);
+      setPage(1);
+    }, 500);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [company]);
+
+  // ==========================================
   // Fetch Medicines
   // ==========================================
 
@@ -110,7 +128,7 @@ function Medicines() {
       const response = await getMedicines({
         search: debouncedSearch,
         category,
-        company,
+        company: debouncedCompany,
         expiry,
         sortBy,
         order,
@@ -142,7 +160,7 @@ function Medicines() {
   }, [
     debouncedSearch,
     category,
-    company,
+    debouncedCompany,
     expiry,
     sortBy,
     order,
@@ -259,7 +277,10 @@ function Medicines() {
     setDebouncedSearch("");
 
     setCategory("");
+
     setCompany("");
+    setDebouncedCompany("");
+
     setExpiry("");
 
     setSortBy("createdAt");
@@ -288,10 +309,6 @@ function Medicines() {
 
         <div>
           <div className="mb-2 flex items-center gap-2">
-
-          
-  
-
           </div>
 
           <h1
@@ -300,7 +317,6 @@ function Medicines() {
               tracking-tight
               text-slate-900
               sm:text-3xl
-
               dark:text-white
             "
           >
@@ -313,7 +329,6 @@ function Medicines() {
               text-sm
               text-slate-500
               sm:text-base
-
               dark:text-slate-400
             "
           >
@@ -341,7 +356,6 @@ function Medicines() {
           bg-white
           p-5
           shadow-sm
-
           dark:border-slate-700
           dark:bg-slate-900
           dark:shadow-none
@@ -391,17 +405,13 @@ function Medicines() {
               font-medium
               text-slate-600
               transition
-
               hover:border-blue-200
               hover:bg-blue-50
               hover:text-blue-600
-
               sm:flex
-
               dark:border-slate-700
               dark:bg-slate-800
               dark:text-slate-300
-
               dark:hover:border-slate-600
               dark:hover:bg-slate-700
               dark:hover:text-blue-400
@@ -461,9 +471,7 @@ function Medicines() {
               text-slate-600
               transition
               hover:bg-slate-50
-
               sm:hidden
-
               dark:border-slate-700
               dark:bg-slate-800
               dark:text-slate-300
@@ -499,6 +507,29 @@ function Medicines() {
           </div>
         )}
 
+        {/* Company Debounce Indicator */}
+
+        {company !== debouncedCompany && (
+          <div
+            className="
+              mt-2
+              flex
+              items-center
+              gap-2
+              text-xs
+              text-slate-400
+              dark:text-slate-500
+            "
+          >
+            <RefreshCw
+              size={13}
+              className="animate-spin"
+            />
+
+            Searching company...
+          </div>
+        )}
+
       </div>
 
       {/* ==========================================
@@ -512,7 +543,6 @@ function Medicines() {
           border border-slate-200
           bg-white
           shadow-sm
-
           dark:border-slate-700
           dark:bg-slate-900
           dark:shadow-none
@@ -530,11 +560,9 @@ function Medicines() {
             border-slate-200
             px-5
             py-5
-
             sm:flex-row
             sm:items-center
             sm:justify-between
-
             dark:border-slate-700
           "
         >
@@ -547,7 +575,6 @@ function Medicines() {
                 items-center justify-center
                 rounded-xl
                 bg-slate-100
-
                 dark:bg-slate-800
               "
             >
@@ -597,7 +624,6 @@ function Medicines() {
                 text-xs
                 font-semibold
                 text-blue-600
-
                 dark:bg-blue-950/60
                 dark:text-blue-400
               "
@@ -631,7 +657,6 @@ function Medicines() {
               border-slate-200
               px-5
               py-4
-
               dark:border-slate-700
             "
           >

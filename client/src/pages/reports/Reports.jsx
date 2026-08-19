@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Loader } from "lucide-react";
 import { exportToExcel } from "../../utils/exportExcel";
@@ -312,7 +312,17 @@ exportToPDF({
   );
 };
 
+  // A ref (not state) so this survives
+  // React StrictMode's dev-mode double
+  // mount/unmount/mount without triggering
+  // a re-render. Makes sure loadReports()
+  // only actually runs once.
+  const hasLoadedRef = useRef(false);
+
   useEffect(() => {
+    if (hasLoadedRef.current) return;
+    hasLoadedRef.current = true;
+
     loadReports();
   }, []);
 

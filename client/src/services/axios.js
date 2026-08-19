@@ -15,6 +15,29 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    // Drop empty/null/undefined query params
+    // so URLs don't show things like
+    // "?search=&page=1" when no filter is
+    // actually applied. Purely cosmetic /
+    // cleaner network logs - the backend
+    // already treats a missing search the
+    // same as an empty one.
+    if (config.params) {
+      Object.keys(config.params).forEach(
+        (key) => {
+          const value = config.params[key];
+
+          if (
+            value === "" ||
+            value === null ||
+            value === undefined
+          ) {
+            delete config.params[key];
+          }
+        }
+      );
+    }
+
     return config;
   },
   (error) => Promise.reject(error)

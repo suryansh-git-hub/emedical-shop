@@ -609,7 +609,11 @@ export const getStockMovementHistoryService =
       await Purchase.find({
         "medicines.medicine":
           medicineId,
-      }).lean();
+      })
+        .select(
+          "medicines invoiceNumber purchaseDate createdAt"
+        )
+        .lean();
 
     // =======================================
     // Get Sales
@@ -635,7 +639,15 @@ export const getStockMovementHistoryService =
                 medicineId.toString()
             )
             .map((item) => ({
+              // purchaseDate is just the
+              // calendar day the user picked
+              // (no real time), so it always
+              // shows as 5:30am / midnight
+              // UTC. createdAt is the actual
+              // moment this purchase was
+              // logged, so use that instead.
               date:
+                purchase.createdAt ||
                 purchase.purchaseDate,
 
               type: "PURCHASE",

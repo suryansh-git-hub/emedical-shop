@@ -4,10 +4,12 @@ function StatCard({
   subtitle,
   icon,
   color,
+  onClick,
 }) {
   return (
     <div
-      className="
+      onClick={onClick}
+      className={`
         group
         relative
         overflow-hidden
@@ -27,7 +29,9 @@ function StatCard({
         dark:shadow-none
         dark:hover:border-slate-600
         dark:hover:bg-slate-800
-      "
+
+        ${onClick ? "cursor-pointer" : ""}
+      `}
     >
 
       {/* Accent bar */}

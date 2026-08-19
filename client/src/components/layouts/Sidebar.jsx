@@ -152,7 +152,7 @@ function Sidebar({ collapsed = false }) {
               text-slate-500
             "
           >
-            Main Menu
+       
           </p>
         )}
 
