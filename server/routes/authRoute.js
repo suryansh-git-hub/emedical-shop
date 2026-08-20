@@ -10,8 +10,6 @@ import {
 } from "../controllers/authController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
-import roleMiddleware from "../middleware/roleMiddleware.js";
-import { ROLES } from "../constants/roles.js";
 
 const router = express.Router();
 
@@ -56,7 +54,6 @@ router.put(
 router.get(
   "/profile",
   authMiddleware,
-  roleMiddleware(ROLES.ADMIN),
   getProfile
 );
 

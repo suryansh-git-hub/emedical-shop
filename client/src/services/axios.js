@@ -5,16 +5,18 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  // The auth token now lives in an httpOnly
+  // cookie set by the server (not
+  // localStorage). withCredentials tells
+  // the browser to include that cookie on
+  // every request, even though our
+  // frontend and backend are on different
+  // domains.
+  withCredentials: true,
 });
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
-
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
     // Drop empty/null/undefined query params
     // so URLs don't show things like
     // "?search=&page=1" when no filter is
@@ -47,7 +49,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
+      // Clear any leftover local user info
+      // and send them back to login. The
+      // actual auth cookie, if invalid or
+      // expired, is the server's to clear.
       localStorage.removeItem("user");
 
       window.location.href = "/";

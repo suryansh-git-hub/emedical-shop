@@ -1,5 +1,5 @@
 import {
-  Printer,
+ Printer,
   ArrowLeft,
   Download,
 } from "lucide-react";
@@ -46,7 +46,7 @@ const InvoiceActions = () => {
 
       {/* Print */}
 
-      <button
+       <button
         onClick={handlePrint}
         className="
           flex
@@ -64,7 +64,7 @@ const InvoiceActions = () => {
       >
         <Printer size={18} />
         Print
-      </button>
+      </button> 
 
       {/* Download */}
 

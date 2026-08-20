@@ -4,16 +4,29 @@ import { MESSAGES } from "../constants/messages.js";
 
 const authMiddleware = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
+    // Prefer the httpOnly cookie (how the
+    // browser sends it now). Fall back to
+    // the Authorization header so tools
+    // like Postman/API testing still work.
+    let token = req.cookies?.token;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!token) {
+      const authHeader = req.headers.authorization;
+
+      if (
+        authHeader &&
+        authHeader.startsWith("Bearer ")
+      ) {
+        token = authHeader.split(" ")[1];
+      }
+    }
+
+    if (!token) {
       return res.status(401).json({
         success: false,
         message: MESSAGES.UNAUTHORIZED,
       });
     }
-
-    const token = authHeader.split(" ")[1];
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 

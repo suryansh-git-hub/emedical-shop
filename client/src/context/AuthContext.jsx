@@ -1,40 +1,68 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { logoutUser } from "../services/authService.js";
+import { getProfile, logoutUser } from "../services/authService.js";
 
 const AuthContext = createContext();
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [loading, setLoading] = useState(true);
 
+  // ========================================
+  // On app load, ask the server "am I still
+  // logged in?" The auth token lives in an
+  // httpOnly cookie now, so JS can't read it
+  // directly to check - but the browser
+  // sends it automatically with this
+  // request, so if it's valid the server
+  // tells us who we are.
+  // ========================================
+
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const checkLoggedIn = async () => {
+      try {
+        const response = await getProfile();
 
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+        setUser(response.user);
 
-    setLoading(false);
+        localStorage.setItem(
+          "user",
+          JSON.stringify(response.user)
+        );
+      } catch (error) {
+        // Not logged in / cookie expired
+        setUser(null);
+
+        localStorage.removeItem("user");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkLoggedIn();
   }, []);
 
-  const login = (userData, jwtToken) => {
+  const login = (userData) => {
+    // The token itself is already set as an
+    // httpOnly cookie by the server's login
+    // response - we never see or handle it
+    // here. We just keep a copy of the
+    // (non-sensitive) user info for the UI.
     setUser(userData);
-    setToken(jwtToken);
 
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", jwtToken);
+    localStorage.setItem(
+      "user",
+      JSON.stringify(userData)
+    );
   };
 
   const logout = async () => {
     try {
-      // Let the server know this session
-      // ended (useful for audit logs, and
-      // future server-side session/token
-      // invalidation). If this fails (e.g.
-      // no internet), we still log the user
-      // out locally below - they shouldn't
-      // get stuck unable to log out.
+      // Ask the server to clear the auth
+      // cookie. httpOnly cookies can only be
+      // cleared by the server, never by
+      // client-side JS - so this call is
+      // required, not optional, for a
+      // complete logout.
       await logoutUser();
     } catch (error) {
       console.error(
@@ -44,21 +72,18 @@ function AuthProvider({ children }) {
     }
 
     setUser(null);
-    setToken("");
 
     localStorage.removeItem("user");
-    localStorage.removeItem("token");
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        token,
         loading,
         login,
         logout,
-        isAuthenticated: !!token,
+        isAuthenticated: !!user,
       }}
     >
       {children}

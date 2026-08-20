@@ -60,6 +60,23 @@ export const resetPassword = async (
 };
 
 // ==========================
+// Get Profile
+// ==========================
+// Used to check whether the person is
+// still logged in (the token cookie is
+// httpOnly, so JS can't read it directly -
+// this is how we ask the server "am I
+// logged in, and if so, who am I?").
+
+export const getProfile = async () => {
+  const response = await api.get(
+    "/auth/profile"
+  );
+
+  return response.data;
+};
+
+// ==========================
 // Logout
 // ==========================
 
